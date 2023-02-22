@@ -27,7 +27,7 @@ tokens = [
     'GREATER', 'LESS', 'AAND', 'OOR', 'NOT', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL', 'LEFTSHIFT', 'RIGHTSHIFT',
     'PERIOD', 'COMMA',
     'INT', 'ID', 'CHAR','STRING', 'LINEENDING', 'WHITESPACE', 'COMMENTS', 
-#    'UNKONWN', 
+    'UNKONWN', 
 ] + list(reserved.values())
 
 #LIST OF REGULAR EXPRESSION RULES
@@ -63,25 +63,21 @@ t_PERIOD = r'\.'
 t_COMMA = r','
 
  #REGULAR EXPRESSIONS WITH RULES
- 
+
 def t_INT(t):
-    r'\d+'
-    try:
-        t.value = int(t.value)    
-    except ValueError:
-        print ("Integer value too large ", t.value)
-        t.value = 0
+    r'[0-9]+'
+    t.value = int(t.value)
     return t
 
 
 #note there is not _ in ID
 def t_ID(t):
-    r'[a-zA-Z][a-zA-Z0-9]*'
+    r'[a-zA-Z_][a-zA-Z0-9_]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
 
 def t_CHAR(t):
-    r'\'[a-zA-Z_]\''
+    r'\'[a-zA-Z_ !#$%&()*+,.-/:;<=>?@[\]^`{\}~]\''
     return t
 
 def t_STRING(t):
@@ -89,10 +85,11 @@ def t_STRING(t):
     return t
 
 def t_WHITESPACE(t):
-    r' [ ]+ '
+    r' [ \t]+ '
 
 def t_NEWLINE(t):
     r'[\n\r]+'
+    t.lexer.lineno += len(t.value)
 
 def t_COMMENTS(t):
     r'//[^\r\n]*'
@@ -100,13 +97,10 @@ def t_COMMENTS(t):
 
 def t_error(t):
     t.type = 'UNKNOWN'
-    #t.value = t
-    t.lexer.skip(1)
+    t.value = t.value[0]
+    x = t.lexer.skip(1)
     return t
 
-
-import ply.lex as lex
-lexer = lex.lex()
 
 # Test it out
 data = '''
@@ -133,7 +127,7 @@ void
 while
 ifelse
 classes
-//'bool' //Unknown
+//'bool'    //Unknown
 "bool"
 BOOL
 IF
@@ -150,30 +144,43 @@ IF
 >=
 > <
 && ||
-!
+!   'r'
 +-*/
 += -= *= /=
 << >>
 . ,
 
 123
+5555
+1513513515313513599999999
 "123"
 
 ThisIsId
-ThisIsNot_ID
+ThisIs__ID
+'test'
+'t'
+'!'
+'"'
+'$4'
+
+
 '''
 
-#FIXME Single quoted stuff = error if not char
-#12.255?
-#ThisIsNot_ID
+
+
+
+import ply.lex as lex
+lexer = lex.lex()
 
  
 # Give the lexer some input
 lexer.input(data)
  
+print('{:15}'.format('TAG'), '{:<10}'.format("Line #"), 'LEXEME')
+print('{:-<35}'.format('-'))
 # Tokenize
 while True:
     tok = lexer.token()
     if not tok: 
         break      # No more input
-    print(tok.type, tok.value)
+    print('{:<15}'.format(tok.type), '{:<10}'.format(tok.lineno), tok.value)
