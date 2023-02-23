@@ -6,6 +6,7 @@ Things to add:
     add -l to command line
     do .main function to call lexer. 
     finish test cases
+    Add EOF token
     
     #FIXME Single quoted stuff = error if not char
 
