@@ -81,7 +81,7 @@ def t_CHAR(t):
     return t
 
 def t_STRING(t):
-    r'"[a-zA-Z_ 0-9][a-zA-Z_ 0-9]*"'
+    r'"[a-zA-Z_ !#$%&()*+,.-/:;<=>?@[\]^`{\}~]*"'
     return t
 
 def t_WHITESPACE(t):
@@ -100,6 +100,29 @@ def t_error(t):
     t.value = t.value[0]
     x = t.lexer.skip(1)
     return t
+
+
+def theLexerFunction(stuff):
+    import ply.lex as lex
+    lexer = lex.lex()
+    lexer.input(stuff)
+    print('{:15}'.format('TAG'), '{:<10}'.format("Line #"), 'LEXEME')
+    print('{:-<35}'.format('-'))
+
+    while True:
+        tok = lexer.token()
+        if not tok: 
+            break      # No more input
+        print('{:<15}'.format(tok.type), '{:<10}'.format(tok.lineno), tok.value)
+
+
+def theLexerTester(stuff):
+    import ply.lex as lex
+    lexer = lex.lex()
+    lexer.input(stuff)
+    tok = lexer.token()
+    return tok
+
 
 
 # Test it out
@@ -162,25 +185,9 @@ ThisIs__ID
 '!'
 '"'
 '$4'
-
+false*
+//This is a comment 434$3499 bool !@##%T@$%& 't 't' 
 
 '''
 
-
-
-
-import ply.lex as lex
-lexer = lex.lex()
-
- 
-# Give the lexer some input
-lexer.input(data)
- 
-print('{:15}'.format('TAG'), '{:<10}'.format("Line #"), 'LEXEME')
-print('{:-<35}'.format('-'))
-# Tokenize
-while True:
-    tok = lexer.token()
-    if not tok: 
-        break      # No more input
-    print('{:<15}'.format(tok.type), '{:<10}'.format(tok.lineno), tok.value)
+theLexerFunction(data)
