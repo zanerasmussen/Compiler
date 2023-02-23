@@ -69,19 +69,17 @@ def t_INT(t):
     t.value = int(t.value)
     return t
 
-
-#note there is not _ in ID
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'
     t.type = reserved.get(t.value,'ID')    # Check for reserved words
     return t
 
 def t_CHAR(t):
-    r'\'[a-zA-Z_ !#$%&()*+,.-/:;<=>?@[\]^`{\}~]\''
+    r'\'[a-zA-Z_ 0-9!#$%&()*+,.-/:;<=>?@[\]^`{\}~\r\n\t\\"\']\''
     return t
 
 def t_STRING(t):
-    r'"[a-zA-Z_ !#$%&()*+,.-/:;<=>?@[\]^`{\}~]*"'
+    r'\"([a-zA-Z_ 0-9!#$%&()*+,.-/:;<=>?@[\]^`{\}~\r\n\t\\]|\'|(\\"))*\"'
     return t
 
 def t_WHITESPACE(t):
@@ -101,8 +99,7 @@ def t_error(t):
     x = t.lexer.skip(1)
     return t
 
-
-def theLexerFunction(stuff):
+def theLexerPrintFunction(stuff):
     import ply.lex as lex
     lexer = lex.lex()
     lexer.input(stuff)
@@ -173,21 +170,28 @@ IF
 << >>
 . ,
 
-123
+"123"
 5555
 1513513515313513599999999
 "123"
-
+'~'
+'`'
 ThisIsId
 ThisIs__ID
-'test'
+'test
 't'
 '!'
 '"'
 '$4'
-false*
-//This is a comment 434$3499 bool !@##%T@$%& 't 't' 
-
+-==
+ThisIsAnId$
+"{"
+"}"
+"["
+"]"
+'"'
+"\'"
+"\n"
 '''
 
-theLexerFunction(data)
+theLexerPrintFunction(data)
