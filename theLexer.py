@@ -192,6 +192,10 @@ ThisIsAnId$
 '"'
 "\'"
 "\n"
+"this is a string"
+==
+"this is a tab string   "
+"this is a new line string
+"
 '''
-
 theLexerPrintFunction(data)

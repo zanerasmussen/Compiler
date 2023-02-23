@@ -311,3 +311,13 @@ class Test_Lexer(unittest.TestCase):
         tok = theLexer.theLexerTester('''false*''')
         self.assertEqual(tok.type, "FALSE" )
         self.assertEqual(tok.value, 'false') 
+
+    def test_minusEqualEqual(self):
+        tok = theLexer.theLexerTester('''-==''')
+        self.assertEqual(tok.type, "MINUSEQUAL" )
+        self.assertEqual(tok.value, '-=')         
+
+    def test_IDquote(self):
+        tok = theLexer.theLexerTester('''ThisIsAID"''')
+        self.assertEqual(tok.type, "ID" )
+        self.assertEqual(tok.value, 'ThisIsAID') 
