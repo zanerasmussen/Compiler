@@ -1,0 +1,75 @@
+data = '''
+bool
+break
+case
+class
+cin
+cout
+default
+else
+false
+if
+kxi2023
+new
+null
+public
+private
+return
+switch
+this
+true
+void
+while
+ifelse
+classes
+//'bool'    //Unknown
+"bool"
+BOOL
+IF
+:
+;
+{
+}
+()
+[] 
+= 
+== 
+!= 
+<=
+>=
+> <
+&& ||
+!   'r'
++-*/
++= -= *= /=
+<< >>
+. ,
+
+"123"
+5555
+1513513515313513599999999
+"123"
+'~'
+'`'
+ThisIsId
+ThisIs__ID
+'test
+'t'
+'!'
+'"'
+'$4'
+-==
+ThisIsAnId$
+"{"
+"}"
+"["
+"]"
+'"'
+"\'"
+"\n"
+"this is a string"
+==
+"this is a tab string   "
+"this is a new line string
+"
+'''

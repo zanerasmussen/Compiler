@@ -99,6 +99,9 @@ def t_error(t):
     x = t.lexer.skip(1)
     return t
 
+def t_eof(t):
+    return None
+
 def theLexerPrintFunction(stuff):
     import ply.lex as lex
     lexer = lex.lex()
@@ -112,7 +115,6 @@ def theLexerPrintFunction(stuff):
             break      # No more input
         print('{:<15}'.format(tok.type), '{:<10}'.format(tok.lineno), tok.value)
 
-
 def theLexerTester(stuff):
     import ply.lex as lex
     lexer = lex.lex()
@@ -120,82 +122,3 @@ def theLexerTester(stuff):
     tok = lexer.token()
     return tok
 
-
-
-# Test it out
-data = '''
-bool
-break
-case
-class
-cin
-cout
-default
-else
-false
-if
-kxi2023
-new
-null
-public
-private
-return
-switch
-this
-true
-void
-while
-ifelse
-classes
-//'bool'    //Unknown
-"bool"
-BOOL
-IF
-:
-;
-{
-}
-()
-[] 
-= 
-== 
-!= 
-<=
->=
-> <
-&& ||
-!   'r'
-+-*/
-+= -= *= /=
-<< >>
-. ,
-
-"123"
-5555
-1513513515313513599999999
-"123"
-'~'
-'`'
-ThisIsId
-ThisIs__ID
-'test
-'t'
-'!'
-'"'
-'$4'
--==
-ThisIsAnId$
-"{"
-"}"
-"["
-"]"
-'"'
-"\'"
-"\n"
-"this is a string"
-==
-"this is a tab string   "
-"this is a new line string
-"
-'''
-theLexerPrintFunction(data)
