@@ -69,7 +69,17 @@ ThisIsAnId$
 "\n"
 "this is a string"
 ==
-"this is a tab string   "
+
+"this is a tab string   \t"
 "this is a not a new line string
 "
+\t
+\n
+"\n"
+"\t"
+"a"a"
+"da\"aa"
+"\\"
+"whole thing is a striung #$~!#$%^&*()(){}><?#@#$__\\\t\"\r\n"
+"\\"
 '''
