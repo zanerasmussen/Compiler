@@ -70,6 +70,6 @@ ThisIsAnId$
 "this is a string"
 ==
 "this is a tab string   "
-"this is a new line string
+"this is a not a new line string
 "
 '''

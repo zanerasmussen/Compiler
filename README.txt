@@ -8,6 +8,7 @@ Things to add:
     finish test cases
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 Lexer Branch
 python3 -m PyInstaller -F ./main.py
@@ -15,6 +16,10 @@ python3 -m PyInstaller -F ./main.py
 Suggestions:
 read fron standard in instead of default file
 line 74 should faile because of the new line token. unit test for ath. 
+=======
+Test
+Test 2
+>>>>>>> 7e4e50552d338c5297129e56510b5eab6f833925
 =======
 Test
 Test 2
