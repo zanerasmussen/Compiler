@@ -6,7 +6,10 @@ You can pass it a parameter of different files or you can not pass a file and it
 Things to add:
     add -l to command line
     finish test cases
+Lexer Branch
+python3 -m PyInstaller -F ./main.py
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -24,3 +27,8 @@ Test 2
 Test
 Test 2
 >>>>>>> 7e4e50552d338c5297129e56510b5eab6f833925
+=======
+Suggestions:
+read fron standard in instead of default file
+line 74 should faile because of the new line token. unit test for ath. 
+>>>>>>> 3f2d7765bde2cdf79865604fdc0f389383457fd4
