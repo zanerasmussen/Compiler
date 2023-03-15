@@ -16,5 +16,3 @@ python3 -m PyInstaller -F ./main.py
 Suggestions:
 read fron standard in instead of default file
 line 74 should faile because of the new line token. unit test for ath. 
-
- asd
