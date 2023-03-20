@@ -113,7 +113,7 @@ def theLexerPrintFunction(stuff):
     while True:
         tok = lexer.token()
         if not tok: 
-            break      # No more input
+            break       # No more input
         print('{:<15}'.format(tok.type), '{:<10}'.format(tok.lineno), tok.value)
 
 def theLexerTester(stuff):
