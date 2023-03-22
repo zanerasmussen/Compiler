@@ -107,14 +107,17 @@ def theLexerPrintFunction(stuff):
     import ply.lex as lex
     lexer = lex.lex()
     lexer.input(stuff)
+    clone = lexer
     print('{:15}'.format('TAG'), '{:<10}'.format("Line #"), 'LEXEME')
     print('{:-<35}'.format('-'))
 
     while True:
-        tok = lexer.token()
+        tok = clone.token()
         if not tok: 
             break       # No more input
         print('{:<15}'.format(tok.type), '{:<10}'.format(tok.lineno), tok.value)
+
+    return lexer
 
 def theLexerTester(stuff):
     import ply.lex as lex
