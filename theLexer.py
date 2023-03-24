@@ -22,13 +22,68 @@ reserved = {
     'while' : 'WHILE',
 }
 
-tokens = [
-    'COLON', 'SEMICOLON', 'LCURLY', 'RCURLY', 'LPAREN', 'RPAREN', 'LSQUARE', 'RSQUARE', 'EQUAL', 'CEQUAL', 'NEQUAL', 'GREATEQUAL', 'LESSEQUAL',
-    'GREATER', 'LESS', 'AAND', 'OOR', 'NOT', 'PLUS', 'MINUS', 'TIMES', 'DIVIDE', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL', 'LEFTSHIFT', 'RIGHTSHIFT',
-    'PERIOD', 'COMMA',
-    'INT', 'ID', 'CHAR','STRING', 'LINEENDING', 'WHITESPACE', 'COMMENTS', 
+tokens = (
+    'COLON', 
+    'SEMICOLON', 
+    'LCURLY',
+    'RCURLY', 
+    'LPAREN', 
+    'RPAREN', 
+    'LSQUARE', 
+    'RSQUARE', 
+    'EQUAL', 
+    'CEQUAL', 
+    'NEQUAL', 
+    'GREATEQUAL', 
+    'LESSEQUAL',
+    'GREATER', 
+    'LESS', 
+    'AAND', 
+    'OOR', 
+    'NOT', 
+    'PLUS', 
+    'MINUS', 
+    'TIMES', 
+    'DIVIDE', 
+    'PLUSEQUAL', 
+    'MINUSEQUAL', 
+    'TIMESEQUAL', 
+    'DIVIDEEQUAL', 
+    'LEFTSHIFT', 
+    'RIGHTSHIFT',
+    'PERIOD', 
+    'COMMA',
+    'INT', 
+    'ID', 
+    'CHAR',
+    'STRING', 
+    'LINEENDING', 
+    'WHITESPACE', 
+    'COMMENTS', 
     'UNKONWN', 
-] + list(reserved.values())
+    'BOOL',
+    'BREAK',
+    'CASE',
+    'CLASS',
+    'CIN',
+    'COUT', 
+    'DEFAULT', 
+    'ELSE', 
+    'FALSE', 
+    'IF', 
+    'KXI2023',
+    'NEW',
+    'NULL', 
+    'PUBLIC', 
+    'PRIVATE', 
+    'RETURN', 
+    'SWITCH', 
+    'THIS',
+    'TRUE', 
+    'VOID', 
+    'WHILE',
+    'MAIN', 
+)
 
 #LIST OF REGULAR EXPRESSION RULES
 t_CEQUAL = r'=='
@@ -102,6 +157,12 @@ def t_error(t):
 
 def t_eof(t):
     return None
+
+def theLexerReturnFucntion(stuff):
+    import ply.lex as lex
+    lexer = lex.lex()
+    lexer.input(stuff)
+    return lexer
 
 def theLexerPrintFunction(stuff):
     import ply.lex as lex

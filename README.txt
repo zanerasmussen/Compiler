@@ -16,3 +16,8 @@ python3 -m PyInstaller -F ./main.py
 Suggestions:
 read fron standard in instead of default file
 line 74 should faile because of the new line token. unit test for ath. 
+
+
+Look into MAIN AS A TOKEN!!!
+
+symantics needs to handle  invalid assignement. such as 3 = 5 of function f = function g.

@@ -1,0 +1,144 @@
+Created by PLY (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    AAND
+    BOOL
+    BREAK
+    CASE
+    CEQUAL
+    CHAR
+    CIN
+    COLON
+    COMMA
+    COMMENTS
+    COUT
+    DEFAULT
+    DIVIDE
+    DIVIDEEQUAL
+    ELSE
+    EQUAL
+    FALSE
+    GREATEQUAL
+    GREATER
+    IF
+    INT
+    LEFTSHIFT
+    LESS
+    LESSEQUAL
+    LINEENDING
+    LSQUARE
+    MINUS
+    MINUSEQUAL
+    NEQUAL
+    NEW
+    NOT
+    NULL
+    OOR
+    PERIOD
+    PLUS
+    PLUSEQUAL
+    PRIVATE
+    PUBLIC
+    RETURN
+    RIGHTSHIFT
+    RSQUARE
+    SEMICOLON
+    STRING
+    SWITCH
+    THIS
+    TIMES
+    TIMESEQUAL
+    TRUE
+    UNKONWN
+    WHILE
+    WHITESPACE
+
+Grammar
+
+Rule 0     S' -> CompilationUnit
+Rule 1     CompilationUnit -> ClassDefinition VOID KXI2023 MAIN LPAREN RPAREN ID
+Rule 2     ClassDefinition -> <empty>
+Rule 3     ClassDefinition -> CLASS ID LCURLY ID RCURLY
+Rule 4     ClassDefinition -> CLASS ID LCURLY ID RCURLY ClassDefinition
+Rule 5     compound_stmt -> if_stmt
+Rule 6     compound_stmt -> for_stmt
+Rule 7     compound_stmt -> while_stmt
+Rule 8     compound_stmt -> funcdef
+Rule 9     compound_stmt -> classdef
+
+Terminals, with rules where they appear
+
+AAND                 : 
+BOOL                 : 
+BREAK                : 
+CASE                 : 
+CEQUAL               : 
+CHAR                 : 
+CIN                  : 
+CLASS                : 3 4
+COLON                : 
+COMMA                : 
+COMMENTS             : 
+COUT                 : 
+DEFAULT              : 
+DIVIDE               : 
+DIVIDEEQUAL          : 
+ELSE                 : 
+EQUAL                : 
+FALSE                : 
+GREATEQUAL           : 
+GREATER              : 
+ID                   : 1 3 3 4 4
+IF                   : 
+INT                  : 
+KXI2023              : 1
+LCURLY               : 3 4
+LEFTSHIFT            : 
+LESS                 : 
+LESSEQUAL            : 
+LINEENDING           : 
+LPAREN               : 1
+LSQUARE              : 
+MINUS                : 
+MINUSEQUAL           : 
+NEQUAL               : 
+NEW                  : 
+NOT                  : 
+NULL                 : 
+OOR                  : 
+PERIOD               : 
+PLUS                 : 
+PLUSEQUAL            : 
+PRIVATE              : 
+PUBLIC               : 
+RCURLY               : 3 4
+RETURN               : 
+RIGHTSHIFT           : 
+RPAREN               : 1
+RSQUARE              : 
+SEMICOLON            : 
+STRING               : 
+SWITCH               : 
+THIS                 : 
+TIMES                : 
+TIMESEQUAL           : 
+TRUE                 : 
+UNKONWN              : 
+VOID                 : 1
+WHILE                : 
+WHITESPACE           : 
+error                : 
+
+Nonterminals, with rules where they appear
+
+ClassDefinition      : 1 4
+CompilationUnit      : 0
+MAIN                 : 1
+classdef             : 9
+compound_stmt        : 
+for_stmt             : 6
+funcdef              : 8
+if_stmt              : 5
+while_stmt           : 7
+
