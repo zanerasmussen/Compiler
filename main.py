@@ -12,7 +12,8 @@ def main(argv):
         # for argument -L
         #tokens = theLexerPrintFunction(file)
         tokens = theLexerReturnFucntion(file)
-        Parse(tokens)
+
+        parsed = Parse(file)
     else:
         try:
             file = open(sys.argv[1], "r")

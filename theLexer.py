@@ -20,6 +20,7 @@ reserved = {
     'true' : 'TRUE', 
     'void' : 'VOID', 
     'while' : 'WHILE',
+    'main' : 'MAIN'
 }
 
 tokens = (
@@ -57,9 +58,9 @@ tokens = (
     'ID', 
     'CHAR',
     'STRING', 
-    'LINEENDING', 
-    'WHITESPACE', 
-    'COMMENTS', 
+#    'LINEENDING', 
+#    'WHITESPACE', 
+#    'COMMENTS', 
     'UNKONWN', 
     'BOOL',
     'BREAK',
@@ -138,16 +139,16 @@ def t_STRING(t):
     r'\"([a-zA-Z_ 0-9!#$%&()*+,.-/:;<=>?@[\]^`{\}~]|(\\")|(\\r)|(\\n)|(\\t)|(\\\\))*\"'
     return t
 
-def t_WHITESPACE(t):
+def t_ignore_WHITESPACE(t):
     r' [ \t]+ '
 
-def t_NEWLINE(t):
+def t__ignore_NEWLINE(t):
     r'[\n\r]+'
     t.lexer.lineno += len(t.value)
 
-def t_COMMENTS(t):
+def t_ignore_COMMENTS(t):
     r'//[^\r\n]*'
-    return t
+
 
 def t_error(t):
     t.type = 'UNKNOWN'

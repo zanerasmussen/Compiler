@@ -131,7 +131,7 @@ void kxi2023 main()
     char var4;
 
     int[] var5;
-    bool[] var6;
+    bool var6;
     void[] var7;
     char[] var8;
 
