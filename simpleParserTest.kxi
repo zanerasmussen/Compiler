@@ -1,5 +1,6 @@
 void kxi2023 main()
 {
     cout << "Hello World!";
+    (my_int = foo());
     return;
 }

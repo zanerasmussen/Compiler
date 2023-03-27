@@ -6,8 +6,8 @@ def main(argv):
 #    inputFile = ''
 #    opts, args = getopt.getopt(argv,"l")
     if len(argv) == 0:
-        file = open("big_parser_test.kxi", "r")
-        #file = open("simpleParserTest.kxi", "r")
+        #file = open("big_parser_test.kxi", "r")
+        file = open("simpleParserTest.kxi", "r")
         file = file.read()
         # for argument -L
         #tokens = theLexerPrintFunction(file)

@@ -1,26 +1,75 @@
 import ply.yacc as yacc
 from theLexer import tokens
+import pydot
 
-
+#This class creates the AST. Each node has children, a type and then a unique ID
+#The unique ID is to create the pretty printer DOT graph as to not create any cyclical edges
 class Node:
-    def __init__(self,type,children=None,leaf=None):
-         self.type = type
-         if children:
-              self.children = children
-         else:
-              self.children = [ ]
-         self.leaf = leaf
+    def __init__(self, type, children=None, id=None):
+        self.type = type
+        self.children = children or []  # ensure that children is always a list
+        self.id = id
 
+#This class is to have an 'outside of recursion' type that adds a unique ID to each node with the help of UniqueID. 
+class Unique:
+    def __init__(self) -> None:
+        self.id = 0
+
+    def getID(self):
+        self.id += 1
+        return self.id
+
+def UniqueID(node, Uid):
+    id = Uid.getID()
+    node.id = '$' + str(id)
+    for child in node.children:
+        UniqueID(child, Uid)
+    return node        
+  
+#This function is to help with debugging at first. May not include in the final project
 def print_tree(node, indent=0):
-    print(' ' * indent + f'- [{node}]')
+    print(' ' * indent + f'- [{node.type}]')
     for child in node.children:
         print_tree(child, indent + 2)
 
-# def print_tree(node, indent=0):
-#     print(' ' * indent + f'- [{node.type}] {node.leaf}')
-#     for child in node.children:
-#         print_tree(child, indent + 2)        
-          
+
+#The next few methods are for the DOT graph. It calls to functions such as 'add_nodes', 'add_edges' and 'add_leafs'
+def pydot_printer(graph, node, first):
+    if len(node.children) != 0:
+        graph = add_nodes(graph, node)
+        if first == True:
+            first = False 
+            start = pydot.Node('Start$0', shape='diamond', style='filled', fillcolor='cyan')
+            graph.add_node(start)
+            edge = pydot.Edge("Start$0", node.type+node.id)
+            graph.add_edge(edge)
+    else:
+        graph = add_leafs(graph, node)
+
+    for child in node.children:
+        pydot_printer(graph, child, first)
+        add_edges(graph, node, child)
+    return graph
+
+def add_nodes(graph, node):
+    x = pydot.Node(node.type+node.id, style="filled", fillcolor="#47E21A")
+    graph.add_node(x)
+    return graph
+
+def add_leafs(graph, node):
+    x = pydot.Node(str(node.type)+node.id, shape='octagon', style="filled", fillcolor="#F62020")
+    graph.add_node(x)
+    return graph
+
+def add_edges(graph, parent, child):
+    edge = pydot.Edge(str(parent.type)+parent.id, str(child.type)+child.id)
+    graph.add_edge(edge)
+    return graph
+
+
+
+
+     
 
 # GRAMMAR
 ###########################
@@ -29,13 +78,13 @@ def p_Arguments(p):
     """Arguments : LPAREN RPAREN
                     | LPAREN ArgumentList RPAREN"""
     if len(p) == 3:
-        p[0] = Node("Arguments", leaf=[p[1], p[2]])
+        p[0] = Node("Arguments", children=[Node(p[1]), Node(p[2])])
     else:
-        p[0] = Node("Arguments", [p[2]], [p[1], p[3]])
+        p[0] = Node("Arguments", children=[Node(p[1]), p[2], Node(p[3])])
     
 def p_ArgumentList(p):
     """ArgumentList : Expression ExpressionComma"""
-    p[0] = Node("Argument List", [p[1], p[2]])
+    p[0] = Node("Argument List", children=[p[1], p[2]])
 
 def p_Case(p):
     """Case :  
@@ -44,11 +93,11 @@ def p_Case(p):
     if len(p) == 1:
         p[0] = Node("None")
     else:
-        p[0] = Node("Case", [p[4]], [p[1], p[2], p[3]])
+        p[0] = Node("Case", children=[Node(p[1]), Node(p[2]), Node(p[3]), p[4]])
 
 def p_CaseBlock(p):
     """CaseBlock : LCURLY Case DEFAULT COLON Statement RCURLY"""
-    p[0] = Node("Case Block", [p[2], p[5]], [p[1], p[3], p[4], p[6]])
+    p[0] = Node("Case Block", children=[Node(p[1]), p[2], Node(p[3]), Node(p[4]), p[5], Node(p[6])])
 
 def p_ClassDefinition(p):
     """ClassDefinition : 
@@ -57,7 +106,7 @@ def p_ClassDefinition(p):
     if len(p) == 1:
         p[0] = Node("None")
     else:
-        p[0] = Node("Class Definition", [p[3], p[4], p[5], p[6]], [p[1], p[2]])
+        p[0] = Node("Class Definition", children=[Node(p[1]), Node(p[2]), Node(p[3]), p[4], Node(p[5]), p[6]])
 
 def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : 
@@ -67,17 +116,15 @@ def p_ClassMemberDefinition(p):
     if len(p) == 1:
         p[0] = Node("None")
     else:
-        p[0] = Node("Class Member Definition", [p[1], p[2]])    
+        p[0] = Node("Class Member Definition", children=[p[1], p[2]])   
 
 def p_CompilationUnit(p):
     """CompilationUnit : ClassDefinition VOID KXI2023 MAIN LPAREN RPAREN MethodBody"""
-    #p[0] = Node("Compilation Unit", [p[1], p[7]], [p[2], p[3], p[4], p[5], p[6]]) #with leaf
-    p[0] = Node("Compilation Unit", [p[1], p[7], p[2], p[3], p[4], p[5], p[6]]) #without leaf
+    p[0] = Node("Compilation Unit", children=[p[1], Node(p[2]), Node(p[3]), Node(p[4]), Node(p[5]), Node(p[6]), p[7]])
 
 def p_ConstructorDeclaration(p):
     """ConstructorDeclaration : ID MethodSuffix"""
-    #p[0] = Node("Constructor Declaration", [p[2]], [p[1]])
-    p[0] = Node("Constructor Declaration", [p[2], p[1]])
+    p[0] = Node("Constructor Declaration", children=[Node(p[1]), p[2]])
 
 def p_ContinueStatement(p):
     """ContinueStatement : ELSE Statement
@@ -85,11 +132,11 @@ def p_ContinueStatement(p):
     if len(p) == 1:
         p[0] = Node("None")
     else:
-        p[0] = Node("Continue Statement", [p[2]], [p[1]])
+        p[0] = Node("Continue Statement", children=[Node(p[1]), p[2]])
 
 def p_DataMemberDeclaration(p):
     """DataMemberDeclaration : Modifier VariableDeclaration"""
-    p[0] = Node("Data Member Declaration", [p[1], p[2]])
+    p[0] = Node("Data Member Declaration", children=[p[1], p[2]])
 
 def p_Expression(p):
     """Expression : Type
@@ -123,21 +170,23 @@ def p_Expression(p):
                     | NEW Type Arguments
                     | NEW Type Index
                     | Expression PERIOD ID"""
-    if len(p) == 2:
-        p[0] = Node("Expression", leaf=[p[1]])
+    if len(p) == 2 and ((p[1] == 'true') or (p[1] == 'false') or (p[1] == 'null') or (p[1] == 'this')):
+        p[0] = Node("Expression", children=[Node(p[1])])
+    elif len(p) == 2:
+        p[0] = Node("Expression", children=[p[1]])
     elif len(p) == 3 and ((p[1] == '+') or (p[1] == '!') or (p[1] == '-')):
-        p[0] = Node("Expression", [p[2]], [p[1]])
+        p[0] = Node("Expression", children=[Node(p[1]), p[2]])
     elif len(p) == 3:
-        p[0] = Node("Expression", [p[1], p[2]])
+        p[0] = Node("Expression", children=[p[1], p[2]])
     elif len(p) == 4 and ((p[2] == '=') or (p[2] == '+=') or (p[2] == '-=') or (p[2] == '*=') or (p[2] == '/=') or (p[2] == '+') or (p[2] == '-') or (p[2] == '*') 
                           or (p[2] == '/') or (p[2] == '==') or (p[2] == '!=') or (p[2] == '<') or (p[2] == '>') or (p[2] == '>=') or (p[2] == '<=') or (p[2] == '&&') or (p[2] == '||')):
-        p[0] = Node("Expression", [p[1], p[3]], [p[2]])
+        p[0] = Node("Expression", children=[p[1], Node(p[2]), p[3]])
     elif len(p) == 4 and p[1] == '(':
-        p[0] = Node("Expression", [p[2]], [p[1], p[3]])
+        p[0] = Node("Expression", children=[Node(p[1]), p[2], Node(p[3])])
     elif len(p) == 4 and p[1] == 'new':
-        p[0] = Node("Expression", [p[2], p[3]], [p[1]])
+        p[0] = Node("Expression", children=[Node(p[1]), p[2], p[3]])
     else:
-        p[0] = Node("Expression", [p[1]], [p[2], p[3]])
+        p[0] = Node("Expression", children=[p[1], Node(p[2]), Node(p[3])])
 
 def p_ExpressionComma(p):
     """ExpressionComma : 
@@ -145,48 +194,48 @@ def p_ExpressionComma(p):
     if len(p) == 1:
         p[0] = Node("None")
     else:
-        p[0] = Node("Expression Comma", [p[2], p[3]], [p[1]])
+        p[0] = Node("Expression Comma", children=[Node(p[1]), p[2], p[3]])
 
 def p_Index(p):
     """Index : LSQUARE Expression RSQUARE"""
-    p[0] = Node("Index", [p[2]], [p[1], p[3]] )
+    p[0] = Node("Index", children=[Node(p[1]), p[2], Node(p[3])])
 
 def p_Initializer(p):
     """Initializer : EQUAL Expression"""
-    p[0] = Node("Initializer", [p[2]], [p[1]])
+    p[0] = Node("Initializer", children=[Node(p[1]), p[2]])
 
 def p_MethodBody(p):
     """MethodBody : LCURLY Statement RCURLY"""
-    p[0] = Node("Method Body", [p[2]], [p[1], p[3]])
+    p[0] = Node("Method Body", children=[Node(p[1]), p[2], Node(p[3])])
 
 def p_MethodDeclaration(p):
     """MethodDeclaration : Modifier Type LSQUARE RSQUARE ID MethodSuffix
                             | Modifier Type ID MethodSuffix"""
     if len(p) == 7:
-        p[0] = Node("Method Declaration", [p[1], p[2], p[6]], [p[3], p[4], p[5]])
+        p[0] = Node("Method Declaration", children=[p[1], p[2], Node(p[3]), Node(p[4]), Node(p[5]), p[6]])
     else:
-        p[0] = Node("Method Declaration", [p[1], p[2], p[4]], [p[3]])
+        p[0] = Node("Method Declaration", children=[p[1], p[2], Node(p[3]), p[4]])
 
 def p_MethodSuffix(p):
     """MethodSuffix : LPAREN ParameterList RPAREN MethodBody
                         | LPAREN RPAREN MethodBody"""
     if len(p) == 5:
-        p[0] = Node("Method Suffix", [p[2], p[4]], [p[1], p[3] ])
+        p[0] = Node("Method Suffix", children=[Node(p[1]), p[2], Node(p[3]), p[4]])
     else:
-        p[0] = Node("Method Suffix", [p[3] ], [p[1], p[2] ])
+        p[0] = Node("Method Suffix", children=[Node(p[1]), Node(p[2]), p[3]])
 
 def p_Modifier(p):
     """Modifier : PUBLIC
                     | PRIVATE"""
-    p[0] = Node("Modifier", leaf=p[1])
+    p[0] = Node("Modifier", children=[Node(p[1])])
 
 def p_Parameter(p):
     """Parameter : Type LSQUARE RSQUARE ID
                     | Type ID"""
     if len(p) == 5:
-        p[0] = Node("Parameter", [p[1]], [p[2], p[3], p[4]])
+        p[0] = Node("Parameter", children=[p[1], Node(p[2]), Node(p[3]), Node(p[4])])
     else:
-        p[0] = Node("Parameter", [p[1]], [p[2]])
+        p[0] = Node("Parameter", children=[p[1], Node(p[2])])
 
 def p_ParameterComma(p):
     """ParameterComma : 
@@ -194,11 +243,11 @@ def p_ParameterComma(p):
     if len(p) == 1:
         p[0] = Node("None")
     else:
-        p[0] = Node("Parameter Comma", [p[2], p[3]], [p[1]])
+        p[0] = Node("Parameter Comma", children=[Node(p[1]), p[2], p[3]])
 
 def p_ParameterList(p):
     """ParameterList : Parameter ParameterComma"""
-    p[0] = Node("Parameter List", [p[1], p[2]])
+    p[0] = Node("Parameter List", children=[p[1], p[2]])
 
 def p_Statement(p):
     """Statement : 
@@ -216,20 +265,19 @@ def p_Statement(p):
     if len(p) == 1:
         p[0] = Node("None")
     elif len(p) == 3:
-        p[0] = Node("Statement", [[p[1]], p[2]])
+        p[0] = Node("Statement", children=[p[1], p[2]])
     elif len(p) == 4 and ((p[1] == 'return') or (p[1] == 'break')):
-        p[0] = Node("Statement", [p[1]], [p[1], p[2]])
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3]])
     elif len(p) == 4:
-        p[0] = Node("Statement", [p[1], p[3]], [p[2]])
+        p[0] = Node("Statement", children=[p[1], Node(p[2]), p[3]])
     elif len(p) == 5:
-        p[0] = Node("Statement", [p[2], p[4]], [p[1], p[3]])
+        p[0] = Node("Statement", children=[Node(p[1]), p[2], Node(p[3]), p[4]])
     elif len(p) == 6:
-        p[0] = Node("Statement", [p[3], p[5]], [p[1], p[2], p[4]])
-
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5]])
     elif len(p) == 7:
-        p[0] = Node("Statement", [p[3], p[5], p[6]], [p[1], p[2], p[4]]) 
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5], p[6]])
     else:
-        p[0] = Node("Statement", [p[3], p[5], p[6], p[7]], [p[1], p[2], p[4]]) 
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5], p[6], p[7]])
 
 def p_Type(p):
     """Type : VOID
@@ -238,7 +286,7 @@ def p_Type(p):
                 | BOOL
                 | STRING
                 | ID"""
-    p[0] = Node("Type", p[1])
+    p[0] = Node("Type", children=[Node(p[1])])
 
 def p_VariableDeclaration(p):
     """VariableDeclaration : Type ID SEMICOLON
@@ -246,13 +294,13 @@ def p_VariableDeclaration(p):
                             | Type LSQUARE RSQUARE ID SEMICOLON
                             | Type LSQUARE RSQUARE ID Initializer SEMICOLON"""
     if len(p) == 4:
-        p[0] = Node("Variable Declaration", [p[1]], [p[2], p[3]])
+        p[0] = Node("Variable Declaration", children=[p[1], Node(p[2]), Node(p[3])])
     elif len(p) == 5:
-        p[0] = Node("Variable Declaration", [p[1], p[3]], [p[2], p[4]])
+        p[0] = Node("Variable Declaration", children=[p[1], Node(p[2]), p[3], Node(p[4])])
     elif len(p) == 6:
-        p[0] = Node("Variable Declaration", [p[1]], [p[2], p[3], p[4], p[5]])
+        p[0] = Node("Variable Declaration", children=[p[1], Node(p[2]), Node(p[3]), Node(p[4]), Node(p[5])])
     else:
-        p[0] = Node("Variable Declaration", [p[1], p[5]], [p[2], p[3], p[4], p[6]])
+        p[0] = Node("Variable Declaration", children=[p[1], Node(p[2]), Node(p[3]), Node(p[4]), p[5], Node(p[6])])
 
 def p_error(p):
     print("Syntax error in input! " + p.type + "/ " + p.value + " was given. This is found on line #" + str(p.lineno))
@@ -269,7 +317,23 @@ precedence = (
     ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
 )
 
+
+
+
+
+
 def Parse(file):
     parser = yacc.yacc(start="CompilationUnit", debug=True)
     parsed_output = parser.parse(file)
     print_tree(parsed_output)
+    parsed_output1 = parsed_output
+    Uid = Unique()
+    parsed_output1= UniqueID(parsed_output1, Uid)
+
+    graph = pydot.Dot('my_graph', graph_type='graph')
+    first = True
+    graph = pydot_printer(graph, parsed_output1, first)
+    graph.write_png('output.png')
+
+
+    # pydot_Graph = pydot_printer(pydot_Graph, parsed_output)
