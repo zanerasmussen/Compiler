@@ -80,7 +80,7 @@ class Test
     }
 }
 
-class TestTwo
+class TestTwo;
 {
     private char memeberVarThree;
 

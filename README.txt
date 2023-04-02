@@ -26,8 +26,13 @@ symantics needs to handle  invalid assignement. such as 3 = 5 of function f = fu
 
 add error for each grammar rule
 
-
+write test case for:
+[
+    //I mewss with 
+    //people
+]
 Questions:
+
  Kenton Renshaw
     I am super confused with how the visitor pattern should be structured. Obviously there are different implementations but I
     think there is a specific implementation we're looking for in this class. A classmate and I compared notes and they differ 
@@ -37,3 +42,27 @@ Jarrett Minton
      own accept method. the parent accept method calls accept on all the children node, then calls visitor.visit on itself 
      (its also possible to call visit before accepts). the accept methods should do all the transversing of the tree. you can do it 
      other ways, but I talked to Dr. Aldous about this and thats how he explained it to me. 
+
+Big Questions:
+    1) Am i doing the visitor pattern right?   
+        a) what is the visitor pattern?
+    2)Symbol Table?
+    3) shift/reduce errors?
+    4) repeat class?
+    5) syntax ideas:
+        a) repeat what i am doing but check for 
+
+
+
+
+
+
+
+
+have subclasses of each type ie : non terminal have nodes
+
+i am doing a linked list. that will be expensive later
+I need to do blocks. Have 
+
+
+shift reduce is most likely caused because of explicit recurssion

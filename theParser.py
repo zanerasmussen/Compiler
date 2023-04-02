@@ -99,6 +99,7 @@ def p_CaseBlock(p):
     """CaseBlock : LCURLY Case DEFAULT COLON Statement RCURLY"""
     p[0] = Node("Case Block", children=[Node(p[1]), p[2], Node(p[3]), Node(p[4]), p[5], Node(p[6])])
 
+
 def p_ClassDefinition(p):
     """ClassDefinition : 
                             | CLASS ID LCURLY ClassMemberDefinition RCURLY ClassDefinition
@@ -107,6 +108,11 @@ def p_ClassDefinition(p):
         p[0] = Node("None")
     else:
         p[0] = Node("Class Definition", children=[Node(p[1]), Node(p[2]), Node(p[3]), p[4], Node(p[5]), p[6]])
+
+# def p_ClassDefinition_error(p):
+#     """ClassDefinition : error ID LCURLY ClassMemberDefinition RCURLY ClassDefinition"""
+#     if p[1] == "error":
+#         print("Syntax error: Expected CLASS")
 
 def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : 
@@ -121,6 +127,15 @@ def p_ClassMemberDefinition(p):
 def p_CompilationUnit(p):
     """CompilationUnit : ClassDefinition VOID KXI2023 MAIN LPAREN RPAREN MethodBody"""
     p[0] = Node("Compilation Unit", children=[p[1], Node(p[2]), Node(p[3]), Node(p[4]), Node(p[5]), Node(p[6]), p[7]])
+
+# def p_CompilationUnit_error(p):
+#     """CompilationUnit : error VOID KXI2023 MAIN LPAREN RPAREN MethodBody
+#                         | ClassDefinition error KXI2023 MAIN LPAREN RPAREN MethodBody"""
+#     print(p[1])
+#     if p[1] == "error":
+#         print("Syntax error with compilationUnit. Expected a Compilation Unit Grammar Rule")
+#     elif p[2] == "error":
+#         print("Syntax error: Expected VOID")
 
 def p_ConstructorDeclaration(p):
     """ConstructorDeclaration : ID MethodSuffix"""
@@ -251,33 +266,33 @@ def p_ParameterList(p):
 
 def p_Statement(p):
     """Statement : 
-                    | VariableDeclaration Statement
-                    | RETURN SEMICOLON Statement
-                    | BREAK SEMICOLON Statement
-                    | Expression SEMICOLON Statement
-                    | RETURN Expression SEMICOLON Statement
-                    | LCURLY Statement RCURLY Statement
-                    | COUT LEFTSHIFT Expression SEMICOLON Statement
-                    | CIN RIGHTSHIFT Expression SEMICOLON Statement
-                    | WHILE LPAREN Expression RPAREN Statement
-                    | SWITCH LPAREN Expression RPAREN CaseBlock Statement
-                    | IF LPAREN Expression RPAREN Statement ContinueStatement Statement"""
+                    | VariableDeclaration
+                    | RETURN SEMICOLON 
+                    | BREAK SEMICOLON 
+                    | Expression SEMICOLON 
+                    | RETURN Expression SEMICOLON 
+                    | LCURLY Statement RCURLY 
+                    | COUT LEFTSHIFT Expression SEMICOLON 
+                    | CIN RIGHTSHIFT Expression SEMICOLON 
+                    | WHILE LPAREN Expression RPAREN 
+                    | SWITCH LPAREN Expression RPAREN CaseBlock 
+                    | IF LPAREN Expression RPAREN Statement ContinueStatement """
     if len(p) == 1:
         p[0] = Node("None")
-    elif len(p) == 3:
-        p[0] = Node("Statement", children=[p[1], p[2]])
-    elif len(p) == 4 and ((p[1] == 'return') or (p[1] == 'break')):
-        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3]])
+    elif len(p) == 2:
+        p[0] = Node("Statement", children=[p[1]])
+    elif len(p) == 3 and ((p[1] == 'return') or (p[1] == 'break')):
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2])])
     elif len(p) == 4:
-        p[0] = Node("Statement", children=[p[1], Node(p[2]), p[3]])
+        p[0] = Node("Statement", children=[p[1], Node(p[2])])
     elif len(p) == 5:
-        p[0] = Node("Statement", children=[Node(p[1]), p[2], Node(p[3]), p[4]])
+        p[0] = Node("Statement", children=[Node(p[1]), p[2], Node(p[3])])
     elif len(p) == 6:
-        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5]])
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4])])
     elif len(p) == 7:
-        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5], p[6]])
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5]])
     else:
-        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5], p[6], p[7]])
+        p[0] = Node("Statement", children=[Node(p[1]), Node(p[2]), p[3], Node(p[4]), p[5], p[6]])
 
 def p_Type(p):
     """Type : VOID
@@ -303,7 +318,7 @@ def p_VariableDeclaration(p):
         p[0] = Node("Variable Declaration", children=[p[1], Node(p[2]), Node(p[3]), Node(p[4]), p[5], Node(p[6])])
 
 def p_error(p):
-    print("Syntax error in input! " + p.type + "/ " + p.value + " was given. This is found on line #" + str(p.lineno))
+    print("Syntax error in input! " + p.type + " / " + p.value + " was given. This is found on line #" + str(p.lineno))
 
 precedence = (
     ('left', 'TIMES', 'DIVIDE'),
@@ -325,15 +340,19 @@ precedence = (
 def Parse(file):
     parser = yacc.yacc(start="CompilationUnit", debug=True)
     parsed_output = parser.parse(file)
-    print_tree(parsed_output)
-    parsed_output1 = parsed_output
-    Uid = Unique()
-    parsed_output1= UniqueID(parsed_output1, Uid)
+    if parsed_output != None:
+        #print_tree(parsed_output)
+        parsed_output1 = parsed_output
+        Uid = Unique()
+        parsed_output1= UniqueID(parsed_output1, Uid)
 
-    graph = pydot.Dot('my_graph', graph_type='graph')
-    first = True
-    graph = pydot_printer(graph, parsed_output1, first)
-    graph.write_png('output.png')
+        graph = pydot.Dot('my_graph', graph_type='graph')
+        first = True
+        graph = pydot_printer(graph, parsed_output1, first)
+        graph.write_png('output.png')
+    else:
+        print("No parsed tree generated")
+
 
 
     # pydot_Graph = pydot_printer(pydot_Graph, parsed_output)
