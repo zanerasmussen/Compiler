@@ -67,4 +67,12 @@ I need to do blocks. Have
 
 shift reduce is most likely caused because of explicit recurssion
 
-test12333
+FIX MAIN In COMPLIATION UNIT should not be keyword
+
+
+
+
+Questions for Caiden:
+1) shift/reduce conflicts
+2) structure for AST?
+3) How do i do visitor pattern on this?

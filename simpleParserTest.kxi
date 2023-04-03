@@ -1,3 +1,13 @@
+class AnotherTest
+{
+    private char memeberVarThree;
+
+    public void FuncThree(char j)
+    {
+        int k;
+    }
+}
+
 void kxi2023 main()
 {
     cout << "Hello World!";

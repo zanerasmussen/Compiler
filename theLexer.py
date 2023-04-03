@@ -20,7 +20,6 @@ reserved = {
     'true' : 'TRUE', 
     'void' : 'VOID', 
     'while' : 'WHILE',
-    'main' : 'MAIN'
 }
 
 tokens = (
@@ -80,7 +79,6 @@ tokens = (
     'TRUE', 
     'VOID', 
     'WHILE',
-    'MAIN', 
 )
 
 #LIST OF REGULAR EXPRESSION RULES
