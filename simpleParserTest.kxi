@@ -1,12 +1,23 @@
-class AnotherTest
-{
-    private char memeberVarThree;
+//class AnotherTest
+//{
+ //   private char memeberVarThree;
 
-    public void FuncThree(char j)
+//    public void FuncThree(char j)
+ //   {
+//        int k;
+//    }
+//}
+
+class AnotherTest2
+{
+    private char memeberVar4;
+
+    public void Func4(char B)
     {
-        int k;
+        int T;
     }
 }
+
 
 void kxi2023 main()
 {

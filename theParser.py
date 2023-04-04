@@ -2,23 +2,7 @@ import ply.yacc as yacc
 from theLexer import tokens
 import pydot
 import AST as AST
-
-#This class creates the AST. Each node has children, a type and then a unique ID
-#The unique ID is to create the pretty printer DOT graph as to not create any cyclical edges
-class Node:
-    def __init__(self, type, children=None, id=None):
-        self.type = type
-        self.children = children or []  # ensure that children is always a list
-        self.id = id
-
-
-  
-#This function is to help with debugging at first. May not include in the final project
-def print_tree(node, indent=0):
-    print(' ' * indent + f'- [{node.type}]')
-    for child in node.children:
-        print_tree(child, indent + 2)
-
+from PrintVisitor import PrintVisitor
 
 #The next few methods are for the DOT graph. It calls to functions such as 'add_nodes', 'add_edges' and 'add_leafs'
 def pydot_printer(graph, node, first):
@@ -59,18 +43,24 @@ def add_edges(graph, parent, child):
 ###########################
 def p_Arguments(p):
     """Arguments : LPAREN MaybeArgumentList RPAREN"""
+    p[0] = AST.ASTArgument(p[1], p[2], p[3])
 
 def p_ArgumentList(p):
     """ArgumentList : Expression MultipleCommaExpression"""
+    p[0] = AST.ASTArgumentList(p[1], p[2])
 
 def p_ArgOrIdx(p):
     """ArgOrIdx : Arguments
                     | Index"""
+    p[0] = AST.ASTArgOrIdx(p[1])
+    
 def p_Case(p):
     """Case : CASE NumOrChar COLON MultipleStatement"""
+    p[0] = AST.ASTCase(p[1], p[2], p[3], p[4])
 
 def p_CaseBlock(p):
     """CaseBlock : LCURLY MultipleCase DEFAULT COLON MultipleStatement RCURLY"""
+    p[0] = AST.ASTCaseBlock(p[1], p[2], p[3], p[4], p[5], p[6])
 
 def p_ClassDefinition(p):
     """ClassDefinition : CLASS ID LCURLY MultipleClassMemberDefinition RCURLY"""
@@ -80,16 +70,8 @@ def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : MethodDeclaration
                                 | DataMemberDeclaration
                                 | ConstructorDeclaration"""
-
-    if p[1] == "MethodDeclartion":
-        p[0] = AST.ASTClassMemberDefinition(p[1], None, None)
-    elif p[1] == "DataMemberDeclaration":
-        p[0] = AST.ASTClassMemberDefinition(None, p[1], None)
-    elif p[1] == "ConstructorDeclaration":
-        p[0] = AST.ASTClassMemberDefinition(None, None, p[1])
-    else:
-        print("Error in Class Member Definition")
-
+    p[0] = AST.ASTClassMemberDefinition(p[1])
+   
 def p_CompilationUnit(p):
     """CompilationUnit : MultipleClassDefinition VOID KXI2023 Main LPAREN RPAREN MethodBody"""
     p[0] = AST.ASTCompilationUnit(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
@@ -104,26 +86,23 @@ def p_DataMemberDeclaration(p):
 
 def p_Expression(p):
     """Expression : LPAREN Expression RPAREN
-                    | Expression EQUAL Expression
-                    | Expression PLUSEQUAL Expression
-                    | Expression MINUSEQUAL Expression
-                    | Expression TIMESEQUAL Expression
-                    | Expression DIVIDEEQUAL Expression
-                    | Expression PLUS Expression
-                    | Expression MINUS Expression
-                    | Expression TIMES Expression
-                    | Expression DIVIDE Expression
+                    | Expression AAND Expression
                     | Expression CEQUAL Expression
-                    | Expression NEQUAL Expression
-                    | Expression LESS Expression
+                    | Expression DIVIDE Expression
+                    | Expression DIVIDEEQUAL Expression
+                    | Expression EQUAL Expression
                     | Expression GREATER Expression
                     | Expression GREATEQUAL Expression
+                    | Expression LESS Expression
                     | Expression LESSEQUAL Expression
-                    | Expression AAND Expression
+                    | Expression MINUS Expression
+                    | Expression MINUSEQUAL Expression
+                    | Expression NEQUAL Expression
                     | Expression OOR Expression
-                    | NOT Expression
-                    | PLUS Expression
-                    | MINUS Expression
+                    | Expression PLUS Expression
+                    | Expression PLUSEQUAL Expression
+                    | Expression TIMES Expression
+                    | Expression TIMESEQUAL Expression
                     | NEW VOID ArgOrIdx
                     | NEW INT ArgOrIdx
                     | NEW CHAR ArgOrIdx
@@ -131,8 +110,10 @@ def p_Expression(p):
                     | NEW STRING ArgOrIdx
                     | NEW ID ArgOrIdx
                     | Expression PERIOD ID
-                    | Expression Index
-                    | Expression Arguments
+                    | Expression ArgOrIdx
+                    | PLUS Expression
+                    | NOT Expression
+                    | MINUS Expression
                     | INT
                     | CHAR
                     | STRING
@@ -141,9 +122,60 @@ def p_Expression(p):
                     | NULL
                     | ID
                     | THIS"""
+    if len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 3 and p[1] == '-':
+        p[0] = AST.ASTExpressionMinus(p[1], p[2])
+    elif len(p) == 3 and p[1] == '!':
+        p[0] = AST.ASTExpressionNot(p[1], p[2])     
+    elif len(p) == 3 and p[1] == '+':
+        p[0] = AST.ASTExpressionNot(p[1], p[2])   
+    elif len(p) == 3:
+        p[0] = AST.ASTExpressionArgIdx(p[1], p[2])
+    elif len(p) == 4 and p[2] == '.':
+        p[0] = AST.ASTExpressionDotID(p[1], p[2], p[3])
+    elif len(p) == 4 and p[1] == "new":
+        p[0] = AST.ASTExpressionNew(p[1], p[2], p[3])   
+    elif len(p) == 4 and p[2] == "*=":
+        p[0] = AST.ASTExpressionETimesEqualE(p[1], p[2], p[3])   
+    elif len(p) == 4 and p[2] == "*":
+        p[0] = AST.ASTExpressionETimesE(p[1], p[2], p[3])      
+    elif len(p) == 4 and p[2] == "+=":
+        p[0] = AST.ASTExpressionEPlusEqualE(p[1], p[2], p[3])    
+    elif len(p) == 4 and p[2] == "+":
+        p[0] = AST.ASTExpressionEPlusE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "||":
+        p[0] = AST.ASTExpressionEOORE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "!=":
+        p[0] = AST.ASTExpressionENotEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "-=":
+        p[0] = AST.ASTExpressionEMinusEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "-":
+        p[0] = AST.ASTExpressionEMinusE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "<=":
+        p[0] = AST.ASTExpressionELessEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "<":
+        p[0] = AST.ASTExpressionELessE(p[1], p[2], p[3])    
+    elif len(p) == 4 and p[2] == ">=":
+        p[0] = AST.ASTExpressionEGreaterEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == ">":
+        p[0] = AST.ASTExpressionEGreaterE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "=":
+        p[0] = AST.ASTExpressionEEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "/=":
+        p[0] = AST.ASTExpressionEDivideEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "/":
+        p[0] = AST.ASTExpressionEDivideE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "==":
+        p[0] = AST.ASTExpressionECEqualE(p[1], p[2], p[3])
+    elif len(p) == 4 and p[2] == "&&":
+        p[0] = AST.ASTExpressionEAANDE(p[1], p[2], p[3])
+    else:
+        p[0] = AST.ASTExpressionPAREN(p[1], p[2], p[3])
 
 def p_Index(p):
     """Index : LSQUARE Expression RSQUARE"""
+    p[0] = AST.ASTIndex(p[1], p[2], p[3])
 
 def p_Initializer(p):
     """Initializer : EQUAL Expression"""
@@ -159,15 +191,26 @@ def p_Main(p):
 def p_MaybeArgumentList(p):
     """MaybeArgumentList : 
                             | ArgumentList"""
+    if len(p) == 1:
+        p[0] = AST.ASTMaybeArgumentList(None)
+    else:
+        p[0] = AST.ASTMaybeArgumentList(p[1])
 
-    
 def p_MaybeExpression(p):
     """MaybeExpression : 
                             | Expression"""
+    if len(p) == 1:
+        p[0] = AST.ASTMaybeExpression(None)
+    else:
+        p[0] = AST.ASTMaybeExpression(p[1])
 
 def p_MaybeInitializer(p):
     """MaybeInitializer : 
                             | Initializer"""
+    if len(p) == 1:
+        p[0] = AST.ASTMaybeInitializer(None)
+    else:
+        p[0] = AST.ASTMaybeInitializer(p[1])    
     
 def p_MaybeLRSquare(p):
     """MaybeLRSquare : 
@@ -180,6 +223,10 @@ def p_MaybeLRSquare(p):
 def p_MaybeParamList(p):
     """MaybeParamList : 
                         | ParameterList"""
+    if len(p) == 1:
+        p[0] = AST.ASTMaybeParamList(None)
+    else:
+        p[0] = AST.ASTMaybeParamList(p[1])       
 
 def p_MethodBody(p):
     """MethodBody : LCURLY MultipleStatement RCURLY"""
@@ -332,16 +379,14 @@ precedence = (
 )
 
 
-
-
-import ast
-
 def Parse(file):
     parser = yacc.yacc(start="CompilationUnit", debug=True)
     parsed_output = parser.parse(file)
     if parsed_output != None:
         print(parsed_output)
         print("parsed")
+        print_Visitor = PrintVisitor()
+        parsed_output.accept(print_Visitor)
         #print_tree(parsed_output)
         # parsed_output1 = parsed_output
 
@@ -355,3 +400,13 @@ def Parse(file):
 
 
     # pydot_Graph = pydot_printer(pydot_Graph, parsed_output)
+
+
+def ParseDotPrinter(file):
+    parser = yacc.yacc(start="CompilationUnit")
+    parsed_output = parser.parse(file)
+    if parsed_output != None:
+        #do DOT print visitor
+        pass
+    else:
+        print("No parsed tree generated")

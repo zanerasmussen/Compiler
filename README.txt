@@ -74,5 +74,7 @@ FIX MAIN In COMPLIATION UNIT should not be keyword
 
 Questions for Caiden:
 1) shift/reduce conflicts
+    -Key an eye on it. If there are big issues come back to this. Cross my fingers it is done. 
 2) structure for AST?
+
 3) How do i do visitor pattern on this?
