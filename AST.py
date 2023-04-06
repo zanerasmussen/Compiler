@@ -561,3 +561,10 @@ class ASTVariableDeclaration(ASTBASENODE):
 
     def accept(self, visitor):
         return visitor.visit_VariableDeclaration(self)
+
+class ASTTerminal(ASTBASENODE):
+    def __init__(self, Terminal):
+        self.Terminal = Terminal
+
+    def accept(self, visitor):
+        return visitor.visit_Terminal(self)

@@ -4,8 +4,7 @@ from theParser import *
 
 def main(argv):
     if len(argv) == 0:
-        #file = open("big_parser_test.kxi", "r")
-        file = open("simpleParserTest.kxi", "r")
+        file = open("TestFile.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
         parsed = Parse(file)
@@ -13,8 +12,9 @@ def main(argv):
     elif argv[0] == '-l':
         DoLexer()
 
-    # elif argv[0] == '-p':
-    #     DoParser()
+    elif argv[0] == '-p':
+        DoParser()
+        
     else:
         try:
             file = open(sys.argv[0], "r")
@@ -27,6 +27,11 @@ def main(argv):
 def DoLexer():
     stuff = input("Enter KXI:")
     theLexerPrintFunction(stuff)
+
+def DoParser():
+    stuff = input("Enter KXI:")
+    tokens = theLexerReturnFucntion(stuff)
+    parsed = ParseDotPrinter(stuff)
 
 if __name__ == "__main__":
 

@@ -253,3 +253,7 @@ class ASTVisitor(metaclass=ABCMeta):
     @abstractmethod
     def visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         pass
+
+    @abstractmethod
+    def visit_Terminal(self, node: ASTTerminal):
+        pass

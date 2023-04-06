@@ -1,43 +1,7 @@
 import ply.yacc as yacc
 from theLexer import tokens
-import pydot
 import AST as AST
-from PrintVisitor import PrintVisitor
-
-#The next few methods are for the DOT graph. It calls to functions such as 'add_nodes', 'add_edges' and 'add_leafs'
-def pydot_printer(graph, node, first):
-    if len(node.children) != 0:
-        graph = add_nodes(graph, node)
-        if first == True:
-            first = False 
-            start = pydot.Node('Start$0', shape='diamond', style='filled', fillcolor='cyan')
-            graph.add_node(start)
-            edge = pydot.Edge("Start$0", node.type+node.id)
-            graph.add_edge(edge)
-    else:
-        graph = add_leafs(graph, node)
-
-    for child in node.children:
-        pydot_printer(graph, child, first)
-        add_edges(graph, node, child)
-    return graph
-
-def add_nodes(graph, node):
-    x = pydot.Node(node.type+node.id, style="filled", fillcolor="#47E21A")
-    graph.add_node(x)
-    return graph
-
-def add_leafs(graph, node):
-    x = pydot.Node(str(node.type)+node.id, shape='octagon', style="filled", fillcolor="#F62020")
-    graph.add_node(x)
-    return graph
-
-def add_edges(graph, parent, child):
-    edge = pydot.Edge(str(parent.type)+parent.id, str(child.type)+child.id)
-    graph.add_edge(edge)
-    return graph
-
-  
+from PrintVisitor import PrintDotVisitor
 
 # GRAMMAR
 ###########################
@@ -45,18 +9,34 @@ def p_Arguments(p):
     """Arguments : LPAREN MaybeArgumentList RPAREN"""
     p[0] = AST.ASTArgument(p[1], p[2], p[3])
 
+# def p_Arguments_error(p):
+#     """Arguments : error MaybeArgumentList RPAREN
+#                     | LPAREN error RPAREN
+#                     | LPAREN MaybeArgumentList error"""
+#     print("Error in Arguments. Should be: ( <MaybeArgumentList> )")
+#     raise SyntaxError("error")
+
 def p_ArgumentList(p):
     """ArgumentList : Expression MultipleCommaExpression"""
     p[0] = AST.ASTArgumentList(p[1], p[2])
 
-def p_ArgOrIdx(p):
-    """ArgOrIdx : Arguments
-                    | Index"""
-    p[0] = AST.ASTArgOrIdx(p[1])
+# def p_ArgumentList_error(p):
+#     """ArgumentList : error MultipleCommaExpression
+#                         | Expression error"""
+#     print("Argument List error: Should be <expression> <MultipleCommaExpression>")
+#     raise SyntaxError("Error")
     
 def p_Case(p):
     """Case : CASE NumOrChar COLON MultipleStatement"""
     p[0] = AST.ASTCase(p[1], p[2], p[3], p[4])
+
+# def p_Case_error(p):
+#     """Case : error NumOrChar COLON MultipleStatement
+#                 | CASE error COLON MultipleStatement
+#                 | CASE NumOrChar error MultipleStatement
+#                 | CASE NumOrChar COLON error"""
+#     print("Error in Case. Should be 'case' <num>|<char> : <Multiple Statement>")
+#     raise SyntaxError("Error in Case")
 
 def p_CaseBlock(p):
     """CaseBlock : LCURLY MultipleCase DEFAULT COLON MultipleStatement RCURLY"""
@@ -65,6 +45,15 @@ def p_CaseBlock(p):
 def p_ClassDefinition(p):
     """ClassDefinition : CLASS ID LCURLY MultipleClassMemberDefinition RCURLY"""
     p[0] = AST.ASTClassDefinition(p[1], p[2], p[3], p[4], p[5])
+
+# def p_ClassDefinition_error(p):
+#     """ClassDefinition : error ID LCURLY MultipleClassMemberDefinition RCURLY
+#                             | CLASS error LCURLY MultipleClassMemberDefinition RCURLY
+#                             | CLASS ID error MultipleClassMemberDefinition RCURLY
+#                             | CLASS ID LCURLY error RCURLY
+#                             | CLASS ID LCURLY MultipleClassMemberDefinition error"""
+#     print("Error in ClassDefinition. Should be: 'class' <id> { <ClassMemberDefinition>* }")
+#     raise SyntaxError("error")
 
 def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : MethodDeclaration
@@ -76,6 +65,10 @@ def p_CompilationUnit(p):
     """CompilationUnit : MultipleClassDefinition VOID KXI2023 Main LPAREN RPAREN MethodBody"""
     p[0] = AST.ASTCompilationUnit(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
 
+def p_CompilationUnit_error(p):
+    """CompilationUnit : error VOID KXI2023 Main LPAREN RPAREN MethodBody"""
+    print("Error with compilation Unit")
+
 def p_ConstructorDeclaration(p):
     """ConstructorDeclaration : ID MethodSuffix"""
     p[0] = AST.ASTConstructorDeclaration(p[1], p[2])
@@ -85,7 +78,21 @@ def p_DataMemberDeclaration(p):
     p[0] = AST.ASTDataMemberDeclaration(p[1], p[2])
 
 def p_Expression(p):
-    """Expression : LPAREN Expression RPAREN
+    """Expression : THIS
+                    | INT
+                    | CHAR
+                    | STRING
+                    | TRUE
+                    | FALSE
+                    | NULL
+                    | ID
+                    | Expression Index
+                    | Expression Arguments
+                    | PLUS Expression
+                    | NOT Expression
+                    | MINUS Expression
+                    | Expression PERIOD ID
+                    | LPAREN Expression RPAREN
                     | Expression AAND Expression
                     | Expression CEQUAL Expression
                     | Expression DIVIDE Expression
@@ -103,27 +110,21 @@ def p_Expression(p):
                     | Expression PLUSEQUAL Expression
                     | Expression TIMES Expression
                     | Expression TIMESEQUAL Expression
-                    | NEW VOID ArgOrIdx
-                    | NEW INT ArgOrIdx
-                    | NEW CHAR ArgOrIdx
-                    | NEW BOOL ArgOrIdx
-                    | NEW STRING ArgOrIdx
-                    | NEW ID ArgOrIdx
-                    | Expression PERIOD ID
-                    | Expression ArgOrIdx
-                    | PLUS Expression
-                    | NOT Expression
-                    | MINUS Expression
-                    | INT
-                    | CHAR
-                    | STRING
-                    | TRUE
-                    | FALSE
-                    | NULL
-                    | ID
-                    | THIS"""
+                    | NEW VOID Index
+                    | NEW VOID Arguments
+                    | NEW INT Index
+                    | NEW INT Arguments
+                    | NEW CHAR Index
+                    | NEW CHAR Arguments
+                    | NEW BOOL Index
+                    | NEW BOOL Arguments
+                    | NEW STRING Index
+                    | NEW STRING Arguments
+                    | NEW ID Index
+                    | NEW ID Arguments"""
+
     if len(p) == 2:
-        p[0] = p[1]
+        p[0] = AST.ASTTerminal(p[1])
     elif len(p) == 3 and p[1] == '-':
         p[0] = AST.ASTExpressionMinus(p[1], p[2])
     elif len(p) == 3 and p[1] == '!':
@@ -364,7 +365,10 @@ def p_VariableDeclaration(p):
     p[0] = AST.ASTVariableDeclaration(p[1], p[2], p[3], p[4], p[5])
 
 def p_error(p):
-    print("Syntax error in input! " + p.type + " / " + p.value + " was given. This is found on line #" + str(p.lineno))
+    if p != None:
+        print("Syntax error in input! " + str(p.type) + " / " + str(p.value) + " was given. This is found on line #" + str(p.lineno))
+    else:
+        print("None Object")
 
 precedence = (
     ('left', 'TIMES', 'DIVIDE'),
@@ -376,37 +380,33 @@ precedence = (
     ('right', 'AAND'),
     ('right', 'OOR'),
     ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
+    ('right', 'LCURLY', 'LSQUARE', 'LPAREN'),
 )
 
 
 def Parse(file):
     parser = yacc.yacc(start="CompilationUnit", debug=True)
+    # parser.error = p_error
+    # parser.error = p_error
+
+    # parser._errok = lambda: errorok() # define errorok
+    # parser.productions.append(('error', ('ClassDefiniton',), p_ClassDefinition_error))
+    # parser.productions.append(('error', ('Arguments',), p_Arguments_error))
+    # parser.productions.append(('error', ('ArgumentList',), p_ArgumentList_error))
     parsed_output = parser.parse(file)
     if parsed_output != None:
-        print(parsed_output)
         print("parsed")
-        print_Visitor = PrintVisitor()
+        print_Visitor = PrintDotVisitor()
         parsed_output.accept(print_Visitor)
-        #print_tree(parsed_output)
-        # parsed_output1 = parsed_output
 
-        # graph = pydot.Dot('my_graph', graph_type='graph')
-        # first = True
-        # graph = pydot_printer(graph, parsed_output1, first)
-        # graph.write_png('output.png')
     else:
         print("No parsed tree generated")
-
-
-
-    # pydot_Graph = pydot_printer(pydot_Graph, parsed_output)
-
 
 def ParseDotPrinter(file):
     parser = yacc.yacc(start="CompilationUnit")
     parsed_output = parser.parse(file)
     if parsed_output != None:
-        #do DOT print visitor
-        pass
+        print_Visitor = PrintDotVisitor()
+        parsed_output.accept(print_Visitor)
     else:
         print("No parsed tree generated")
