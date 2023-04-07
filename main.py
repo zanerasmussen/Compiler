@@ -7,6 +7,7 @@ def main(argv):
         file = open("TestFile.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
+        #tokens = theLexerPrintFunction(file)
         parsed = Parse(file)
 
     elif argv[0] == '-l':

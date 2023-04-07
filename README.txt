@@ -53,3 +53,18 @@ Questions for passoff:
 1) how does command line accept more than one line?
 2) shift reduce errors
 3) unknown token?
+4) symbol table?? (1st thing built)
+
+
+
+can only call constructor with NEW (Syntax)
+    1) default initaialize
+    2) sytntax initaialize
+    3) constructor code
+
+
+
+
+    else in precendece. ply dangling else. do this over that
+    token for [] [ ] [//comment]
+    for [ int/ char/ ]

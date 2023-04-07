@@ -18,5 +18,5 @@ void kxi2023 main (){
 
    MyClass beef;
    MyClass beef = 10;
-   //array[0];
+   array[0];
 }

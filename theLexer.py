@@ -79,6 +79,7 @@ tokens = (
     'TRUE', 
     'VOID', 
     'WHILE',
+    'LRSQUARE'
 )
 
 #LIST OF REGULAR EXPRESSION RULES
@@ -115,6 +116,11 @@ t_COMMA = r','
 
  #REGULAR EXPRESSIONS WITH RULES
 
+def t_LRSQUARE(t):
+    r'(\[( \n\r\t)*(//[a-zA-Z_ 0-9!#$%&()*+,.-/:;<=>?@[\]^`{\}~\\r\\n\\t\\\\]*)*\])'
+    t.value = '[]'
+    return t
+
 def t_INT(t):
     r'[0-9]+'
     t.value = int(t.value)
@@ -130,14 +136,13 @@ def t_CHAR(t):
     return t
 
 def t_STRING(t):
-    #r'"([a-zA-Z_ 0-9!#$%&()*+,.-/:;<=>?@[\]^` { \ } ~ \\r \\n \\t \\ \']|(\\"))*"'
     r'\"([a-zA-Z_ 0-9!#$%&()*+,.-/:;<=>?@[\]^`{\}~]|(\\")|(\\r)|(\\n)|(\\t)|(\\\\))*\"'
     return t
 
 def t_ignore_WHITESPACE(t):
-    r' [ \t]+ '
+    r' [ \\t]+'
 
-def t__ignore_NEWLINE(t):
+def t_ignore_NEWLINE(t):
     r'[\n\r]+'
     t.lexer.lineno += len(t.value)
 

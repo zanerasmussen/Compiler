@@ -9,34 +9,13 @@ def p_Arguments(p):
     """Arguments : LPAREN MaybeArgumentList RPAREN"""
     p[0] = AST.ASTArgument(p[1], p[2], p[3])
 
-# def p_Arguments_error(p):
-#     """Arguments : error MaybeArgumentList RPAREN
-#                     | LPAREN error RPAREN
-#                     | LPAREN MaybeArgumentList error"""
-#     print("Error in Arguments. Should be: ( <MaybeArgumentList> )")
-#     raise SyntaxError("error")
-
 def p_ArgumentList(p):
     """ArgumentList : Expression MultipleCommaExpression"""
     p[0] = AST.ASTArgumentList(p[1], p[2])
 
-# def p_ArgumentList_error(p):
-#     """ArgumentList : error MultipleCommaExpression
-#                         | Expression error"""
-#     print("Argument List error: Should be <expression> <MultipleCommaExpression>")
-#     raise SyntaxError("Error")
-    
 def p_Case(p):
     """Case : CASE NumOrChar COLON MultipleStatement"""
     p[0] = AST.ASTCase(p[1], p[2], p[3], p[4])
-
-# def p_Case_error(p):
-#     """Case : error NumOrChar COLON MultipleStatement
-#                 | CASE error COLON MultipleStatement
-#                 | CASE NumOrChar error MultipleStatement
-#                 | CASE NumOrChar COLON error"""
-#     print("Error in Case. Should be 'case' <num>|<char> : <Multiple Statement>")
-#     raise SyntaxError("Error in Case")
 
 def p_CaseBlock(p):
     """CaseBlock : LCURLY MultipleCase DEFAULT COLON MultipleStatement RCURLY"""
@@ -46,14 +25,6 @@ def p_ClassDefinition(p):
     """ClassDefinition : CLASS ID LCURLY MultipleClassMemberDefinition RCURLY"""
     p[0] = AST.ASTClassDefinition(p[1], p[2], p[3], p[4], p[5])
 
-# def p_ClassDefinition_error(p):
-#     """ClassDefinition : error ID LCURLY MultipleClassMemberDefinition RCURLY
-#                             | CLASS error LCURLY MultipleClassMemberDefinition RCURLY
-#                             | CLASS ID error MultipleClassMemberDefinition RCURLY
-#                             | CLASS ID LCURLY error RCURLY
-#                             | CLASS ID LCURLY MultipleClassMemberDefinition error"""
-#     print("Error in ClassDefinition. Should be: 'class' <id> { <ClassMemberDefinition>* }")
-#     raise SyntaxError("error")
 
 def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : MethodDeclaration
@@ -215,7 +186,7 @@ def p_MaybeInitializer(p):
     
 def p_MaybeLRSquare(p):
     """MaybeLRSquare : 
-                        | LSQUARE RSQUARE"""
+                        | LRSQUARE"""
     if len(p) == 1:
         p[0] = None
     else:
@@ -330,7 +301,7 @@ def p_Statement(p):
                     | CIN RIGHTSHIFT Expression SEMICOLON
                     | WHILE LPAREN Expression RPAREN Statement
                     | SWITCH LPAREN Expression RPAREN CaseBlock
-                    | IF LPAREN Expression RPAREN Statement
+                    | IF LPAREN Expression RPAREN Statement %prec IF
                     | IF LPAREN Expression RPAREN Statement ELSE Statement"""
     if len(p) == 2:
         p[0] = AST.ASTStatementToVariableDeclaration(p[1])
@@ -350,9 +321,9 @@ def p_Statement(p):
         p[0] = AST.ASTStatementWhile(p[1], p[2], p[3], p[4], p[5])
     elif p[1] == 'switch':
         p[0] = AST.ASTStatementSwitch(p[1], p[2], p[3], p[4], p[5])
-    elif p[1] == 'if' and len(p) == 5:
+    elif p[1] == 'if' and len(p) == 6:
         p[0] = AST.ASTStatementIF(p[1], p[2], p[3], p[4], p[5])
-    else:
+    elif len(p) == 7:
         p[0] = AST.ASTStatementIFELSE(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
 
 def p_VariableDeclaration(p):
@@ -371,6 +342,7 @@ def p_error(p):
         print("None Object")
 
 precedence = (
+    ('left', 'IF'), ('left', 'ELSE'), 
     ('left', 'TIMES', 'DIVIDE'),
     ('left', 'PLUS', 'MINUS'),
     ('right', 'RIGHTSHIFT', 'LEFTSHIFT'),
@@ -380,19 +352,11 @@ precedence = (
     ('right', 'AAND'),
     ('right', 'OOR'),
     ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
-    ('right', 'LCURLY', 'LSQUARE', 'LPAREN'),
 )
 
 
 def Parse(file):
     parser = yacc.yacc(start="CompilationUnit", debug=True)
-    # parser.error = p_error
-    # parser.error = p_error
-
-    # parser._errok = lambda: errorok() # define errorok
-    # parser.productions.append(('error', ('ClassDefiniton',), p_ClassDefinition_error))
-    # parser.productions.append(('error', ('Arguments',), p_Arguments_error))
-    # parser.productions.append(('error', ('ArgumentList',), p_ArgumentList_error))
     parsed_output = parser.parse(file)
     if parsed_output != None:
         print("parsed")
