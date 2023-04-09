@@ -9,6 +9,11 @@ def p_Arguments(p):
     """Arguments : LPAREN MaybeArgumentList RPAREN"""
     p[0] = AST.ASTArgument(p[1], p[2], p[3])
 
+def p_ArgOrIdx(p):
+    """ArgOrIdx : Arguments
+                    | Index"""
+    p[0] =AST.ASTArgOrIdx(p[1])
+
 def p_ArgumentList(p):
     """ArgumentList : Expression MultipleCommaExpression"""
     p[0] = AST.ASTArgumentList(p[1], p[2])
@@ -25,7 +30,6 @@ def p_ClassDefinition(p):
     """ClassDefinition : CLASS ID LCURLY MultipleClassMemberDefinition RCURLY"""
     p[0] = AST.ASTClassDefinition(p[1], p[2], p[3], p[4], p[5])
 
-
 def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : MethodDeclaration
                                 | DataMemberDeclaration
@@ -35,10 +39,6 @@ def p_ClassMemberDefinition(p):
 def p_CompilationUnit(p):
     """CompilationUnit : MultipleClassDefinition VOID KXI2023 Main LPAREN RPAREN MethodBody"""
     p[0] = AST.ASTCompilationUnit(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
-
-def p_CompilationUnit_error(p):
-    """CompilationUnit : error VOID KXI2023 Main LPAREN RPAREN MethodBody"""
-    print("Error with compilation Unit")
 
 def p_ConstructorDeclaration(p):
     """ConstructorDeclaration : ID MethodSuffix"""
@@ -81,18 +81,12 @@ def p_Expression(p):
                     | Expression PLUSEQUAL Expression
                     | Expression TIMES Expression
                     | Expression TIMESEQUAL Expression
-                    | NEW VOID Index
-                    | NEW VOID Arguments
-                    | NEW INT Index
-                    | NEW INT Arguments
-                    | NEW CHAR Index
-                    | NEW CHAR Arguments
-                    | NEW BOOL Index
-                    | NEW BOOL Arguments
-                    | NEW STRING Index
-                    | NEW STRING Arguments
-                    | NEW ID Index
-                    | NEW ID Arguments"""
+                    | NEW VOID ArgOrIdx
+                    | NEW INT ArgOrIdx
+                    | NEW CHAR ArgOrIdx
+                    | NEW BOOL ArgOrIdx
+                    | NEW STRING ArgOrIdx
+                    | NEW ID ArgOrIdx"""
 
     if len(p) == 2:
         p[0] = AST.ASTTerminal(p[1])
@@ -101,7 +95,7 @@ def p_Expression(p):
     elif len(p) == 3 and p[1] == '!':
         p[0] = AST.ASTExpressionNot(p[1], p[2])     
     elif len(p) == 3 and p[1] == '+':
-        p[0] = AST.ASTExpressionNot(p[1], p[2])   
+        p[0] = AST.ASTExpressionPlus(p[1], p[2])   
     elif len(p) == 3:
         p[0] = AST.ASTExpressionArgIdx(p[1], p[2])
     elif len(p) == 4 and p[2] == '.':
@@ -229,25 +223,25 @@ def p_MultipleCase(p):
     """MultipleCase : 
                         | Case MultipleCase"""
     if len(p) == 1:
-        p[0] = AST.ASTMultipleCase(None)
+        p[0] = AST.ASTMultipleCase(None, None)
     else:
-        p[0] = AST.ASTMultipleCase(Case=[p[1], p[2]])
+        p[0] = AST.ASTMultipleCase(p[1], p[2])
 
 def p_MultipleClassDefinition(p):
     """MultipleClassDefinition : 
                                     | ClassDefinition MultipleClassDefinition"""
     if len(p) == 1:
-        p[0] = AST.ASTMultipleClassDefinition(None)
+        p[0] = AST.ASTMultipleClassDefinition(None, None)
     else:
-        p[0] = AST.ASTMultipleClassDefinition(ClassDefinition=[p[1], p[2]])
+        p[0] = AST.ASTMultipleClassDefinition(p[1], p[2])
 
 def p_MultipleClassMemberDefinition(p):
     """MultipleClassMemberDefinition : 
                                         | ClassMemberDefinition MultipleClassMemberDefinition"""    
     if len(p) == 1:
-        p[0] = AST.ASTMultipleClassMemberDefinition(None)
+        p[0] = AST.ASTMultipleClassMemberDefinition(None, None)
     else:
-        p[0] = AST.ASTMultipleClassMemberDefinition(ClassMemberDefinition=[p[1], p[2]])
+        p[0] = AST.ASTMultipleClassMemberDefinition(p[1], p[2])
 
 def p_MultipleCommaExpression(p):
     """MultipleCommaExpression : 
@@ -269,9 +263,9 @@ def p_MultipleStatement(p):
     """MultipleStatement :
                             | Statement MultipleStatement"""
     if len(p) == 1:
-        p[0] = AST.ASTMultipleStatement(None)
+        p[0] = AST.ASTMultipleStatement(None, None)
     else:
-        p[0] = AST.ASTMultipleStatement(Statement=[p[1], p[2]])
+        p[0] = AST.ASTMultipleStatement(p[1], p[2])
 
 def p_NumOrChar(p):
     """NumOrChar : INT
@@ -323,7 +317,7 @@ def p_Statement(p):
         p[0] = AST.ASTStatementSwitch(p[1], p[2], p[3], p[4], p[5])
     elif p[1] == 'if' and len(p) == 6:
         p[0] = AST.ASTStatementIF(p[1], p[2], p[3], p[4], p[5])
-    elif len(p) == 7:
+    else:
         p[0] = AST.ASTStatementIFELSE(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
 
 def p_VariableDeclaration(p):
@@ -374,3 +368,8 @@ def ParseDotPrinter(file):
         parsed_output.accept(print_Visitor)
     else:
         print("No parsed tree generated")
+
+def ParseTester(st, input):
+    parser = yacc.yacc(start=st)
+    parsed_output = parser.parse(input)
+    return parsed_output

@@ -140,7 +140,7 @@ def t_STRING(t):
     return t
 
 def t_ignore_WHITESPACE(t):
-    r' [ \\t]+'
+    r' [ \t]+'
 
 def t_ignore_NEWLINE(t):
     r'[\n\r]+'
@@ -188,3 +188,13 @@ def theLexerTester(stuff):
     tok = lexer.token()
     return tok
 
+def tokenChecker(stuff):
+    import sys
+    clone = stuff
+    while True:
+        tok = clone.token()
+        if not tok:
+            break
+        elif tok.type == 'UNKNOWN':
+            print("Unknown token " + str(tok.value) + " reached on line #" + str(tok.lineno))
+            print("Caution when parsing with unknown tokens")

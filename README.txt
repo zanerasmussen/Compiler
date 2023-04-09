@@ -68,3 +68,6 @@ can only call constructor with NEW (Syntax)
     else in precendece. ply dangling else. do this over that
     token for [] [ ] [//comment]
     for [ int/ char/ ]
+
+add testing for LRSquare
+do a lot of testing for STRINGS

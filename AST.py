@@ -382,22 +382,25 @@ class ASTMethodSuffix(ASTBASENODE):
         return visitor.visit_MethodSuffix(self)
 
 class ASTMultipleCase(ASTBASENODE):
-    def __init__(self, Case):
+    def __init__(self, Case, MultipleCase):
         self.Case = Case
+        self.MultipleCase = MultipleCase
 
     def accept(self, visitor):
         return visitor.visit_MultipleCase(self)
 
 class ASTMultipleClassDefinition(ASTBASENODE):
-    def __init__(self, ClassDefinition):
+    def __init__(self, ClassDefinition, MultipleClassDefinition):
         self.ClassDefinition = ClassDefinition
+        self.MultipleClassDefinition = MultipleClassDefinition
 
     def accept(self, visitor):
         return visitor.visit_MultipleClassDefinition(self)
 
 class ASTMultipleClassMemberDefinition(ASTBASENODE):
-    def __init__(self, ClassMemberDefinition):
+    def __init__(self, ClassMemberDefinition, MultipleClassMemberDefinition):
         self.ClassMemberDefinition = ClassMemberDefinition
+        self.MultipleClassMemberDefinition = MultipleClassMemberDefinition
 
     def accept(self, visitor):
         return visitor.visit_MultipleClassMemberDefinition(self)
@@ -412,17 +415,18 @@ class ASTMultipleCommaExpression(ASTBASENODE):
         return visitor.visit_MultipleCommaExpression(self)
 
 class ASTMultipleCommaParameter(ASTBASENODE):
-    def __init__(self, COMMA, Expression, MultipleCommaParameter):
+    def __init__(self, COMMA, Parameter, MultipleCommaParameter):
         self.COMMA = COMMA
-        self.Expression = Expression
+        self.Parameter = Parameter
         self.MultipleCommaParameter = MultipleCommaParameter
 
     def accept(self, visitor):
         return visitor.visit_MultipleCommaParameter(self)
 
 class ASTMultipleStatement(ASTBASENODE):
-    def __init__(self, Statement):
+    def __init__(self, Statement, MultipleStatement):
         self.Statement = Statement
+        self.MultipleStatement = MultipleStatement
 
     def accept(self, visitor):
         return visitor.visit_MultipleStatement(self)

@@ -7,6 +7,7 @@ def main(argv):
         file = open("TestFile.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
+        tokenChecker(tokens)
         #tokens = theLexerPrintFunction(file)
         parsed = Parse(file)
 
@@ -32,6 +33,7 @@ def DoLexer():
 def DoParser():
     stuff = input("Enter KXI:")
     tokens = theLexerReturnFucntion(stuff)
+    tokenChecker(tokens)
     parsed = ParseDotPrinter(stuff)
 
 if __name__ == "__main__":

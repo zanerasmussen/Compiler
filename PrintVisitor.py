@@ -700,8 +700,9 @@ class PrintDotVisitor(ASTVisitor):
             
         else:
             for s in node.Statement:
-                s.accept(self)
-                self.graph.add_edge(pydot.Edge(str(node), str(s)))
+                if (s != None):
+                    s.accept(self)
+                    self.graph.add_edge(pydot.Edge(str(node), str(s)))
 
     def visit_Parameter(self, node: ASTParameter):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
