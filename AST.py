@@ -1,6 +1,5 @@
 from AbstractNode import ASTBASENODE
 
-
 class ASTArgument(ASTBASENODE):
     def __init__(self, LPAREN, MaybeArgumentList, RPAREN):
         self.LPAREN = LPAREN
@@ -8,7 +7,9 @@ class ASTArgument(ASTBASENODE):
         self.RPAREN = RPAREN
 
     def accept(self, visitor):
-        return visitor.visit_Argument(self)
+        if self.MaybeArgumentList != None:
+            self.MaybeArgumentList.accept(visitor)
+        visitor.visit_Argument(self)
 
 class ASTArgumentList(ASTBASENODE):
     def __init__(self, Expression, MultipleCommaExpression):
@@ -16,14 +17,19 @@ class ASTArgumentList(ASTBASENODE):
         self.MultipleCommaExpression = MultipleCommaExpression 
 
     def accept(self, visitor):
-        return visitor.visit_ArgumentList(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.MultipleCommaExpression != None:
+            self.MultipleCommaExpression.accept(visitor)
+        visitor.visit_ArgumentList(self)
 
 class ASTArgOrIdx(ASTBASENODE):
     def __init__(self, Arg_Idx):
         self.Arg_Idx = Arg_Idx
 
     def accept(self, visitor):
-        return visitor.visit_ArgOrIdx(self)
+        self.Arg_Idx.accept(visitor)
+        visitor.visit_ArgOrIdx(self)
 
 class ASTCase(ASTBASENODE):
     def __init__(self, CASE, NumOrChar, COLON, MultipleStatement):
@@ -33,7 +39,9 @@ class ASTCase(ASTBASENODE):
         self.MultipleStatement = MultipleStatement
 
     def accept(self, visitor):
-        return visitor.visit_Case(self)
+        if self.MultipleStatement != None:
+            self.MultipleStatement.accept(visitor)
+        visitor.visit_Case(self)
 
 class ASTCaseBlock(ASTBASENODE):
     def __init__(self, LCURLY, MultipleCase, DEFAULT, COLON, MultipleStatement, RCURLY):
@@ -45,7 +53,11 @@ class ASTCaseBlock(ASTBASENODE):
         self.RCURLY = RCURLY
 
     def accept(self, visitor):
-        return visitor.visit_CaseBlock(self)
+        if self.MultipleCase != None:
+            self.MultipleCase.accept(visitor)
+        if self.MultipleStatement != None:
+            self.MultipleStatement.accept(visitor)
+        visitor.visit_CaseBlock(self)
 
 class ASTClassDefinition(ASTBASENODE):
     def __init__(self, Class, ID, LCURLY, MultipleClassMemberDefinition, RCURLY):
@@ -56,14 +68,18 @@ class ASTClassDefinition(ASTBASENODE):
         self.RCURLY = RCURLY
 
     def accept(self, visitor):
-        return visitor.visit_ClassDefinition(self)
+        if self.MultipleClassMemberDefinition != None:
+            self.MultipleClassMemberDefinition.accept(visitor)
+        if self.MultipleClassMemberDefinition != None:
+            visitor.visit_ClassDefinition(self)
 
 class ASTClassMemberDefinition(ASTBASENODE):
     def __init__(self, Method_DataMember_Constructor):
         self.Method_DataMember_Constructor = Method_DataMember_Constructor
 
     def accept(self, visitor):
-        return visitor.visit_ClassMemberDefinition(self)
+        self.Method_DataMember_Constructor.accept(visitor)
+        visitor.visit_ClassMemberDefinition(self)
 
 class ASTCompilationUnit(ASTBASENODE):
     def __init__(self, MultipleClassDefinition, void, kxi2023, main, LPAREN, RPAREN, MethodBody):
@@ -76,7 +92,13 @@ class ASTCompilationUnit(ASTBASENODE):
         self.MethodBody = MethodBody
 
     def accept(self, visitor):
-        return visitor.visit_CompilationUnit(self)
+        if self.MultipleClassDefinition != None:
+            self.MultipleClassDefinition.accept(visitor)
+        if self.MethodBody != None:
+            self.MethodBody.accept(visitor)
+        
+        if self.MultipleClassDefinition != None and self.MethodBody != None:
+            visitor.visit_CompilationUnit(self)
   
 class ASTConstructorDeclaration(ASTBASENODE):
     def __init__(self, ID, MethodSuffix):
@@ -84,7 +106,9 @@ class ASTConstructorDeclaration(ASTBASENODE):
         self.MethodSuffix = MethodSuffix
 
     def accept(self, visitor):
-        return visitor.visit_ConstructorDeclaration(self)
+        if self.MethodSuffix != None:
+            self.MethodSuffix.accept(visitor)
+        visitor.visit_ConstructorDeclaration(self)
 
 class ASTDataMemberDeclaration(ASTBASENODE):
     def __init__(self, Modifier, VariableDeclaration):
@@ -92,7 +116,9 @@ class ASTDataMemberDeclaration(ASTBASENODE):
         self.VariableDeclaration = VariableDeclaration
 
     def accept(self, visitor):
-        return visitor.visit_DataMemberDeclaration(self)
+        if self.VariableDeclaration != None:
+            self.VariableDeclaration.accept(visitor)
+        visitor.visit_DataMemberDeclaration(self)
 
 class ASTExpressionArgIdx(ASTBASENODE):
     def __init__(self, Expression, ArgOrIdx):
@@ -100,7 +126,11 @@ class ASTExpressionArgIdx(ASTBASENODE):
         self.ArgOrIdx = ArgOrIdx
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionArgIdx(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.ArgOrIdx != None:
+            self.ArgOrIdx.accept(visitor)
+        visitor.visit_ExpressionArgIdx(self)
 
 class ASTExpressionDotID(ASTBASENODE):
     def __init__(self, Expression, PERIOD, ID):
@@ -109,7 +139,9 @@ class ASTExpressionDotID(ASTBASENODE):
         self.ID = ID
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionDotID(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_ExpressionDotID(self)
 
 class ASTExpressionMinus(ASTBASENODE):
     def __init__(self, MINUS, Expression):
@@ -117,7 +149,9 @@ class ASTExpressionMinus(ASTBASENODE):
         self.Expression = Expression
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionMinus(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_ExpressionMinus(self)
 
 class ASTExpressionNew(ASTBASENODE):
     def __init__(self, NEW, Type, ArgOrIdx):
@@ -126,7 +160,9 @@ class ASTExpressionNew(ASTBASENODE):
         self.ArgOrIdx = ArgOrIdx
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionNew(self)
+        if self.ArgOrIdx != None:
+            self.ArgOrIdx.accept(visitor)
+        visitor.visit_ExpressionNew(self)
 
 class ASTExpressionNot(ASTBASENODE):
     def __init__(self, NOT, Expression):
@@ -134,7 +170,9 @@ class ASTExpressionNot(ASTBASENODE):
         self.Expression = Expression
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionNot(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_ExpressionNot(self)
 
 class ASTExpressionPlus(ASTBASENODE):
     def __init__(self, PLUS, Expression):
@@ -142,7 +180,9 @@ class ASTExpressionPlus(ASTBASENODE):
         self.Expression = Expression
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionPlus(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_ExpressionPlus(self)
 
 class ASTExpressionPAREN(ASTBASENODE):
     def __init__(self, LPAREN, Expression, RPAREN):
@@ -151,7 +191,9 @@ class ASTExpressionPAREN(ASTBASENODE):
         self.RPAREN = RPAREN
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionPAREN(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_ExpressionPAREN(self)
 
 class ASTExpressionEAANDE(ASTBASENODE):
     def __init__(self, Expression, AAND, Expression2):
@@ -160,7 +202,11 @@ class ASTExpressionEAANDE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEAANDE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEAANDE(self)
 
 class ASTExpressionECEqualE(ASTBASENODE):
     def __init__(self, Expression, CEQUAL, Expression2):
@@ -169,7 +215,11 @@ class ASTExpressionECEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpresssionECEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpresssionECEqualE(self)
 
 class ASTExpressionEDivideE(ASTBASENODE):
     def __init__(self, Expression, DIVIDE, Expression2):
@@ -178,7 +228,11 @@ class ASTExpressionEDivideE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEDivideE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEDivideE(self)
 
 class ASTExpressionEDivideEqualE(ASTBASENODE):
     def __init__(self, Expression, DIVIDEEQUAL, Expression2):
@@ -187,7 +241,11 @@ class ASTExpressionEDivideEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEDivideEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEDivideEqualE(self)
 
 class ASTExpressionEEqualE(ASTBASENODE):
     def __init__(self, Expression, EQUAL, Expression2):
@@ -196,7 +254,11 @@ class ASTExpressionEEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEEqualE(self)
 
 class ASTExpressionEGreaterE(ASTBASENODE):
     def __init__(self, Expression, GREATER, Expression2):
@@ -205,7 +267,11 @@ class ASTExpressionEGreaterE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEGreaterE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEGreaterE(self)
 
 class ASTExpressionEGreaterEqualE(ASTBASENODE):
     def __init__(self, Expression, GREATEQUAL, Expression2):
@@ -214,7 +280,11 @@ class ASTExpressionEGreaterEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEGreaterEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEGreaterEqualE(self)
 
 class ASTExpressionELessE(ASTBASENODE):
     def __init__(self, Expression, LESS, Expression2):
@@ -223,7 +293,11 @@ class ASTExpressionELessE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionELessE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionELessE(self)
 
 class ASTExpressionELessEqualE(ASTBASENODE):
     def __init__(self, Expression, LESSEQUAL, Expression2):
@@ -232,7 +306,11 @@ class ASTExpressionELessEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionELessEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionELessEqualE(self)
 
 class ASTExpressionEMinusE(ASTBASENODE):
     def __init__(self, Expression, MINUS, Expression2):
@@ -241,7 +319,11 @@ class ASTExpressionEMinusE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEMinusE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEMinusE(self)
 
 class ASTExpressionEMinusEqualE(ASTBASENODE):
     def __init__(self, Expression, MINUSEQUAL, Expression2):
@@ -250,7 +332,11 @@ class ASTExpressionEMinusEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEMinusEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEMinusEqualE(self)
 
 class ASTExpressionENotEqualE(ASTBASENODE):
     def __init__(self, Expression, NEQUAL, Expression2):
@@ -259,7 +345,11 @@ class ASTExpressionENotEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionENotEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionENotEqualE(self)
 
 class ASTExpressionEOORE(ASTBASENODE):
     def __init__(self, Expression, OOR, Expression2):
@@ -268,7 +358,11 @@ class ASTExpressionEOORE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEOORE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEOORE(self)
 
 class ASTExpressionEPlusE(ASTBASENODE):
     def __init__(self, Expression, PLUS, Expression2):
@@ -277,7 +371,11 @@ class ASTExpressionEPlusE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEPlusE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEPlusE(self)
 
 class ASTExpressionEPlusEqualE(ASTBASENODE):
     def __init__(self, Expression, PLUSEQUAL, Expression2):
@@ -286,7 +384,11 @@ class ASTExpressionEPlusEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionEPlusEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionEPlusEqualE(self)
 
 class ASTExpressionETimesE(ASTBASENODE):
     def __init__(self, Expression, TIMES, Expression2):
@@ -295,7 +397,11 @@ class ASTExpressionETimesE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionETimesE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionETimesE(self)
 
 class ASTExpressionETimesEqualE(ASTBASENODE):
     def __init__(self, Expression, TIMESEQUAL, Expression2):
@@ -304,7 +410,11 @@ class ASTExpressionETimesEqualE(ASTBASENODE):
         self.Expression2 = Expression2
 
     def accept(self, visitor):
-        return visitor.visit_ExpressionETimesEqualE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression2 != None:
+            self.Expression2.accept(visitor)
+        visitor.visit_ExpressionETimesEqualE(self)
 
 class ASTIndex(ASTBASENODE):
     def __init__(self, LSQUARE, Expression, RSQUARE):
@@ -313,7 +423,9 @@ class ASTIndex(ASTBASENODE):
         self.RSQUARE = RSQUARE
 
     def accept(self, visitor):
-        return visitor.visit_Index(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_Index(self)
 
 class ASTInitializer(ASTBASENODE):
     def __init__(self, EQUAL, Expression):
@@ -321,35 +433,49 @@ class ASTInitializer(ASTBASENODE):
         self.Expression = Expression
 
     def accept(self, visitor):
-        return visitor.visit_Initializer(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_Initializer(self)
 
 class ASTMaybeArgumentList(ASTBASENODE):
     def __init__(self, ArgumentList):
         self.ArgumentList = ArgumentList
 
     def accept(self, visitor):
-        return visitor.visit_MaybeArgumentList(self)
+        if self.ArgumentList != None:
+            self.ArgumentList.accept(visitor)
+        if self.ArgumentList != None:
+            visitor.visit_MaybeArgumentList(self)
 
 class ASTMaybeExpression(ASTBASENODE):
     def __init__(self, Expression):
         self.Expression = Expression
 
     def accept(self, visitor):
-        return visitor.visit_MaybeExpression(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Expression != None:
+            visitor.visit_MaybeExpression(self)
 
 class ASTMaybeInitializer(ASTBASENODE):
     def __init__(self, Initializer):
         self.Initializer = Initializer
 
     def accept(self, visitor):
-        return visitor.visit_MaybeInitializer(self)
+        if self.Initializer != None:
+            self.Initializer.accept(visitor)
+        if self.Initializer != None:
+            visitor.visit_MaybeInitializer(self)
 
 class ASTMaybeParamList(ASTBASENODE):
     def __init__(self, ParameterList):
         self.ParameterList = ParameterList
 
     def accept(self, visitor):
-        return visitor.visit_MaybeParamList(self)
+        if self.ParameterList != None:
+            self.ParameterList.accept(visitor)
+        if self.ParameterList != None:
+            visitor.visit_MaybeParamList(self)
 
 class ASTMethodBody(ASTBASENODE):
     def __init__(self, LCURLY, MultipleStatement, RCURLY):
@@ -358,7 +484,10 @@ class ASTMethodBody(ASTBASENODE):
         self.RCURLY = RCURLY
 
     def accept(self, visitor):
-        return visitor.visit_MethodBody(self)
+        if self.MultipleStatement != None:
+            self.MultipleStatement.accept(visitor)
+        if self.MultipleStatement != None:
+            visitor.visit_MethodBody(self)
 
 class ASTMethodDeclaration(ASTBASENODE):
     def __init__(self, Modifier, Type, LRSquare, ID, MethodSuffix):
@@ -369,7 +498,9 @@ class ASTMethodDeclaration(ASTBASENODE):
         self.MethodSuffix = MethodSuffix
 
     def accept(self, visitor):
-        return visitor.visit_MethodDeclaration(self)
+        if self.MethodSuffix != None:
+            self.MethodSuffix.accept(visitor)
+            visitor.visit_MethodDeclaration(self)
 
 class ASTMethodSuffix(ASTBASENODE):
     def __init__(self, LPAREN, MaybeParameterList, RPAREN, MethodBody):
@@ -379,7 +510,11 @@ class ASTMethodSuffix(ASTBASENODE):
         self.MethodBody = MethodBody
 
     def accept(self, visitor):
-        return visitor.visit_MethodSuffix(self)
+        if self.MaybeParameterList != None:
+            self.MaybeParameterList.accept(visitor)
+        if self.MethodBody != None:
+            self.MethodBody.accept(visitor)
+        visitor.visit_MethodSuffix(self)
 
 class ASTMultipleCase(ASTBASENODE):
     def __init__(self, Case, MultipleCase):
@@ -387,7 +522,12 @@ class ASTMultipleCase(ASTBASENODE):
         self.MultipleCase = MultipleCase
 
     def accept(self, visitor):
-        return visitor.visit_MultipleCase(self)
+        if self.Case != None:
+            self.Case.accept(visitor)
+        if self.MultipleCase != None:
+            self.MultipleCase.accept(visitor)
+        if self.MultipleCase != None and self.Case != None:
+            visitor.visit_MultipleCase(self)
 
 class ASTMultipleClassDefinition(ASTBASENODE):
     def __init__(self, ClassDefinition, MultipleClassDefinition):
@@ -395,7 +535,12 @@ class ASTMultipleClassDefinition(ASTBASENODE):
         self.MultipleClassDefinition = MultipleClassDefinition
 
     def accept(self, visitor):
-        return visitor.visit_MultipleClassDefinition(self)
+        if self.ClassDefinition != None:
+            self.ClassDefinition.accept(visitor)
+        if self.MultipleClassDefinition != None:
+            self.MultipleClassDefinition.accept(visitor)  
+        if self.ClassDefinition != None and self.MultipleClassDefinition != None:
+            visitor.visit_MultipleClassDefinition(self)
 
 class ASTMultipleClassMemberDefinition(ASTBASENODE):
     def __init__(self, ClassMemberDefinition, MultipleClassMemberDefinition):
@@ -403,7 +548,12 @@ class ASTMultipleClassMemberDefinition(ASTBASENODE):
         self.MultipleClassMemberDefinition = MultipleClassMemberDefinition
 
     def accept(self, visitor):
-        return visitor.visit_MultipleClassMemberDefinition(self)
+        if self.ClassMemberDefinition != None:
+            self.ClassMemberDefinition.accept(visitor)
+        if self.MultipleClassMemberDefinition != None:
+            self.MultipleClassMemberDefinition.accept(visitor)
+        if self.ClassMemberDefinition != None and self.MultipleClassMemberDefinition != None:
+            visitor.visit_MultipleClassMemberDefinition(self)
 
 class ASTMultipleCommaExpression(ASTBASENODE):
     def __init__(self, COMMA, Expression, MultipleCommaExpression):
@@ -412,7 +562,11 @@ class ASTMultipleCommaExpression(ASTBASENODE):
         self.MultipleCommaExpression = MultipleCommaExpression
 
     def accept(self, visitor):
-        return visitor.visit_MultipleCommaExpression(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.MultipleCommaExpression != None:
+            self.MultipleCommaExpression.accept(visitor)
+        visitor.visit_MultipleCommaExpression(self)
 
 class ASTMultipleCommaParameter(ASTBASENODE):
     def __init__(self, COMMA, Parameter, MultipleCommaParameter):
@@ -421,7 +575,11 @@ class ASTMultipleCommaParameter(ASTBASENODE):
         self.MultipleCommaParameter = MultipleCommaParameter
 
     def accept(self, visitor):
-        return visitor.visit_MultipleCommaParameter(self)
+        if self.Parameter != None:
+            self.Parameter.accept(visitor)
+        if self.MultipleCommaParameter != None:
+            self.MultipleCommaParameter.accept(visitor)
+        visitor.visit_MultipleCommaParameter(self)
 
 class ASTMultipleStatement(ASTBASENODE):
     def __init__(self, Statement, MultipleStatement):
@@ -429,7 +587,12 @@ class ASTMultipleStatement(ASTBASENODE):
         self.MultipleStatement = MultipleStatement
 
     def accept(self, visitor):
-        return visitor.visit_MultipleStatement(self)
+        if self.Statement != None:
+            self.Statement.accept(visitor)
+        if self.MultipleStatement != None:
+            self.MultipleStatement.accept(visitor)
+        if self.MultipleStatement != None and self.Statement != None:
+            visitor.visit_MultipleStatement(self)
 
 class ASTParameter(ASTBASENODE):
     def __init__(self, Type, LRSquare, ID):
@@ -438,7 +601,7 @@ class ASTParameter(ASTBASENODE):
         self.ID = ID
 
     def accept(self, visitor):
-        return visitor.visit_Parameter(self)
+        visitor.visit_Parameter(self)
 
 class ASTParameterList(ASTBASENODE):
     def __init__(self, Parameter, MultipleCommaParameter):
@@ -446,7 +609,11 @@ class ASTParameterList(ASTBASENODE):
         self.MultipleCommaParameter = MultipleCommaParameter
 
     def accept(self, visitor):
-        return visitor.visit_ParameterList(self)
+        if self.Parameter != None:
+            self.Parameter.accept(visitor)
+        if self.MultipleCommaParameter != None:
+            self.MultipleCommaParameter.accept(visitor)
+        visitor.visit_ParameterList(self)
 
 class ASTStatementBreak(ASTBASENODE):
     def __init__(self, BREAK, SEMICOLON):
@@ -454,7 +621,7 @@ class ASTStatementBreak(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
 
     def accept(self, visitor):
-        return visitor.visit_StatementBreak(self)
+        visitor.visit_StatementBreak(self)
 
 class ASTStatementCIN(ASTBASENODE):
     def __init__(self, CIN, RIGHTSHIFT, Expression, SEMICOLON):
@@ -464,7 +631,9 @@ class ASTStatementCIN(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
 
     def accept(self, visitor):
-        return visitor.visit_StatementCIN(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_StatementCIN(self)
 
 class ASTStatementCOUT(ASTBASENODE):
     def __init__(self, COUT, LEFTSHIFT, Expression, SEMICOLON):
@@ -474,7 +643,9 @@ class ASTStatementCOUT(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
 
     def accept(self, visitor):
-        return visitor.visit_StatementCOUT(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_StatementCOUT(self)
 
 class ASTStatementExpression(ASTBASENODE):
     def __init__(self, Expression, SEMICOLON):
@@ -482,7 +653,9 @@ class ASTStatementExpression(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
 
     def accept(self, visitor):
-        return visitor.visit_StatementExpression(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        visitor.visit_StatementExpression(self)
 
 class ASTStatementIF(ASTBASENODE):
     def __init__(self, IF, LPAREN, Expression, RPAREN, Statement):
@@ -493,7 +666,11 @@ class ASTStatementIF(ASTBASENODE):
         self.Statement = Statement
 
     def accept(self, visitor):
-        return visitor.visit_StatementIF(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Statement != None:
+            self.Statement.accept(visitor)
+        visitor.visit_StatementIF(self)
 
 class ASTStatementIFELSE(ASTBASENODE):
     def __init__(self, IF, LPAREN, Expression, RPAREN, Statement, ELSE, Statement2):
@@ -506,7 +683,13 @@ class ASTStatementIFELSE(ASTBASENODE):
         self.Statement2 = Statement2
 
     def accept(self, visitor):
-        return visitor.visit_StatementIFELSE(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Statement != None:
+            self.Statement.accept(visitor)
+        if self.Statement2 != None:
+            self.Statement2.accept(visitor)
+        visitor.visit_StatementIFELSE(self)
 
 class ASTStatementMultipleStatement(ASTBASENODE):
     def __init__(self, LCURLY, MultipleStatement, RCURLY):
@@ -515,14 +698,18 @@ class ASTStatementMultipleStatement(ASTBASENODE):
         self.RCURLY = RCURLY
 
     def accept(self, visitor):
-        return visitor.visit_StatementMultipleStatement(self)
+        if self.MultipleStatement != None:
+            self.MultipleStatement.accept(visitor)
+        visitor.visit_StatementMultipleStatement(self)
 
 class ASTStatementToVariableDeclaration(ASTBASENODE):
     def __init__(self, VariableDeclaration):
         self.VariableDeclaration = VariableDeclaration
 
     def accept(self, visitor):
-        return visitor.visit_StatementToVariableDeclaration(self)
+        if self.VariableDeclaration != None:
+            self.VariableDeclaration.accept(visitor)
+        visitor.visit_StatementToVariableDeclaration(self)
 
 class ASTStatementReturn(ASTBASENODE):
     def __init__(self, RETURN, MaybeExpression, SEMICOLON):
@@ -531,7 +718,9 @@ class ASTStatementReturn(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
 
     def accept(self, visitor):
-        return visitor.visit_StatementReturn(self)
+        if self.MaybeExpression != None:
+            self.MaybeExpression.accept(visitor)
+        visitor.visit_StatementReturn(self)
 
 class ASTStatementSwitch(ASTBASENODE):
     def __init__(self, SWITCH, LPAREN, Expression, RPAREN, CaseBlock):
@@ -542,7 +731,11 @@ class ASTStatementSwitch(ASTBASENODE):
         self.CaseBlock = CaseBlock
 
     def accept(self, visitor):
-        return visitor.visit_StatementSwitch(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.CaseBlock != None:
+            self.CaseBlock.accept(visitor)
+        visitor.visit_StatementSwitch(self)
 
 class ASTStatementWhile(ASTBASENODE):
     def __init__(self, WHILE, LPAREN, Expression, RPAREN, Statement):
@@ -553,7 +746,11 @@ class ASTStatementWhile(ASTBASENODE):
         self.Statement = Statement
 
     def accept(self, visitor):
-        return visitor.visit_StatementWhile(self)
+        if self.Expression != None:
+            self.Expression.accept(visitor)
+        if self.Statement != None:
+            self.Statement.accept(visitor)
+        visitor.visit_StatementWhile(self)
 
 class ASTVariableDeclaration(ASTBASENODE):
     def __init__(self, Type, LRSquare, ID, Initializer, SEMICOLON):
@@ -564,11 +761,13 @@ class ASTVariableDeclaration(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
 
     def accept(self, visitor):
-        return visitor.visit_VariableDeclaration(self)
+        if self.Initializer != None:
+            self.Initializer.accept(visitor)
+        visitor.visit_VariableDeclaration(self)
 
 class ASTTerminal(ASTBASENODE):
     def __init__(self, Terminal):
         self.Terminal = Terminal
 
     def accept(self, visitor):
-        return visitor.visit_Terminal(self)
+        visitor.visit_Terminal(self)

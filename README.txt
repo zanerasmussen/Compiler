@@ -71,3 +71,6 @@ can only call constructor with NEW (Syntax)
 
 add testing for LRSquare
 do a lot of testing for STRINGS
+
+test chars tokens
+test string tokens

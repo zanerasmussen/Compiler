@@ -1,0 +1,62 @@
+class MyClass {
+    public string [] methodDeclartion_Single () {}
+}
+
+class OtherClass{
+    public bool methodDeclaration_double (void [] param_single) {
+        break;
+    }
+    private bool DataMemberDeclaration_double;
+}
+
+class LastClass{
+    public int [] methodDeclaration_triple (string param_One_double, param2ID param_two_double) {
+        a = b;
+        123 -= 1;
+        if (a *= b) cin >> "cin string";
+        if (a *= b) cin >> "cin string2 "; else false;
+        cout << "this is a cout string";
+        return (a==b);
+    }
+    private int [] DataMemberDeclaration_triple = this;
+    ConstructorDeclaration_triple () {
+        int a = 5;
+        int b = 2;
+        a /= b;
+        a + b;
+        a - b;
+        a * b;
+        a / b;
+        a == b;
+        a != b;
+        a < b;
+        a > b;
+        a <= b;
+        a >= b;
+        a && b;
+        a || b;
+        !a;
+        +b;
+        -a;
+        123;
+        'x';
+        "string literal";
+        true;
+        false;
+        null;
+        id_test;
+        new void ();
+        new bool (a == b);
+        new string((a==b), 123);
+        new array [0];
+        this;
+        id1.id2;
+        array[3];
+        temp();
+        temp (123);
+    }
+}
+
+void kxi2023 main (){
+
+}

@@ -19,7 +19,11 @@ class Unique:
 class PrintDotVisitor(ASTVisitor):
     def __init__(self):
         self.UID = Unique()
-        self.graph = None
+        self.graph = pydot.Graph() 
+        self.graph = pydot.Dot('my_graph', graph_type='graph')
+        start = pydot.Node('Start', shape='diamond', style='filled', fillcolor='cyan')
+
+        self.graph.add_node(start)
 
     def visit_Argument(self, node: ASTArgument):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
@@ -27,31 +31,29 @@ class PrintDotVisitor(ASTVisitor):
         LPARENNodeName = str(node.LPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
-
-        node.MaybeArgumentList.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MaybeArgumentList)))
+        
+        if (node.MaybeArgumentList.ArgumentList!= None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MaybeArgumentList)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
     def visit_ArgumentList(self, node: ASTArgumentList):
+
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
-        node.MultipleCommaExpression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaExpression)))
     
     def visit_ArgOrIdx(self, node: ASTArgOrIdx):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Arg_Idx.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Arg_Idx)))
 
     def visit_Case(self, node: ASTCase):
-        self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="##7CFC7C"))
+        self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         CaseNodeName = str(node.CASE) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(CaseNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
@@ -65,7 +67,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(ColonNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), ColonNodeName))
 
-        node.MultipleStatement.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
 
     def visit_CaseBlock(self, node: ASTCaseBlock):
@@ -75,7 +76,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LCURLYNodeName))
 
-        node.MultipleCase.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCase)))
 
         DefaultNodeName = str(node.DEFAULT) + " $" + str(self.UID.getID())
@@ -86,7 +86,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(ColonNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), ColonNodeName))
 
-        node.MultipleStatement.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
         
         RCURLYNodeName = str(node.RCURLY) + " $" + str(self.UID.getID())
@@ -94,69 +93,79 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
     def visit_ClassDefinition(self, node: ASTClassDefinition):
+        #add node for Class Definition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
+        #add terminal node for 'Class Node'
         classNodeName = str(node.Class) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(classNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), classNodeName))
 
+        #add terminal node for 'ID Node'
         IDNodeName = str(node.ID) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), IDNodeName))
 
+        #add terminal node for '{ Node'
         LCURLYNodeName = str(node.LCURLY) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(LCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LCURLYNodeName))
 
-        node.MultipleClassMemberDefinition.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassMemberDefinition)))
+        #check to see if it will be visited. if not don't add edge. 
+        if node.MultipleClassMemberDefinition.MultipleClassMemberDefinition != None:
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassMemberDefinition)))
 
+        #add terminal node for '}Node'
         RCURLYNodeName = str(node.RCURLY) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
     def visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
+        #add node for Class Member Definition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Method_DataMember_Constructor.accept(self)
+        #add node for Method/DataMember/Constructor
         self.graph.add_edge(pydot.Edge(str(node), str(node.Method_DataMember_Constructor)))
 
     def visit_CompilationUnit(self, node: ASTCompilationUnit):
 
-        self.graph = pydot.Dot('my_graph', graph_type='graph')
-        start = pydot.Node('Start', shape='diamond', style='filled', fillcolor='cyan')
-
-        self.graph.add_node(start)
+        #add Compilation Unit to Start
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
         self.graph.add_edge(pydot.Edge('Start', str(node)))
 
-        node.MultipleClassDefinition.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassDefinition)))
+        #check to see if this will be visted. If not, don't add edge
+        if node.MultipleClassDefinition.ClassDefinition != None and node.MultipleClassDefinition.MultipleClassDefinition != None:
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassDefinition)))
 
+        #add node for terminal 'void'
         voidNodeName = str(node.void) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(voidNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), voidNodeName))
 
+        #add node for terminal 'KXI2023'
         kxiNodeName = str(node.kxi2023) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(kxiNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), kxiNodeName))
 
+        #add node for terminal 'main'
         mainNodeName = str(node.main) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(mainNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), mainNodeName))
 
+
+        #add node for terminal '('
         LPARENNodeName = str(node.LPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
     
+        #add node for terminal ')'
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-        node.MethodBody.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MethodBody)))
-
-        self.graph.write_png('output.png')
+        #check to see if this will be visted. If not, don't add edge
+        if node.MethodBody.MultipleStatement != None:
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MethodBody)))
 
     def visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
@@ -165,7 +174,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), IDNodeName))
 
-        node.MethodSuffix.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MethodSuffix)))
 
     def visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
@@ -175,22 +183,18 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(ModifierNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), ModifierNodeName))
         
-        node.VariableDeclaration.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.VariableDeclaration)))
 
     def visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
         
-        node.ArgOrIdx.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.ArgOrIdx)))
 
     def visit_ExpressionDotID(self, node: ASTExpressionDotID):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         PeriodNodeName = str(node.PERIOD) + " $" + str(self.UID.getID())
@@ -208,7 +212,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(MinusNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), MinusNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
     def visit_ExpressionNew(self, node: ASTExpressionNew):
@@ -222,7 +225,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(TypeNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), TypeNodeName))
 
-        node.ArgOrIdx.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.ArgOrIdx)))
 
     def visit_ExpressionNot(self, node: ASTExpressionNot):
@@ -232,7 +234,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(NOTNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), NOTNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
     def visit_ExpressionPlus(self, node: ASTExpressionPlus):
@@ -242,7 +243,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(PLUSNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), PLUSNodeName))
         
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
     def visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
@@ -252,7 +252,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
         
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
@@ -262,222 +261,188 @@ class PrintDotVisitor(ASTVisitor):
     def visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         AANDNodeName = str(node.AAND) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(AANDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), AANDNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         CEQUALNodeName = str(node.CEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(CEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), CEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         DIVIDENodeName = str(node.DIVIDE) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(DIVIDENodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), DIVIDENodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         DivideEqualNodeName = str(node.DIVIDEEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(DivideEqualNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), DivideEqualNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
     
     def visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         EqualNodeName = str(node.EQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(EqualNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), EqualNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         GREATERNodeName = str(node.GREATER) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(GREATERNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), GREATERNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         GREATEQUALNodeName = str(node.GREATEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(GREATEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), GREATEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionELessE(self, node: ASTExpressionELessE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         LESSNodeName = str(node.LESS) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(LESSNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LESSNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         LESSEQUALNodeName = str(node.LESSEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(LESSEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LESSEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         MINUSNodeName = str(node.MINUS) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(MINUSNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), MINUSNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         MINUSEQUALNodeName = str(node.MINUSEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(MINUSEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), MINUSEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         NEQUALNodeName = str(node.NEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(NEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), NEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         OORNodeName = str(node.OOR) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(OORNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), OORNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         PLUSNodeName = str(node.PLUS) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(PLUSNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), PLUSNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         PLUSEQUALNodeName = str(node.PLUSEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(PLUSEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), PLUSEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         TIMESNodeName = str(node.TIMES) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(TIMESNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), TIMESNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         TIMESEQUALNodeName = str(node.TIMESEQUAL) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(TIMESEQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), TIMESEQUALNodeName))
         
-        node.Expression2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
     def visit_Index(self, node: ASTIndex):
@@ -487,7 +452,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LSQUARENodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LSQUARENodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         RSQUARENodeName = str(node.RSQUARE) + " $" + str(self.UID.getID())
@@ -501,91 +465,77 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(EQUALNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), EQUALNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
     def visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if node.ArgumentList is None:
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-
-        else:
-            node.ArgumentList.accept(self)
+        if node.ArgumentList != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.ArgumentList)))
 
     def visit_MaybeExpression(self, node: ASTMaybeExpression):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if node.Expression is None:
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-            
-        else:
-            node.Expression.accept(self)
+        if node.Expression != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
     def visit_MaybeInitializer(self, node: ASTMaybeInitializer):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if node.Initializer is None:
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-            
-        else:
-            node.Initializer.accept(self)
+        if node.Initializer != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.Initializer)))
 
     def visit_MaybeParamList(self, node: ASTMaybeParamList):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if node.ParameterList is None:
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-            
-        else:
-            node.ParameterList.accept(self)
+        if node.ParameterList != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.ParameterList)))
 
     def visit_MethodBody(self, node: ASTMethodBody):
+        #add node for MethodBody
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
+        #add terminal node for '{'
         LCURLYNodeName = str(node.LCURLY) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(LCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LCURLYNodeName))
 
-        node.MultipleStatement.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
+        #check to see if MultipleStatement will be visited. 
+        if node.MultipleStatement.MultipleStatement != None and node.MultipleStatement.Statement:
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
 
+        #add terminal node for '}'
         RCURLYNodeName = str(node.RCURLY) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
     def visit_MethodDeclaration(self, node: ASTMethodDeclaration):
+        #add node for MEthodDeclaration
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
+        #add node for terminal Modifier
         ModifierNodeName = str(node.Modifier) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(ModifierNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), ModifierNodeName))
+
+        #add node for terminal Type
 
         TypeNodeName = str(node.Type) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(TypeNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), TypeNodeName))
 
-        LRSquareNodeName = str(node.LRSquare) + " $" + str(self.UID.getID())
-        self.graph.add_node(pydot.Node(LRSquareNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-        self.graph.add_edge(pydot.Edge(str(node), LRSquareNodeName))
+        #add node for terminal []
+        if node.LRSquare != None:
+            LRSquareNodeName = str(node.LRSquare) + " $" + str(self.UID.getID())
+            self.graph.add_node(pydot.Node(LRSquareNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
+            self.graph.add_edge(pydot.Edge(str(node), LRSquareNodeName))
 
+        #add node for terminal ID
         IDNodeName = str(node.ID) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), IDNodeName))
 
-        node.MethodSuffix.accept(self)
+        #add edge for node.MethodSuffix
         self.graph.add_edge(pydot.Edge(str(node), str(node.MethodSuffix)))
 
     def visit_MethodSuffix(self, node: ASTMethodSuffix):
@@ -595,54 +545,47 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
 
-        node.MaybeParameterList.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MaybeParameterList)))
+        if (node.MaybeParameterList.ParameterList!= None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MaybeParameterList)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-        node.MethodBody.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MethodBody)))
 
     def visit_MultipleCase(self, node: ASTMultipleCase):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if (node.Case == None):
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-            
-        else:
-            for c in node.Case:
-                c.accept(self)
-                self.graph.add_edge(pydot.Edge(str(node), str(c)))
+        if (node.Case != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.Case)))
+
+        if (node.MultipleCase.Case != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCase)))
 
     def visit_MultipleClassDefinition(self, node: ASTMultipleClassDefinition):
+        #add node for MultipleClass Definition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if (node.ClassDefinition == None):
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
+        #check to see if this will be visited. If not, don't add edge
+        if (node.ClassDefinition != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.ClassDefinition)))
 
-        else:
-            for classDef in node.ClassDefinition:
-                classDef.accept(self)
-                self.graph.add_edge(pydot.Edge(str(node), str(classDef)))
+        #check to see if this will be visited. If not, don't add edge
+        if (node.MultipleClassDefinition.ClassDefinition != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassDefinition)))
                 
     def visit_MultipleClassMemberDefinition(self, node: ASTMultipleClassMemberDefinition):
+        #add node for MultipleClassMemberDefinition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if (node.ClassMemberDefinition == None):
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-
-        else:
-            for classMem in node.ClassMemberDefinition:
-                classMem.accept(self)
-                self.graph.add_edge(pydot.Edge(str(node), str(classMem)))
+        #check to see if this will be visited. If not, don't add edge
+        if (node.ClassMemberDefinition != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.ClassMemberDefinition)))
+            
+        #check to see if this will be visited. If not, don't add edge
+        if (node.MultipleClassMemberDefinition.ClassMemberDefinition != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassMemberDefinition)))
 
     def visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
@@ -656,7 +599,6 @@ class PrintDotVisitor(ASTVisitor):
             self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
             self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
         else:
-            node.Expression.accept(self)
             self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         if node.MultipleCommaExpression == None:
@@ -664,7 +606,6 @@ class PrintDotVisitor(ASTVisitor):
             self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
             self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
         else:
-            node.MultipleCommaExpression.accept(self)
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaExpression)))
 
     def visit_MultipleCommaParameter(self, node: ASTMultipleCommaParameter):
@@ -674,35 +615,27 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(CommaNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), CommaNodeName))
 
-        if node.Expression == None:
+        if node.Parameter == None:
             noneNodeName = "None $" + str(self.UID.getID())
             self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
             self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
         else:
-            node.Expression.accept(self)
-            self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
+            self.graph.add_edge(pydot.Edge(str(node), str(node.Parameter)))
 
         if node.MultipleCommaParameter == None:
             noneNodeName = "None $" + str(self.UID.getID())
             self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
             self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
         else:
-            node.MultipleCommaParameter.accept(self)
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaParameter)))
 
     def visit_MultipleStatement(self, node: ASTMultipleStatement):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        if (node.Statement == None):
-            noneNodeName = "None $" + str(self.UID.getID())
-            self.graph.add_node(pydot.Node(noneNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-            self.graph.add_edge(pydot.Edge(str(node), noneNodeName))
-            
-        else:
-            for s in node.Statement:
-                if (s != None):
-                    s.accept(self)
-                    self.graph.add_edge(pydot.Edge(str(node), str(s)))
+        if (node.Statement != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.Statement)))
+        if (node.MultipleStatement.MultipleStatement != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
 
     def visit_Parameter(self, node: ASTParameter):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
@@ -711,9 +644,11 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(TypeNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), TypeNodeName))
 
-        LRSquareNodeName = str(node.LRSquare) + " $" + str(self.UID.getID())
-        self.graph.add_node(pydot.Node(LRSquareNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-        self.graph.add_edge(pydot.Edge(str(node), LRSquareNodeName))
+        #add node for terminal []
+        if node.LRSquare != None:
+            LRSquareNodeName = str(node.LRSquare) + " $" + str(self.UID.getID())
+            self.graph.add_node(pydot.Node(LRSquareNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
+            self.graph.add_edge(pydot.Edge(str(node), LRSquareNodeName))
 
         IDNodeName = str(node.ID) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
@@ -722,10 +657,8 @@ class PrintDotVisitor(ASTVisitor):
     def visit_ParameterList(self, node: ASTParameterList):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Parameter.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Parameter)))
 
-        node.MultipleCommaParameter.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaParameter)))
 
     def visit_StatementBreak(self, node: ASTStatementBreak):
@@ -750,7 +683,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RIGHTSHIFTNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RIGHTSHIFTNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         SEMICOLONNodeName = str(node.SEMICOLON) + " $" + str(self.UID.getID())
@@ -768,7 +700,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LEFTSHIFTNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LEFTSHIFTNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         SEMICOLONNodeName = str(node.SEMICOLON) + " $" + str(self.UID.getID())
@@ -778,7 +709,6 @@ class PrintDotVisitor(ASTVisitor):
     def visit_StatementExpression(self, node: ASTStatementExpression):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         SEMICOLONNodeName = str(node.SEMICOLON) + " $" + str(self.UID.getID())
@@ -796,14 +726,12 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-        node.Statement.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement)))
 
     def visit_StatementIFELSE(self, node: ASTStatementIFELSE):
@@ -817,21 +745,18 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-        node.Statement.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement)))
 
         ELSENodeName = str(node.ELSE) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(ELSENodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), ELSENodeName))
 
-        node.Statement2.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement2)))
 
     def visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
@@ -841,7 +766,6 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LCURLYNodeName))
 
-        node.MultipleStatement.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
 
         RCURLYNodeName = str(node.RCURLY) + " $" + str(self.UID.getID())
@@ -851,7 +775,6 @@ class PrintDotVisitor(ASTVisitor):
     def visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
-        node.VariableDeclaration.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.VariableDeclaration)))
 
     def visit_StatementReturn(self, node: ASTStatementReturn):
@@ -861,8 +784,8 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RETURNNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RETURNNodeName))
 
-        node.MaybeExpression.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.MaybeExpression)))
+        if (node.MaybeExpression.Expression != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.MaybeExpression)))
 
         SEMICOLONNodeName = str(node.SEMICOLON) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
@@ -879,14 +802,12 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-        node.CaseBlock.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.CaseBlock)))
 
     def visit_StatementWhile(self, node: ASTStatementWhile):
@@ -900,14 +821,12 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(LPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), LPARENNodeName))
 
-        node.Expression.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
         RPARENNodeName = str(node.RPAREN) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-        node.Statement.accept(self)
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement)))
 
     def visit_VariableDeclaration(self, node: ASTVariableDeclaration):
@@ -917,22 +836,22 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(TypeNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), TypeNodeName))
 
-        LRSquareNodeName = str(node.LRSquare) + " $" + str(self.UID.getID())
-        self.graph.add_node(pydot.Node(LRSquareNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
-        self.graph.add_edge(pydot.Edge(str(node), LRSquareNodeName))
+        #add node for terminal []
+        if node.LRSquare != None:
+            LRSquareNodeName = str(node.LRSquare) + " $" + str(self.UID.getID())
+            self.graph.add_node(pydot.Node(LRSquareNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
+            self.graph.add_edge(pydot.Edge(str(node), LRSquareNodeName))
 
         IDNodeName = str(node.ID) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), IDNodeName))
 
-        node.Initializer.accept(self)
-        self.graph.add_edge(pydot.Edge(str(node), str(node.Initializer)))
+        if (node.Initializer.Initializer != None):
+            self.graph.add_edge(pydot.Edge(str(node), str(node.Initializer)))
 
         SEMICOLONNodeName = str(node.SEMICOLON) + " $" + str(self.UID.getID())
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))
-
-
 
     def visit_Terminal(self, node: ASTTerminal):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))

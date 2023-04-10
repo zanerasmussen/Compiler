@@ -1,4 +1,5 @@
 import sys, getopt
+from mainHelper import *
 from theLexer import *
 from theParser import *
 
@@ -8,7 +9,6 @@ def main(argv):
         file = file.read()
         tokens = theLexerReturnFucntion(file)
         tokenChecker(tokens)
-        #tokens = theLexerPrintFunction(file)
         parsed = Parse(file)
 
     elif argv[0] == '-l':
@@ -24,17 +24,6 @@ def main(argv):
             theLexerPrintFunction(file)
         except:
             print("Unable to open file")
-
-
-def DoLexer():
-    stuff = input("Enter KXI:")
-    theLexerPrintFunction(stuff)
-
-def DoParser():
-    stuff = input("Enter KXI:")
-    tokens = theLexerReturnFucntion(stuff)
-    tokenChecker(tokens)
-    parsed = ParseDotPrinter(stuff)
 
 if __name__ == "__main__":
 

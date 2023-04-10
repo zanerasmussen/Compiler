@@ -353,10 +353,7 @@ def Parse(file):
     parser = yacc.yacc(start="CompilationUnit", debug=True)
     parsed_output = parser.parse(file)
     if parsed_output != None:
-        print("parsed")
-        print_Visitor = PrintDotVisitor()
-        parsed_output.accept(print_Visitor)
-
+        return parsed_output
     else:
         print("No parsed tree generated")
 
@@ -364,8 +361,10 @@ def ParseDotPrinter(file):
     parser = yacc.yacc(start="CompilationUnit")
     parsed_output = parser.parse(file)
     if parsed_output != None:
+        print("parsed")
         print_Visitor = PrintDotVisitor()
         parsed_output.accept(print_Visitor)
+        print_Visitor.graph.write_png('output.png')
     else:
         print("No parsed tree generated")
 
