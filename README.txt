@@ -8,52 +8,22 @@ Things to add:
 Lexer Branch
 python3 -m PyInstaller -F ./main.py
 
-Lexer Branch
-python3 -m PyInstaller -F ./main.py
-
-
-Suggestions:
-read fron standard in instead of default file
-line 74 should faile because of the new line token. unit test for ath. 
-
 
 symantics needs to handle  invalid assignement. such as 3 = 5 of function f = function g.
 
-add error for each grammar rule
-
-write test case for:
-"""
-[
-    //I mewss with 
-    //people
-]
-"""
 
 Big Questions:
-
-    2)Symbol Table?
-    3) shift/reduce errors?
-    4) repeat class?
+    1) repeat class
 
 
-I need to do blocks. Have 
-
-
-check for \n in tokens python main -l \n
 
 
 Questions for Caiden:
-1) shift/reduce conflicts
-    -Key an eye on it. If there are big issues come back to this. Cross my fingers it is done. 
-2) help with Assembler Heap
-3) sematntics help
+
 
 
 Questions for passoff:
-1) how does command line accept more than one line?
-2) shift reduce errors
-3) unknown token?
-4) symbol table?? (1st thing built)
+1) unknown token?
 
 
 
@@ -64,8 +34,6 @@ can only call constructor with NEW (Syntax)
 
 
 
-
-    else in precendece. ply dangling else. do this over that
     token for [] [ ] [//comment]
     for [ int/ char/ ]
 
@@ -73,4 +41,18 @@ add testing for LRSquare
 do a lot of testing for STRINGS
 
 test chars tokens
+    add char testing  to automation (allChar.kxi)
 test string tokens
+
+Things for Assembler:
+    No overwritting checking
+    Lables with invalid signatures?
+    Heap Testing
+    //when doing sl,sb,etc see if in valid range. then throw an error. 
+//make sure heap and sl don't overlap. 
+
+
+
+
+
+Things to do next. Add PREVISIT and POSTVISIT method to AST and also PrintVisitor to make backwards compatible. 

@@ -2,6 +2,7 @@ import sys, getopt
 from mainHelper import *
 from theLexer import *
 from theParser import *
+from theSemantics import *
 
 def main(argv):
     if len(argv) == 0:
@@ -10,6 +11,7 @@ def main(argv):
         tokens = theLexerReturnFucntion(file)
         tokenChecker(tokens)
         parsed = Parse(file)
+        semantics(parsed)
 
     elif argv[0] == '-l':
         DoLexer()
@@ -17,6 +19,9 @@ def main(argv):
     elif argv[0] == '-p':
         DoParser()
         
+    elif argv[0] == '-s':
+        DoSemantics()
+
     else:
         try:
             file = open(sys.argv[0], "r")
@@ -24,6 +29,8 @@ def main(argv):
             theLexerPrintFunction(file)
         except:
             print("Unable to open file")
+
+
 
 if __name__ == "__main__":
 

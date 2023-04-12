@@ -25,7 +25,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_node(start)
 
-    def visit_Argument(self, node: ASTArgument):
+    def pre_visit_Argument(self, node: ASTArgument):
+        pass
+
+    def post_visit_Argument(self, node: ASTArgument):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
         
         LPARENNodeName = str(node.LPAREN) + " $" + str(self.UID.getID())
@@ -39,7 +42,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-    def visit_ArgumentList(self, node: ASTArgumentList):
+    def pre_visit_ArgumentList(self, node: ASTArgumentList):
+        pass
+
+    def post_visit_ArgumentList(self, node: ASTArgumentList):
 
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
@@ -47,12 +53,18 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaExpression)))
     
-    def visit_ArgOrIdx(self, node: ASTArgOrIdx):
+    def pre_visit_ArgOrIdx(self, node: ASTArgOrIdx):
+        pass
+    
+    def post_visit_ArgOrIdx(self, node: ASTArgOrIdx):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Arg_Idx)))
 
-    def visit_Case(self, node: ASTCase):
+    def pre_visit_Case(self, node: ASTCase):
+        pass
+
+    def post_visit_Case(self, node: ASTCase):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         CaseNodeName = str(node.CASE) + " $" + str(self.UID.getID())
@@ -69,7 +81,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
 
-    def visit_CaseBlock(self, node: ASTCaseBlock):
+    def pre_visit_CaseBlock(self, node: ASTCaseBlock):
+        pass
+
+    def post_visit_CaseBlock(self, node: ASTCaseBlock):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         LCURLYNodeName = str(node.LCURLY) + " $" + str(self.UID.getID())
@@ -92,7 +107,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
-    def visit_ClassDefinition(self, node: ASTClassDefinition):
+    def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
+        pass
+    
+    def post_visit_ClassDefinition(self, node: ASTClassDefinition):
         #add node for Class Definition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
@@ -120,14 +138,20 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
-    def visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
+    def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
+        pass
+
+    def post_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
         #add node for Class Member Definition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         #add node for Method/DataMember/Constructor
         self.graph.add_edge(pydot.Edge(str(node), str(node.Method_DataMember_Constructor)))
 
-    def visit_CompilationUnit(self, node: ASTCompilationUnit):
+    def pre_visit_CompilationUnit(self, node: ASTCompilationUnit):
+        pass
+
+    def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
 
         #add Compilation Unit to Start
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
@@ -167,7 +191,10 @@ class PrintDotVisitor(ASTVisitor):
         if node.MethodBody.MultipleStatement != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.MethodBody)))
 
-    def visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
+    def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
+        pass
+
+    def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         IDNodeName = str(node.ID) + " $" + str(self.UID.getID())
@@ -176,7 +203,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.MethodSuffix)))
 
-    def visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
+    def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
+        pass
+
+    def post_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         ModifierNodeName = str(node.Modifier) + " $" + str(self.UID.getID())
@@ -185,14 +215,20 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.VariableDeclaration)))
 
-    def visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
+    def pre_visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
+        pass
+
+    def post_visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.ArgOrIdx)))
 
-    def visit_ExpressionDotID(self, node: ASTExpressionDotID):
+    def pre_visit_ExpressionDotID(self, node: ASTExpressionDotID):
+        pass
+
+    def post_visit_ExpressionDotID(self, node: ASTExpressionDotID):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -205,7 +241,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), IDNodeName))
 
-    def visit_ExpressionMinus(self, node: ASTExpressionMinus):
+    def pre_visit_ExpressionMinus(self, node: ASTExpressionMinus):
+        pass
+
+    def post_visit_ExpressionMinus(self, node: ASTExpressionMinus):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         MinusNodeName = str(node.MINUS) + " $" + str(self.UID.getID())
@@ -214,7 +253,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
-    def visit_ExpressionNew(self, node: ASTExpressionNew):
+    def pre_visit_ExpressionNew(self, node: ASTExpressionNew):
+        pass
+
+    def post_visit_ExpressionNew(self, node: ASTExpressionNew):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         NewNodeName = str(node.NEW) + " $" + str(self.UID.getID())
@@ -227,7 +269,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.ArgOrIdx)))
 
-    def visit_ExpressionNot(self, node: ASTExpressionNot):
+    def pre_visit_ExpressionNot(self, node: ASTExpressionNot):
+        pass
+
+    def post_visit_ExpressionNot(self, node: ASTExpressionNot):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         NOTNodeName = str(node.NOT) + " $" + str(self.UID.getID())
@@ -236,7 +281,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
-    def visit_ExpressionPlus(self, node: ASTExpressionPlus):
+    def pre_visit_ExpressionPlus(self, node: ASTExpressionPlus):
+        pass
+
+    def post_visit_ExpressionPlus(self, node: ASTExpressionPlus):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         PLUSNodeName = str(node.PLUS) + " $" + str(self.UID.getID())
@@ -245,7 +293,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
-    def visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
+    def pre_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
+        pass
+    
+    def post_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         LPARENNodeName = str(node.LPAREN) + " $" + str(self.UID.getID())
@@ -258,7 +309,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RPARENNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RPARENNodeName))
 
-    def visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
+    def pre_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
+        pass
+
+    def post_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -269,7 +323,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
+    def pre_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
+        pass
+
+    def post_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -280,7 +337,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
+    def pre_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
+        pass
+
+    def post_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -291,7 +351,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
+    def pre_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
+        pass
+
+    def post_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -302,7 +365,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
     
-    def visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
+    def pre_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
+        pass
+
+    def post_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -313,7 +379,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
+    def pre_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
+        pass
+
+    def post_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -324,7 +393,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
+    def pre_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
+        pass
+
+    def post_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -335,7 +407,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionELessE(self, node: ASTExpressionELessE):
+    def pre_visit_ExpressionELessE(self, node: ASTExpressionELessE):
+        pass
+
+    def post_visit_ExpressionELessE(self, node: ASTExpressionELessE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -346,7 +421,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
+    def pre_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
+        pass
+
+    def post_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -357,7 +435,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
+    def pre_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
+        pass
+
+    def post_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -368,7 +449,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
+    def pre_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
+        pass
+
+    def post_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -379,7 +463,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
+    def pre_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
+        pass
+
+    def post_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -390,7 +477,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
+    def pre_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
+        pass
+
+    def post_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -401,7 +491,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
+    def pre_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
+        pass
+    
+    def post_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -412,7 +505,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
+    def pre_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
+        pass
+
+    def post_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -423,7 +519,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
+    def pre_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
+        pass
+
+    def post_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -434,7 +533,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
+    def pre_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
+        pass
+
+    def post_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -445,7 +547,10 @@ class PrintDotVisitor(ASTVisitor):
         
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression2)))
 
-    def visit_Index(self, node: ASTIndex):
+    def pre_visit_Index(self, node: ASTIndex):
+        pass
+
+    def post_visit_Index(self, node: ASTIndex):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         LSQUARENodeName = str(node.LSQUARE) + " $" + str(self.UID.getID())
@@ -458,7 +563,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RSQUARENodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RSQUARENodeName))
         
-    def visit_Initializer(self, node: ASTInitializer):
+    def pre_visit_Initializer(self, node: ASTInitializer):
+        pass
+
+    def post_visit_Initializer(self, node: ASTInitializer):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         EQUALNodeName = str(node.EQUAL) + " $" + str(self.UID.getID())
@@ -467,31 +575,46 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
-    def visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
+    def pre_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
+        pass
+
+    def post_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         if node.ArgumentList != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.ArgumentList)))
 
-    def visit_MaybeExpression(self, node: ASTMaybeExpression):
+    def pre_visit_MaybeExpression(self, node: ASTMaybeExpression):
+        pass
+
+    def post_visit_MaybeExpression(self, node: ASTMaybeExpression):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         if node.Expression != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
 
-    def visit_MaybeInitializer(self, node: ASTMaybeInitializer):
+    def pre_visit_MaybeInitializer(self, node: ASTMaybeInitializer):
+        pass
+
+    def post_visit_MaybeInitializer(self, node: ASTMaybeInitializer):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         if node.Initializer != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.Initializer)))
 
-    def visit_MaybeParamList(self, node: ASTMaybeParamList):
+    def pre_visit_MaybeParamList(self, node: ASTMaybeParamList):
+        pass
+
+    def post_visit_MaybeParamList(self, node: ASTMaybeParamList):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         if node.ParameterList != None:
             self.graph.add_edge(pydot.Edge(str(node), str(node.ParameterList)))
 
-    def visit_MethodBody(self, node: ASTMethodBody):
+    def pre_visit_MethodBody(self, node: ASTMethodBody):
+        pass
+
+    def post_visit_MethodBody(self, node: ASTMethodBody):
         #add node for MethodBody
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
@@ -509,7 +632,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
-    def visit_MethodDeclaration(self, node: ASTMethodDeclaration):
+    def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
+        pass
+
+    def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
         #add node for MEthodDeclaration
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
@@ -538,7 +664,10 @@ class PrintDotVisitor(ASTVisitor):
         #add edge for node.MethodSuffix
         self.graph.add_edge(pydot.Edge(str(node), str(node.MethodSuffix)))
 
-    def visit_MethodSuffix(self, node: ASTMethodSuffix):
+    def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
+        pass
+
+    def post_visit_MethodSuffix(self, node: ASTMethodSuffix):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         LPARENNodeName = str(node.LPAREN) + " $" + str(self.UID.getID())
@@ -554,7 +683,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.MethodBody)))
 
-    def visit_MultipleCase(self, node: ASTMultipleCase):
+    def pre_visit_MultipleCase(self, node: ASTMultipleCase):
+        pass
+
+    def post_visit_MultipleCase(self, node: ASTMultipleCase):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         if (node.Case != None):
@@ -563,7 +695,10 @@ class PrintDotVisitor(ASTVisitor):
         if (node.MultipleCase.Case != None):
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCase)))
 
-    def visit_MultipleClassDefinition(self, node: ASTMultipleClassDefinition):
+    def pre_visit_MultipleClassDefinition(self, node: ASTMultipleClassDefinition):
+        pass
+
+    def post_visit_MultipleClassDefinition(self, node: ASTMultipleClassDefinition):
         #add node for MultipleClass Definition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
@@ -575,7 +710,10 @@ class PrintDotVisitor(ASTVisitor):
         if (node.MultipleClassDefinition.ClassDefinition != None):
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassDefinition)))
                 
-    def visit_MultipleClassMemberDefinition(self, node: ASTMultipleClassMemberDefinition):
+    def pre_visit_MultipleClassMemberDefinition(self, node: ASTMultipleClassMemberDefinition):
+        pass
+
+    def post_visit_MultipleClassMemberDefinition(self, node: ASTMultipleClassMemberDefinition):
         #add node for MultipleClassMemberDefinition
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
@@ -587,7 +725,10 @@ class PrintDotVisitor(ASTVisitor):
         if (node.MultipleClassMemberDefinition.ClassMemberDefinition != None):
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleClassMemberDefinition)))
 
-    def visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
+    def pre_visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
+        pass
+
+    def post_visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         CommaNodeName = str(node.COMMA) + " $" + str(self.UID.getID())
@@ -608,7 +749,10 @@ class PrintDotVisitor(ASTVisitor):
         else:
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaExpression)))
 
-    def visit_MultipleCommaParameter(self, node: ASTMultipleCommaParameter):
+    def pre_visit_MultipleCommaParameter(self, node: ASTMultipleCommaParameter):
+        pass
+
+    def post_visit_MultipleCommaParameter(self, node: ASTMultipleCommaParameter):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         CommaNodeName = str(node.COMMA) + " $" + str(self.UID.getID())
@@ -629,7 +773,10 @@ class PrintDotVisitor(ASTVisitor):
         else:
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaParameter)))
 
-    def visit_MultipleStatement(self, node: ASTMultipleStatement):
+    def pre_visit_MultipleStatement(self, node: ASTMultipleStatement):
+        pass
+
+    def post_visit_MultipleStatement(self, node: ASTMultipleStatement):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         if (node.Statement != None):
@@ -637,7 +784,10 @@ class PrintDotVisitor(ASTVisitor):
         if (node.MultipleStatement.MultipleStatement != None):
             self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleStatement)))
 
-    def visit_Parameter(self, node: ASTParameter):
+    def pre_visit_Parameter(self, node: ASTParameter):
+        pass
+
+    def post_visit_Parameter(self, node: ASTParameter):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         TypeNodeName = str(node.Type) + " $" + str(self.UID.getID())
@@ -654,14 +804,20 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(IDNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), IDNodeName))
 
-    def visit_ParameterList(self, node: ASTParameterList):
+    def pre_visit_ParameterList(self, node: ASTParameterList):
+        pass
+
+    def post_visit_ParameterList(self, node: ASTParameterList):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Parameter)))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.MultipleCommaParameter)))
 
-    def visit_StatementBreak(self, node: ASTStatementBreak):
+    def pre_visit_StatementBreak(self, node: ASTStatementBreak):
+        pass
+
+    def post_visit_StatementBreak(self, node: ASTStatementBreak):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         BreakNodeName = str(node.BREAK) + " $" + str(self.UID.getID())
@@ -672,7 +828,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))        
 
-    def visit_StatementCIN(self, node: ASTStatementCIN):
+    def pre_visit_StatementCIN(self, node: ASTStatementCIN):
+        pass
+
+    def post_visit_StatementCIN(self, node: ASTStatementCIN):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         CINNodeName = str(node.CIN) + " $" + str(self.UID.getID())
@@ -689,7 +848,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))
 
-    def visit_StatementCOUT(self, node: ASTStatementCOUT):
+    def pre_visit_StatementCOUT(self, node: ASTStatementCOUT):
+        pass
+
+    def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         COUTNodeName = str(node.COUT) + " $" + str(self.UID.getID())
@@ -706,7 +868,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))
 
-    def visit_StatementExpression(self, node: ASTStatementExpression):
+    def pre_visit_StatementExpression(self, node: ASTStatementExpression):
+        pass
+
+    def post_visit_StatementExpression(self, node: ASTStatementExpression):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Expression)))
@@ -715,7 +880,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))
 
-    def visit_StatementIF(self, node: ASTStatementIF):
+    def pre_visit_StatementIF(self, node: ASTStatementIF):
+        pass
+
+    def post_visit_StatementIF(self, node: ASTStatementIF):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         IFNodeName = str(node.IF) + " $" + str(self.UID.getID())
@@ -734,7 +902,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement)))
 
-    def visit_StatementIFELSE(self, node: ASTStatementIFELSE):
+    def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
+        pass
+
+    def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         IFNodeName = str(node.IF) + " $" + str(self.UID.getID())
@@ -759,7 +930,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement2)))
 
-    def visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
+    def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
+        pass
+
+    def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         LCURLYNodeName = str(node.LCURLY) + " $" + str(self.UID.getID())
@@ -772,12 +946,18 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(RCURLYNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), RCURLYNodeName))
 
-    def visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
+    def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
+        pass
+
+    def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.VariableDeclaration)))
 
-    def visit_StatementReturn(self, node: ASTStatementReturn):
+    def pre_visit_StatementReturn(self, node: ASTStatementReturn):
+        pass
+
+    def post_visit_StatementReturn(self, node: ASTStatementReturn):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         RETURNNodeName = str(node.RETURN) + " $" + str(self.UID.getID())
@@ -791,7 +971,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))
 
-    def visit_StatementSwitch(self, node: ASTStatementSwitch):
+    def pre_visit_StatementSwitch(self, node: ASTStatementSwitch):
+        pass
+
+    def post_visit_StatementSwitch(self, node: ASTStatementSwitch):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         SWITCHNodeName = str(node.SWITCH) + " $" + str(self.UID.getID())
@@ -810,7 +993,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.CaseBlock)))
 
-    def visit_StatementWhile(self, node: ASTStatementWhile):
+    def pre_visit_StatementWhile(self, node: ASTStatementWhile):
+        pass
+
+    def post_visit_StatementWhile(self, node: ASTStatementWhile):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         WHILENodeName = str(node.WHILE) + " $" + str(self.UID.getID())
@@ -829,7 +1015,10 @@ class PrintDotVisitor(ASTVisitor):
 
         self.graph.add_edge(pydot.Edge(str(node), str(node.Statement)))
 
-    def visit_VariableDeclaration(self, node: ASTVariableDeclaration):
+    def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
+        pass
+
+    def post_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         TypeNodeName = str(node.Type) + " $" + str(self.UID.getID())
@@ -853,7 +1042,10 @@ class PrintDotVisitor(ASTVisitor):
         self.graph.add_node(pydot.Node(SEMICOLONNodeName, shape='octagon', style="filled", fillcolor="#F62020"))
         self.graph.add_edge(pydot.Edge(str(node), SEMICOLONNodeName))
 
-    def visit_Terminal(self, node: ASTTerminal):
+    def pre_visit_Terminal(self, node: ASTTerminal):
+        pass
+
+    def post_visit_Terminal(self, node: ASTTerminal):
         self.graph.add_node(pydot.Node(str(node), style='filled',  fillcolor="#7CFC7C"))
 
         TerminalNodeName = str(node.Terminal) + " $" + str(self.UID.getID())

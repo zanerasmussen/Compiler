@@ -1,0 +1,14 @@
+[0]
+[test]
+[[]]
+[ ]
+[//comment]
+[ //comment]
+[ // comment // comment]
+[\t]
+[\n]
+[\n\t ]
+[
+    //I mess
+    //with people
+]

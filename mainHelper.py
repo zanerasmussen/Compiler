@@ -1,5 +1,6 @@
 from theLexer import *
 from theParser import *
+from theSemantics import *
 
 def DoLexer():
     stuff = input("Enter path to KXI file:") 
@@ -14,3 +15,12 @@ def DoParser():
     tokens = theLexerReturnFucntion(file)
     tokenChecker(tokens)
     ParseDotPrinter(file)
+
+def DoSemantics():
+    stuff = input("Enter path to KXI file:")
+    file = open(stuff, "r")
+    file = file.read()
+    tokens = theLexerReturnFucntion(file)
+    tokenChecker(tokens)
+    myAST = Parse(file)
+    semantics(myAST)
