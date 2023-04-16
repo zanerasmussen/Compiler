@@ -1,4 +1,4 @@
-import sys, getopt
+import sys
 from mainHelper import *
 from theLexer import *
 from theParser import *
@@ -12,6 +12,7 @@ def main(argv):
         tokenChecker(tokens)
         parsed = Parse(file)
         semantics(parsed)
+        
 
     elif argv[0] == '-l':
         DoLexer()

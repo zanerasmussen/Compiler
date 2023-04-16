@@ -1,1 +1,20 @@
 void kxi2023 main (){}
+
+
+class MyClass {
+    public char [] id1 = this;
+}
+
+class OtherClass{
+    private int id2;
+    public void [] id3 = tempId;
+    private bool id4;
+    public string id5;
+    public idid [] id6;
+}
+
+class TempClass{
+
+}
+
+void kxi2023 main (){}

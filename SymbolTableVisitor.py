@@ -1,50 +1,91 @@
 from AST import *
-from enum import Enum
+from theLexer import theLexerTester
 from AbstractVisitor import ASTVisitor
 
+class Unique:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.id = -1
+        return cls._instance
+
+    def getID(self):
+        self.id += 1
+        return self.id
+
 class Symbol:
-    def __init__(self, name, value, type, modifier, offset):
+    def __init__(self, whatAmI: str, name: str, type, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool):
+        self.whatAmI = whatAmI
         self.Name = name
-        self.Value = value
         self.Type = type
-        self.Modifer = modifier
         self.Offset = offset
-
-class Type(Enum):
-    INT = 1
-    STRING = 2
-    ID = 3
-    BOOl = 4
-    CHAR = 5
-    NULL = 6
-    VOID = 7
-    THIS = 8
-    FUNCTION = 9
-
-class Modifier(Enum):
-    PRIVATE = 1
-    PUBLIC = 2
-    NA = 3
+        self.isPrivate = isPrivate
+        self.isPublic = isPublic
+        self.hasIndex = hasIndex
 
 class SymbolTableVisitor(ASTVisitor):
     def __init__(self):
-        self.symbol_tables = [{}]
-    
-    def add_to_symbol_table(self, name, type, modifier, offset):
-        symbol = Symbol(name, type, modifier, offset)
-        self.symbol_tables[-1][name] = symbol
-    
-    def get_from_symbol_table(self, name):
-        for symbol_table in reversed(self.symbol_tables):
-            if name in symbol_table:
-                return symbol_table[name]
-        return None
-    
-    def push_symbol_table(self):
+        self.UID = Unique()
+        self.symbol_tables = []
+        self.scope_stack = []
+        self.has_Error = False
+
+
+    def enter_scope(self):
+        new_scope = self.UID.getID()
+        self.scope_stack.append(new_scope)
         self.symbol_tables.append({})
-    
-    def pop_symbol_table(self):
-        self.symbol_tables.pop()
+
+    def exit_scope(self):
+        self.scope_stack.pop()
+
+    def create_symbol(self, whatAmI: str, name: str, type: str, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool) -> Symbol:
+        return Symbol(whatAmI = whatAmI, name=name, type=type, offset=offset, isPrivate=isPrivate, isPublic=isPublic, hasIndex=hasIndex)
+
+
+    def add_to_symbol_table(self, symbol: Symbol):
+        current_scope = self.scope_stack[-1]
+        name = symbol.Name
+        whatAmI = symbol.whatAmI
+        
+        #Data Members and Methods can not be the same name
+        if whatAmI == 'constructor':
+            if(name,'class') in self.symbol_tables[current_scope]:
+                pass
+            else:
+                print(f"Error: Constructor {name} is being called in a class with a different name. Names must be the same for a constructor.")
+                self.has_Error = True
+
+        if whatAmI == 'dataMember':
+            if(name,'method') in self.symbol_tables[current_scope]:
+                print(f"Error: symbol {name} already defined in scope {current_scope} as a method")
+                self.has_Error = True
+            if(name,'class') in self.symbol_tables[current_scope]:
+                print(f"Error: dataMemeber {name} is defined in class with the same name")
+                self.has_Error = True
+            
+        elif whatAmI == 'method':
+            if(name,'dataMember') in self.symbol_tables[current_scope]:
+                print(f"Error: symbol {name} already defined in scope {current_scope} as a dataMember")
+                self.has_Error = True
+            if(name,'class') in self.symbol_tables[current_scope]:
+                print(f"Error: method {name} is defined in class with the same name")
+                self.has_Error = True
+
+        elif (name, whatAmI) in self.symbol_tables[current_scope]:
+            #can have more than one constructor but must have the same name as the class defining it. 
+            if whatAmI == 'constructor':
+                pass
+            else:
+                print(f"Error: symbol {name} already defined in scope {current_scope}")
+                self.has_Error = True
+
+        self.symbol_tables[current_scope][(name, whatAmI)] = {
+            "symbol": symbol,
+            "can_access_scopes": self.scope_stack.copy(),
+        }
 
     def pre_visit_Argument(self, node: ASTArgument):
         pass
@@ -65,22 +106,26 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_Case(self, node: ASTCase):
-        pass
+        type = theLexerTester(str(node.NumOrChar))
+        symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False)
+        self.add_to_symbol_table(symbol)
 
     def post_visit_Case(self, node: ASTCase):
         pass
 
     def pre_visit_CaseBlock(self, node: ASTCaseBlock):
-        pass
+        self.enter_scope()
 
     def post_visit_CaseBlock(self, node: ASTCaseBlock):
-        pass
+        self.exit_scope()
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
-        pass
+        self.enter_scope()
+        symbol = self.create_symbol(str("class"), str(node.ID), str(node.Class), 12, False, True, False)
+        self.add_to_symbol_table(symbol)
     
     def post_visit_ClassDefinition(self, node: ASTClassDefinition):
-        pass
+        self.exit_scope()
 
     def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
         pass
@@ -89,20 +134,33 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_CompilationUnit(self, node: ASTCompilationUnit):
-        self.push_symbol_table()
-        self.add_to_symbol_table(node.main, None, Type.FUNCTION, Modifier.NA, 0)
+        self.enter_scope()
+        symbol = self.create_symbol(str("function"), str(node.main), str(node.void), 12, False, True, False)
+        self.add_to_symbol_table(symbol)
 
     def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
-        self.pop_symbol_table()
-
+        self.exit_scope()
+        #self.clear_empty_scopes()
+        
     def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        pass
+        symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False)
+        self.add_to_symbol_table(symbol)
 
     def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         pass
 
     def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
-        pass
+        isPrivate = False
+        isPublic = False
+        hasIndex = False
+        if node.Modifier == 'private':
+            isPrivate = True
+        if node.Modifier == 'public':
+            isPublic = True
+        if node.VariableDeclaration.LRSquare is not None:
+            hasIndex = True
+        symbol = self.create_symbol(str("dataMember"), str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, isPrivate, isPublic, hasIndex)
+        self.add_to_symbol_table(symbol)
 
     def post_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         pass
@@ -127,7 +185,7 @@ class SymbolTableVisitor(ASTVisitor):
 
     def pre_visit_ExpressionNew(self, node: ASTExpressionNew):
         pass
-
+    
     def post_visit_ExpressionNew(self, node: ASTExpressionNew):
         pass
 
@@ -294,10 +352,21 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
-        pass
+        isPrivate = False
+        isPublic = False
+        hasIndex = False
+        if node.Modifier == 'private':
+            isPrivate = True
+        if node.Modifier == 'public':
+            isPublic = True
+        if node.LRSquare is not None:
+            hasIndex = True
+        symbol = self.create_symbol(str("method"), str(node.ID), str(node.Type), 12, isPrivate, isPublic, hasIndex)
+        self.add_to_symbol_table(symbol)
+        self.enter_scope()
 
     def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
-        pass
+        self.exit_scope()
 
     def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
         pass
@@ -342,7 +411,11 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_Parameter(self, node: ASTParameter):
-        pass
+        hasIndex = False
+        if node.LRSquare is not None:
+            hasIndex = True
+        symbol = self.create_symbol("variable", str(node.ID), str(node.Type), 12, False, False, hasIndex)
+        self.add_to_symbol_table(symbol)
 
     def post_visit_Parameter(self, node: ASTParameter):
         pass
@@ -378,25 +451,30 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementIF(self, node: ASTStatementIF):
-        pass
+        self.enter_scope()
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
-        pass
+        self.exit_scope()
 
     def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-        pass
+        self.enter_scope()
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-       pass
+       self.exit_scope()
 
     def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        pass
+        self.enter_scope()
 
     def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        pass
+        self.exit_scope()
 
     def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
-        pass
+        hasIndex = False
+        if node.VariableDeclaration.LRSquare is not None:
+            hasIndex = True
+        symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
+        self.add_to_symbol_table(symbol)
+
 
     def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         pass
@@ -414,10 +492,10 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementWhile(self, node: ASTStatementWhile):
-        pass
+        self.enter_scope()
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
-        pass
+        self.exit_scope()
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         pass
