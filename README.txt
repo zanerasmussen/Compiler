@@ -55,16 +55,16 @@ Things for Assembler:
 
 look at offset on symbol tables. 
 
-test DOTprinter with pre/post visit
 
-    def get_from_symbol_table(self, name):
-        for symbol_table in reversed(self.symbol_tables):
-            if name in symbol_table:
-                return symbol_table[name]
-        return None
-    
-    def push_symbol_table(self):
-        self.symbol_tables.append({})
-    
-    def pop_symbol_table(self):
-        self.symbol_tables.pop()
+#Test for Parameter [ ] and Paramter [//comment]
+#and test for paramter [
+#    //comment
+#]
+
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << '\n';   //Why does this fail?
+                i = i + 1;
+            }

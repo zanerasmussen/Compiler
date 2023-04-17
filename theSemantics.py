@@ -6,11 +6,10 @@ def semantics(parsed_AST):
     symbolTable = SymbolTableVisitor()
     parsed_AST.accept(symbolTable)
     if symbolTable.has_Error == True:
+        for x in symbolTable.errors:
+            print(x)
         sys.exit(1)
+    
+    #undeclaredVariableVistior = UndeclaredVisitor()
     print("semantics")
     
-
-
-
-    # def create_symbol(name: str, type, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool) -> Symbol:
-    #     return Symbol(name=name, type=type, offset=offset, isPrivate=isPrivate, isPublic=isPublic, hasIndex=hasIndex)

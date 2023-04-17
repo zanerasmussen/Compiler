@@ -1,81 +1,192 @@
-// Tests criteria under the C tier
-// (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
-class Fibonacci {
-    Fibonacci() {}
-    Fibonacci() {}
-    public int compute(int x) {
-
-        if (x == 0) {
-            return 0;
-        } else if (x == 1) {
-            return 1;
-        }
-        return compute(1-x) + this.compute(x-2);
-    }
-}
-
-class Test {
-    Test() {}
-    private chat test;
-    public int est(int x) {
-        int test;
-        cout << x;
-        char l = '\n';
-        cout << '\n';
-        if (x == 5) {
-            cout << this.test(x + 5);
-            cout << '\n';
-        }
-        return x + 5;
-    }
-}
 
 void kxi2023 main() {
-    int main;
-    char t;
-    int index;
-    int i = 0;
-    Fibonacci fib = new Fibonacci();
-    Fibonacci fib2 = new Fibonacci();
+    if (1==1) cout << "1==1\n";
+    if (-1==-1) cout << "-1==-1\n";
+    if (1==2) cout << "1==2 fail\n";
+    if (2==1) cout << "2==1 fail\n";
 
-    cin >> t;
-    cout << t;
-    cin >> t;
-    cout << t;
-    cin >> index;
-    while (i <= index) {
-        cout << i;
-        cout << ',';
-        cout << ' ';
-        cout << fib.compute(i);
-        cout << '\n';
-        i = i + 1;
-    }
 
-    int[] arrTest = new int[5];
-    Test test = new Test();
-    cout << test.test(5);
+    if (1!=2) cout << "1!=2\n";
+    if (2!=1) cout << "2!=1\n";
+    if (1!=1) cout << "1!=1 fail\n";
+
+
+    if (1 < 2) cout << "1<2\n";
+    if (1 < 1) cout << "1<1 fail\n";
+    if (2 < 1) cout << "2<1 fail\n";
+
+
+    if (2 > 1) cout << "2>1\n";
+    if (1 > 1) cout << "1>1 fail\n";
+    if (1 > 2) cout << "1>2 fail\n";
+
+    if (1 <= 2) cout << "1<=2\n";
+    if (1 <= 1) cout << "1<=1\n";
+    if (2 <= 1) cout << "2<=1 fail\n";
+
+    if (2 >= 1) cout << "2>=1\n";
+    if (1 >= 1) cout << "1>=1\n";
+    if (1 >= 2) cout << "1>=2 fail\n";
+
+    if (-1 == -(1))
+        cout << "-1==-(1)\n";
+
+    if (1 * 2 / 2 + 4 - 5 * 8 / 8 == 0)
+        cout << "good math\n";
+
+    if (     'a' == 'a'
+        &&   'b' == 'b'
+        && !('c' == 'd')
+        &&   'c' != 'd'
+        &&   'd' <  'e'
+        &&   'a' >  'A' )
+        cout << "char comparison is good\n";
+
+    int un_test = 2;
+    un_test = +++++++un_test;
+    cout << un_test;
     cout << '\n';
-    arrTest[1] = 3;
 
-    int a = 0;
 
-    while (a != 10) {
-        cin >> a;
-        switch (a) {
-            case 1:
-                cout << '-';
-                break;
-            case 1:
-                cout << '-';
-                break;
-            case 0:
-                cout << '.';
-            case 3:
-                cout << ',';
-                break;
-            default:
-                cout << '+';
+    int x = 1;
+    while (x <= 128) {
+        cout << "while: ";
+        cout << x;
+        cout << '\n';
+
+        int i = x;
+        int j = 0;
+        while(j < 3) {
+            cout << "nested while: ";
+            cout << i * 3;
+            cout << '\n';
+            i *= 3;
+            j += 1;
         }
+        x *= 2;
     }
+
+    //x = j = i;
+    //cout << x; cout << '\n';
+
+    // ASSIGNMENT
+    cout << "assneq: ";
+
+    int test = 0-1;
+    
+    test += 1;
+    if (test == 0) {
+        cout << '+';
+    } else {
+        cout << '-';
+        cout << test;
+    }
+    cout << '|';
+
+    test -= 1;
+    if (test == -1) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    test *= 2;
+    if (test == -2) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    test /= 2;
+    if (test == -1) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    cout << '\n';
+
+    // BOOL EXPRESSIONS
+    cout << "bool: ";
+
+    bool t = true;
+    bool f = false;
+    int a = 0;
+    int b = 1;
+
+    if (t) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (t != f) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (a < b) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (b > a) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (a <= 0) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (b >= 1) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    cout << '\n';
+    
+
+    // SWITCH CASE
+    cout << "switch: ";
+
+    a = 0;
+    switch (a) {
+        case 1:
+            cout << '-';
+            break;
+        case 0:
+            cout << '.';
+        case 3:
+            cout << ',';
+        default:
+            cout << '+';
+    }
+    cout << '|';
+    cout << '\n';
+
+    int v1 = 1;
+    int v2 = 2;
+    int v3 = 3;
+
+    v1 = v2 = v3;
+
+    if (v1 == 3 && v2 == 3 && v3 == 3) cout << "v1 = v2 = v3 pass\n";
+    else cout << "v1 = v2 = v3 fail\n";
+
+    v1 += v1 = 2;
+    if (v1 == 4) cout << "v1 += v1 = 2 pass\n";
+    else cout << "v1 += v1 = 2 fail\n";
+
+    v1 = v2 = v3 = 1 + 2 + 3;
+    if (v1 == 6 && v2 == 6 && v3 == 6) cout << "v1 = v2 = v3 = 1 + 2 + 3 pass\n";
+    else cout << "v1 = v2 = v3 = 1 + 2 + 3 fail\n";
 }

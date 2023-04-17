@@ -12,6 +12,7 @@ def main(argv):
         tokenChecker(tokens)
         parsed = Parse(file)
         semantics(parsed)
+        print("Done")
         
 
     elif argv[0] == '-l':

@@ -3,13 +3,15 @@ from theLexer import theLexerTester
 from AbstractVisitor import ASTVisitor
 
 class Unique:
-    _instance = None
+    def __init__(self):
+        self.id = -1
+    # _instance = None
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance.id = -1
-        return cls._instance
+    # def __new__(cls):
+    #     if cls._instance is None:
+    #         cls._instance = super().__new__(cls)
+    #         cls._instance.id = -1
+    #     return cls._instance
 
     def getID(self):
         self.id += 1
@@ -31,6 +33,7 @@ class SymbolTableVisitor(ASTVisitor):
         self.symbol_tables = []
         self.scope_stack = []
         self.has_Error = False
+        self.errors = []
 
 
     def enter_scope(self):
@@ -50,36 +53,61 @@ class SymbolTableVisitor(ASTVisitor):
         name = symbol.Name
         whatAmI = symbol.whatAmI
         
-        #Data Members and Methods can not be the same name
         if whatAmI == 'constructor':
             if(name,'class') in self.symbol_tables[current_scope]:
                 pass
             else:
-                print(f"Error: Constructor {name} is being called in a class with a different name. Names must be the same for a constructor.")
+                self.errors.append(f"Error: Constructor {name} is being called in a class with a different name. Names must be the same for a constructor.")
                 self.has_Error = True
 
+        if whatAmI == 'object':
+            classExist = False
+            className = symbol.Type
+            for i in range(len(self.symbol_tables)-2, -1, -1):
+                if (className, 'class') in self.symbol_tables[i]:
+                    classExist = True
+            if classExist == False:
+                self.errors.append(f"Error: symbol {name} tried to create an object of {className} which doesn't exist")
+                self.has_Error = True
+            if(name,'variable') in self.symbol_tables[current_scope]:
+                self.errors.append(f"Error: {name} is already defined as an object")
+                self.has_Error = True
+
+        #Data Members and Methods can not be the same name
         if whatAmI == 'dataMember':
             if(name,'method') in self.symbol_tables[current_scope]:
-                print(f"Error: symbol {name} already defined in scope {current_scope} as a method")
+                self.errors.append(f"Error: symbol {name} already defined as a method")
                 self.has_Error = True
             if(name,'class') in self.symbol_tables[current_scope]:
-                print(f"Error: dataMemeber {name} is defined in class with the same name")
-                self.has_Error = True
-            
-        elif whatAmI == 'method':
-            if(name,'dataMember') in self.symbol_tables[current_scope]:
-                print(f"Error: symbol {name} already defined in scope {current_scope} as a dataMember")
-                self.has_Error = True
-            if(name,'class') in self.symbol_tables[current_scope]:
-                print(f"Error: method {name} is defined in class with the same name")
+                self.errors.append(f"Error: dataMember {name} is defined in class with the same name")
                 self.has_Error = True
 
-        elif (name, whatAmI) in self.symbol_tables[current_scope]:
+        elif whatAmI == 'variable':
+            if(name,'object') in self.symbol_tables[current_scope]:
+                self.errors.append(f"Error: {name} is already defined as a variable")
+                self.has_Error = True
+
+        elif whatAmI == 'method':
+            if(name,'dataMember') in self.symbol_tables[current_scope]:
+                self.errors.append(f"Error: symbol {name} already defined as a dataMember")
+                self.has_Error = True
+            if(name,'class') in self.symbol_tables[current_scope]:
+                self.errors.append(f"Error: method {name} is defined in class with the same name")
+                self.has_Error = True
+
+        elif whatAmI == 'class':
+            for i in range(len(self.symbol_tables)-2, -1, -1):
+                if (name, 'class') in self.symbol_tables[i]:
+                    self.errors.append(f"Error: class {name} is already as a class")
+                    self.has_Error = True
+
+        if (name, whatAmI) in self.symbol_tables[current_scope]:
             #can have more than one constructor but must have the same name as the class defining it. 
             if whatAmI == 'constructor':
-                pass
+                self.errors.append(f"Error: Only one constructor is allowed. {name} is duplicated.")
+                self.has_Error = True
             else:
-                print(f"Error: symbol {name} already defined in scope {current_scope}")
+                self.errors.append(f"Error: symbol {name} already defined")
                 self.has_Error = True
 
         self.symbol_tables[current_scope][(name, whatAmI)] = {
@@ -109,9 +137,10 @@ class SymbolTableVisitor(ASTVisitor):
         type = theLexerTester(str(node.NumOrChar))
         symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False)
         self.add_to_symbol_table(symbol)
+        self.enter_scope()
 
     def post_visit_Case(self, node: ASTCase):
-        pass
+        self.exit_scope()
 
     def pre_visit_CaseBlock(self, node: ASTCaseBlock):
         self.enter_scope()
@@ -140,7 +169,6 @@ class SymbolTableVisitor(ASTVisitor):
 
     def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
         self.exit_scope()
-        #self.clear_empty_scopes()
         
     def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False)
@@ -472,7 +500,11 @@ class SymbolTableVisitor(ASTVisitor):
         hasIndex = False
         if node.VariableDeclaration.LRSquare is not None:
             hasIndex = True
-        symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
+        if node.VariableDeclaration.Type != 'void' and node.VariableDeclaration.Type != 'int' and node.VariableDeclaration.Type != 'char' and node.VariableDeclaration.Type != 'bool' and node.VariableDeclaration.Type != 'string':
+            symbol = self.create_symbol("object", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
+        else:
+            symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
+
         self.add_to_symbol_table(symbol)
 
 

@@ -1,6 +1,7 @@
 import unittest
 import theLexer
 import theParser
+from SymbolTableVisitor import SymbolTableVisitor
 
 class Test_Lexer(unittest.TestCase):
 
@@ -2091,7 +2092,1060 @@ class Test_parser(unittest.TestCase):
         parsed = theParser.ParseTester("VariableDeclaration", data)
         self.assertEqual(parsed, None)
 
-#Test for Parameter [ ] and Paramter [//comment]
-#and test for paramter [
-#    //comment
-#]
+class Test_SymbolTableVisitor(unittest.TestCase):
+
+    def test_basic(self):
+        data = """
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_duplicate_1(self):
+        data = """
+        void kxi2023 main (){
+            int x = 3;
+            int x = 2;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol x already defined")
+
+    def test_duplicate_class(self):
+        data = """
+        class TempClass{}
+        class TempClass{}
+
+        void kxi2023 main (){
+            int x = 3;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: class TempClass is already as a class")
+
+    def test_classMain(self):
+        data = """
+        class main{}
+        class Main{}
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_classConstructors(self):
+        data = """
+        class Class{
+            Class(){}
+        }
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_classConstructors_multiple(self):
+        data = """
+        class Class{
+            Class(){}
+            Class(){}
+        }
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: Only one constructor is allowed. Class is duplicated.")
+
+    def test_classConstructors_multiple2(self):
+        data = """
+        class Test{
+            Test(){}
+            Test(int x){}
+        }
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: Only one constructor is allowed. Test is duplicated.")
+
+    def test_classConstructors_wrongName(self):
+        data = """
+        class Class{
+            Test(){}
+        }
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: Constructor Test is being called in a class with a different name. Names must be the same for a constructor.")
+
+    def test_class_duplicate(self):
+        data = """
+        class Temp{
+            Temp(){}
+        }
+        
+        class Temp{
+            Temp(){}
+        }
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: class Temp is already as a class")
+        
+    def test_methodDeclaration(self):
+        data = """
+        class Temp{
+            Temp(){}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        
+    def test_methodDeclaration_duplicate(self):
+        data = """
+        class Temp{
+            Temp(){}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined")
+        
+    def test_methodDeclaration_duplicate_notSameType(self):
+        data = """
+        class Temp{
+            Temp(){}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            public char compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined")
+
+    def test_methodDeclaration_same_name_as_class(self):
+        data = """
+        class Temp{
+            public int Temp(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char test;
+            public Fibonacci fib = new Fibonacci();
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: method Temp is defined in class with the same name")
+        
+    def test_DataMemberDeclaration(self):
+        data = """
+        class Temp{
+            Temp(){}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char test;
+            public Fibonacci fib = new Fibonacci();
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_DataMemberDeclaration_duplicate(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char test;
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char test;
+            public Fibonacci fib = new Fibonacci();
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol test already defined")
+
+    def test_DataMemberDeclaration_duplicate_notSameType(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private string test;
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char test;
+            public Fibonacci fib = new Fibonacci();
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol test already defined")
+
+    def test_DataMemberDeclaration_same_name_as_class(self):
+        data = """
+        class Temp{
+            private string Temp;
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char test;
+            public Fibonacci fib = new Fibonacci();
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: dataMember Temp is defined in class with the same name")
+        
+    def test_DataMemberDeclaration_and_MethodDeclaration(self):
+        data = """
+        class Temp{
+            Temp(){}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char test;
+            public Fibonacci fib = new Fibonacci();
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        
+    def test_DataMemberDeclaration_and_MethodDeclaration_sameName(self):
+        data = """
+        class Temp{
+            Temp(){}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            private char compute;
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined as a method")
+        
+    def test_DataMemberDeclaration_and_MethodDeclaration_sameName2(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char compute;
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined as a dataMember")
+        
+    def test_Method_with_declarations(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        
+    def test_Method_with_declarations_nested(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        
+    def test_Method_with_declarations_nested_same_name(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    char x = 4;
+                    string Method = "this is a string";
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        
+    def test_Method_with_declarations_nested_same_name_else(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    char x = 4;
+                    string Method = "this is a string";
+                    return 0;
+                } else if (x == 1) {
+                    int dataMember = 4;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        
+    def test_Method_with_declarations_nested_same_name_else_error(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    char x = 4;
+                    string Method = "this is a string";
+                    return 0;
+                } else if (x == 1) {
+                    int dataMember = 4;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+                bool dataMember = false;
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined")
+        
+    def test_Method_with_declarations_nested_same_name_else_error(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    char x = 4;
+                    string Method = "this is a string";
+                    return 0;
+                } else if (x == 1) {
+                    int dataMember = 4;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+                bool dataMember = false;
+            }
+        }
+
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined")
+        
+    def test_multiple_Method_with_declarations_nested_same_name(self):
+        data = """
+        class Temp{
+            Temp(){}
+            private char dataMember;
+            public int Method(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    char x = 4;
+                    string Method = "this is a string";
+                    return 0;
+                } else if (x == 1) {
+                    int dataMember = 4;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+            public int Method2(int x) {
+                int dataMember;
+                if (x == 0) {
+                    int dataMember = 3;
+                    char x = 4;
+                    string Method = "this is a string";
+                    return 0;
+                } else if (x == 1) {
+                    int dataMember = 4;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_MethodBody(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            int main;
+            char t;
+            int index;
+            int i = 0;
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+               cout << '\\n';
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            cout << test.test(5);
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_MethodBody_nested(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            int main;
+            char t;
+            int index;
+            int i = 0;
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                bool index = false;
+                cout << '\\n';
+                cout << i;
+                if (index == false){
+                    int index = 3;
+                }
+                cout << ',';
+                cout << ' ';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            cout << test.test(5);
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                        int index = 3;
+                    case 0:
+                        cout << '.';
+                        if (a == 0){
+                            bool index = false;
+                        }
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_MethodBody_error(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            int main;
+            char t;
+            int index;
+            int i = 0;
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                bool index = false;
+                cout << '\\n';
+                cout << i;
+                if (index == false){
+                    int index = 3;
+                }
+                cout << ',';
+                cout << ' ';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            cout << test.test(5);
+            arrTest[1] = 3;
+
+            int a = 0;
+            int main = 4;
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                        int index = 3;
+                    case 0:
+                        cout << '.';
+                        if (a == 0){
+                            bool index = false;
+                        }
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol main already defined")
+
+    def test_object(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_object_duplicate(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+            Fibonacci fib = new Fibonacci();
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol fib already defined")
+
+    def test_object_same_name_as_Int(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+            int fib = 4;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: fib is already defined as a variable")
+
+    def test_object_same_name_as_Int_2(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            int fib = 4;
+            Fibonacci fib = new Fibonacci();
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: fib is already defined as an object")
+
+    def test_object_with_no_class(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+            Fibonaccis fib = new Fibonacci();
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol fib tried to create an object of Fibonaccis which doesn't exist")
+
+    def test_object_nested(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        Fibonacci fib = new Fibonacci();
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        Fibonacci fib = new Fibonacci();
+                        int a;
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+
+    def test_case_error(self):
+        data = """
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        Fibonacci fib = new Fibonacci();
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        Fibonacci fib = new Fibonacci();
+                        int a;
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, True)
+        self.assertEqual(symbolTable.errors[0], "Error: symbol 0 already defined")
+
