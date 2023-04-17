@@ -1,5 +1,6 @@
 from SymbolTableVisitor import SymbolTableVisitor
 from PrintVisitor import PrintDotVisitor
+from UndeclaredVarVistitor import *
 import sys
 
 def semantics(parsed_AST):
@@ -9,7 +10,9 @@ def semantics(parsed_AST):
         for x in symbolTable.errors:
             print(x)
         sys.exit(1)
-    
-    #undeclaredVariableVistior = UndeclaredVisitor()
+    symbols = symbolTable.symbol_tables
+    undeclaredVariableVistior = UndeclaredVisitor()
+    undeclaredVariableVistior.symbols = symbols
+    parsed_AST.accept(undeclaredVariableVistior)
     print("semantics")
     

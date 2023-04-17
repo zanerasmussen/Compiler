@@ -2658,7 +2658,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         self.assertEqual(symbolTable.has_Error, True)
         self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined")
         
-    def test_Method_with_declarations_nested_same_name_else_error(self):
+    def test_Method_with_declarations_nested_same_name_else_error2(self):
         data = """
         class Temp{
             Temp(){}
@@ -3149,3 +3149,14 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         self.assertEqual(symbolTable.has_Error, True)
         self.assertEqual(symbolTable.errors[0], "Error: symbol 0 already defined")
 
+class Test_UndeclaredVariables(unittest.TestCase):
+
+    def test_basic(self):
+        data = """
+        void kxi2023 main (){}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
