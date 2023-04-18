@@ -2,6 +2,8 @@ import unittest
 import theLexer
 import theParser
 from SymbolTableVisitor import SymbolTableVisitor
+from UndeclaredVarVistitor import UndeclaredVisitor
+from ObjectInitializerAndTypeVisitor import ObjectInitializerAndTypeVisitor
 
 class Test_Lexer(unittest.TestCase):
 
@@ -3149,14 +3151,922 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         self.assertEqual(symbolTable.has_Error, True)
         self.assertEqual(symbolTable.errors[0], "Error: symbol 0 already defined")
 
-class Test_UndeclaredVariables(unittest.TestCase):
-
-    def test_basic(self):
+    def test_big_test_pass(self):
         data = """
-        void kxi2023 main (){}
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    char x = 'a';
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+        
+        void kxi2023 main() {
+            Fibonacci fib = new Fibonacci();
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        Fibonacci fib = new Fibonacci();
+                        a = 1;
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << fib;
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        Fibonacci fib = new Fibonacci();
+                        int a;
+                        cout << '+';
+                }
+            }
+        }
         """
         theLexer.theLexerReturnFucntion(data)
         myAST = theParser.Parse(data)
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, False)
+
+class Test_UndeclaredVariables(unittest.TestCase):
+
+    def test_basic(self):
+        data = """
+        // Tests criteria under the C tier
+        // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        class Test {
+            Test() {}
+            public int test(int x) {
+                cout << x;
+                char l = '\\n';
+                cout << '\\n';
+                if (x == 5) {
+                    cout << this.test(x + 5);
+                    cout << '\\n';
+                }
+                return x + 5;
+            }
+        }
+
+        void kxi2023 main() {
+            char t;
+            int index;
+            int i = 0;
+            Fibonacci fib = new Fibonacci();
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << fib.compute(i);
+                cout << '\\n';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            Test test = new Test();
+            cout << test.test(5);
+            cout << '\\n';
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(undeclaredVariableVistior.has_Error, False)
+
+    def test_undeclared_class(self):
+        data = """
+        // Tests criteria under the C tier
+        // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                y = 3;
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        class Test {
+            Test() {}
+            public int test(int x) {
+                cout << x;
+                char l = '\\n';
+                cout << '\\n';
+                if (x == 5) {
+                    cout << this.test(x + 5);
+                    cout << '\\n';
+                }
+                return x + 5;
+            }
+        }
+
+        void kxi2023 main() {
+            char t;
+            int index;
+            int i = 0;
+            Fibonacci fib = new Fibonacci();
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << fib.compute(i);
+                cout << '\\n';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            Test test = new Test();
+            cout << test.test(5);
+            cout << '\\n';
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(undeclaredVariableVistior.has_Error, True)
+        self.assertEqual(undeclaredVariableVistior.errors[0], "Error: y is used but never declared or used before it is declared")
+
+    def test_undeclared_object(self):
+        data = """
+        // Tests criteria under the C tier
+        // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                int y = 3;
+                if (x == 0) {
+                    y = 3;
+                    temp = false;
+                    return 0;
+                } else if (x == 1) {
+                    temp = true;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        class Test {
+            Test() {}
+            public int test(int x) {
+                cout << x;
+                l = '\\n';
+                char l = '\\n';
+                cout << '\\n';
+                if (x == 5) {
+                    cout << this.test(x + 5);
+                    cout << '\\n';
+                }
+                return x + 5;
+            }
+        }
+
+        void kxi2023 main() {
+            char t;
+            index = 3;
+            int index;
+            int i = 0;
+            Fibonacci fib = new Fibonacci();
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << fib2.compute(i);
+                cout << '\\n';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            Test test = new Test();
+            cout << test2.test(5);
+            cout << '\\n';
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        myvar = 3;
+                        cout << '.';
+                    case 3:
+                        cout << myvar;
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+            
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(undeclaredVariableVistior.has_Error, True)
+        self.assertEqual(undeclaredVariableVistior.errors[0], "Error: temp is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[1], "Error: temp is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[2], "Error: l is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[3], "Error: index is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[4], "Error: fib2 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[5], "Error: test2 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[6], "Error: myvar is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[7], "Error: myvar is used but never declared or used before it is declared")
+
+    def test_undeclared_big(self):
+        data = """
+        // Tests criteria under the C tier
+        // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                int y = 3;
+                if (x == 0) {
+                    y = 3;
+                    temp = false;
+                    return 0;
+                } else if (x == 1) {
+                    temp = true;
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        class Test {
+            Test() {}
+            public int test(int x) {
+                cout << x;
+                l = '\\n';
+                char l = '\\n';
+                cout << '\\n';
+                if (x == 5) {
+                    cout << this.test(x + 5);
+                    cout << '\\n';
+                }
+                return x + 5;
+            }
+        }
+
+        void kxi2023 main() {
+            char t1;
+            int index;
+            int i = 0;
+            Fibonacci fib = new Fibonacci();
+            cin >> t1;
+            cout << t1;
+            cin >> t1;
+            cout << t1;
+            cin >> index;
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << fib.compute(i);
+                cout << '\\n';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            Test test2 = new Test();
+            cout << test2.test2(5);
+            cout << '\\n';
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        myVar1 = null;
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+            if (1==1) cout << myVar2;
+            if (1==1) cout << "1==1\\n";
+            if (-1==-1) cout << "-1==-1\\n";
+            if (1==2) cout << "1==2 fail\\n";
+            if (2==1) cout << "2==1 fail\\n";
+
+
+            if (1!=2) cout << "1!=2\\n";
+            if (2!=1) cout << "2!=1\\n";
+            if (1!=1) cout << "1!=1 fail\\n";
+
+
+            if (1 < 2) cout << "1<2\\n";
+            if (1 < 1) cout << "1<1 fail\\n";
+            if (2 < 1) cout << "2<1 fail\\n";
+
+
+            if (2 > 1) cout << "2>1\\n";
+            if (1 > 1) cout << "1>1 fail\\n";
+            if (1 > 2) cout << "1>2 fail\\n";
+
+            if (1 <= 2) cout << "1<=2\\n";
+            if (1 <= 1) cout << "1<=1\\n";
+            if (2 <= 1) cout << "2<=1 fail\\n";
+
+            if (2 >= 1) cout << "2>=1\\n";
+            if (1 >= 1) cout << "1>=1\\n";
+            if (1 >= 2) cout << "1>=2 fail\\n";
+
+            if (-1 == -(1))
+                cout << "-1==-(1)\\n";
+
+            if (1 * 2 / 2 + 4 - 5 * 8 / 8 == 0)
+                cout << "good math\\n";
+
+            if (     myVar3 == 'a'
+                &&   'b' == 'b'
+                && !('c' == 'd')
+                &&   'c' != 'd'
+                &&   'd' <  'e'
+                &&   'a' >  'A' )
+                cout << "char comparison is good\\n";
+
+            int un_test = 2;
+            un_test = +++++++un_test;
+            cout << un_test;
+            cout << '\\n';
+
+
+            int x = 1;
+            while (x <= 128) {
+                cout << "while: ";
+                cout << x;
+                cout << '\\n';
+                myVar4 = true;
+                int i = x;
+                int j = 0;
+                while(j < 3) {
+                    cout << "nested while: ";
+                    cout << i * 3;
+                    cout << '\\n';
+                    i *= 3;
+                    myVar5 = 12;
+                    j += 1;
+                }
+                x *= 2;
+            }
+
+            //x = j = i;
+            //cout << x; cout << '\\n';
+
+            // ASSIGNMENT
+            cout << "assneq: ";
+
+            int test = 0-1;
+            
+
+            test += 1;
+            if (test == 0) {
+                cout << '+';
+            } else {
+                cout << '-';
+                cout << test;
+            }
+            cout << '|';
+
+            test -= 1;
+            if (test == -1) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+
+            test *= 2;
+            myVar6 *= 4;
+            if (test == -2) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+
+            test /= 2;
+            bool here;
+            if (test == -1) {
+                bool after;
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            cout << '\\n';
+
+            // BOOL EXPRESSIONS
+            cout << "bool: ";
+
+            bool t = true;
+            bool f = false;
+            a = 0;
+            int b = 1;
+            b = myVar7;
+
+            if (t) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            if (t != f) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            if (a < b) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            if (b > a) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            if (a <= 0) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            if (b >= 1) {
+                cout << '+';
+            } else {
+                cout << '-';
+            }
+            cout << '|';
+            cout << '\\n';
+            
+
+            // SWITCH CASE
+            cout << "switch: ";
+
+            a = 0;
+            switch (a) {
+                case 1:
+                    cout << '-';
+                    +myVar8;
+                    break;
+                case 0:
+                    cout << '.';
+                case 3:
+                    cout << ',';
+                default:
+                    cout << '+';
+            }
+            cout << '|';
+            cout << '\\n';
+
+            int v1 = 1;
+            int v2 = 2;
+            int v3 = 3;
+
+            v1 = v2 = v3;
+
+            if (v1 == 3 && v2 == 3 && v3 == 3) cout << "v1 = v2 = v3 pass\\n";
+            else cout << "v1 = v2 = v3 fail\\n";
+
+            v1 += v1 = 2;
+            if (v1 == 4) cout << "v1 += v1 = 2 pass\\n";
+            else cout << "v1 += v1 = 2 fail\\n";
+
+            v1 = v2 = v3 = 1 + 2 + 3;
+            if (v1 == 6 && v2 == 6 && v3 == 6) cout << "v1 = v2 = v3 = 1 + 2 + 3 pass\\n";
+            else cout << "v1 = v2 = v3 = 1 + 2 + 3 fail\\n";
+            Fibonacci fib2 = new MyVar9();
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(undeclaredVariableVistior.has_Error, True)
+        self.assertEqual(undeclaredVariableVistior.errors[0], "Error: temp is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[1], "Error: temp is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[2], "Error: l is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[3], "Error: myVar1 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[4], "Error: myVar2 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[5], "Error: myVar3 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[6], "Error: myVar4 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[7], "Error: myVar5 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[8], "Error: myVar6 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[9], "Error: myVar7 is used but never declared or used before it is declared")
+        self.assertEqual(undeclaredVariableVistior.errors[10], "Error: myVar8 is used but never declared or used before it is declared")
+
+    def test_undeclared_method(self):
+        data = """
+        // Tests criteria under the C tier
+        // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+        class Fibonacci {
+            Fibonacci() {}
+            public int compute(int x) {
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        class Test {
+            Test() {}
+            public int test(int x) {
+                cout << x;
+                char l = '\\n';
+                cout << '\\n';
+                if (x == 5) {
+                    cout << this.test(x + 5);
+                    cout << '\\n';
+                }
+                return x + 5;
+            }
+        }
+
+        void kxi2023 main() {
+            ThisIsATest();
+            char t;
+            int index;
+            int i = 0;
+            Fibonacci fib = new Fibonacci();
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << fib.compute(i);
+                cout << '\\n';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            Test test = new Test();
+            cout << test.test(5);
+            cout << '\\n';
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(undeclaredVariableVistior.has_Error, True)
+        self.assertEqual(undeclaredVariableVistior.errors[0], "Error: ThisIsATest is used but never declared or used before it is declared")
+
+class Test_ObjectInitializerAndType(unittest.TestCase):
+
+    def test_basic(self):
+        data = """
+        // Tests criteria under the C tier
+        // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+        class Fibonacci {
+            Fibonacci() {}
+            public Test myTest;
+            public Test myTest2 = new Test();
+            public int compute(int x) {
+
+                if (x == 0) {
+                    return 0;
+                } else if (x == 1) {
+                    return 1;
+                }
+                return compute(1-x) + this.compute(x-2);
+            }
+        }
+
+        class Test {
+            Test() {}
+            private Fibonacci fib;
+            public Fibonacci fib2 = new Fibonacci();
+            private Fibonacci[] fib3 = new Fibonacci[0];
+            public int test(int x) {
+                cout << x;
+                char l = '\\n';
+                cout << '\\n';
+                if (x == 5) {
+                    cout << this.test(x + 5);
+                    cout << '\\n';
+                }
+                return x + 5;
+            }
+        }
+
+        void kxi2023 main() {
+            char t;
+            int index;
+            int i = 0;
+            Fibonacci fib = new Fibonacci();
+            Fibonacci[] fibs = new Fibonacci[0];
+            cin >> t;
+            cout << t;
+            cin >> t;
+            cout << t;
+            cin >> index;
+            while (i <= index) {
+                cout << i;
+                cout << ',';
+                cout << ' ';
+                cout << fib.compute(i);
+                cout << '\\n';
+                i = i + 1;
+            }
+
+            int[] arrTest = new int[5];
+            Test test = new Test();
+            cout << test.test(5);
+            cout << '\\n';
+            arrTest[1] = 3;
+
+            int a = 0;
+
+            while (a != 10) {
+                cin >> a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(symbolTable.has_Error, False)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(undeclaredVariableVistior.has_Error, False)
+        objectInitializerAndTypeVisitor = ObjectInitializerAndTypeVisitor()
+        symbols = symbolTable.symbol_tables
+        objectInitializerAndTypeVisitor.symbol_tables = symbols
+        myAST.accept(objectInitializerAndTypeVisitor)
+        self.assertEqual(objectInitializerAndTypeVisitor.has_Error, False)
+
+    def test_errors_with_Objects_and_Types(self):
+            data = """
+            // Tests criteria under the C tier
+            // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+            class Fibonacci {
+                Fibonacci(notInt X, notTest tesss, int aaa) {}
+                public Test myTest = new NotATest();
+                public Test myTest2 = new Test[1];
+                public int compute(int x) {
+
+                    if (x == 0) {
+                        return 0;
+                    } else if (x == 1) {
+                        return 1;
+                    }
+                    return compute(1-x) + this.compute(x-2);
+                }
+            }
+
+            class Test {
+                Test() {}
+                private Fibonacci fib;
+                public Fibonacci[] fib2 = new Fibonacci();
+                private Fibonacci[] fib3 = new Fibonacci();
+                public void test(int x) {
+                    cout << x;
+                    char l = '\\n';
+                    cout << '\\n';
+                    if (x == 5) {
+                        cout << this.test(x + 5);
+                        cout << '\\n';
+                    }
+                    return x + 5;
+                }
+            }
+
+            void kxi2023 main() {
+                char t;
+                int index;
+                int i = 0;
+                Fibonacci fib = new Fibonaccisss();
+                Fibonacci[] fibs = new Fibonacci[0];
+                cin >> t;
+                cout << t;
+                cin >> t;
+                cout << t;
+                cin >> index;
+                while (i <= index) {
+                    cout << i;
+                    cout << ',';
+                    cout << ' ';
+                    cout << fib.compute(i);
+                    cout << '\\n';
+                    i = i + 1;
+                }
+
+                int[] arrTest = new int[5];
+                
+                int[] arrTest1 = new void[5];
+                int[] arrTest2 = new void();
+                int arrTest3 = new void[5];
+                Test test = new Test();
+                cout << test.test(5);
+                cout << '\\n';
+                arrTest[1] = 3;
+
+                Fibonacci fibfff = new Test();
+                int a = 0;
+
+                while (a != 10) {
+                    cin >> a;
+                    switch (a) {
+                        case 1:
+                            cout << '-';
+                            break;
+                        case 0:
+                            cout << '.';
+                        case 3:
+                            cout << ',';
+                            break;
+                        default:
+                            cout << '+';
+                    }
+                }
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(symbolTable.has_Error, False)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(undeclaredVariableVistior.has_Error, False)
+            objectInitializerAndTypeVisitor = ObjectInitializerAndTypeVisitor()
+            symbols = symbolTable.symbol_tables
+            objectInitializerAndTypeVisitor.symbol_tables = symbols
+            myAST.accept(objectInitializerAndTypeVisitor)
+            self.assertEqual(objectInitializerAndTypeVisitor.has_Error, True)
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[0], "Error: there is no class 'notInt'. Attempting to use a variable of that type is illegal")
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[1], "Error: there is no class 'notTest'. Attempting to use a variable of that type is illegal")
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[2], 'Error: Attempting to initalize object Test myTest with invalid type of NotATest')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[3], "Error: there is no class 'NotATest'. Attempting to use a variable of that type is illegal")
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[4], 'Error: error when attempting to initialize object Test myTest2')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[5], 'Error: error when attempting to initialize object Fibonacci fib2')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[6], 'Error: error when attempting to initialize object Fibonacci fib3')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[7], 'Error: Attempting to initalize object Fibonacci fib with invalid type of Fibonaccisss')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[8], "Error: there is no class 'Fibonaccisss'. Attempting to use a variable of that type is illegal")
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[9], 'Error: Attempting to initalize object int arrTest1 with invalid type of void')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[10], 'Error: Attempting to initalize object int arrTest2 with invalid type of void')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[11], "Error : can not use 'NEW' with type void when arrTest2 is an array type")
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[12], 'Error: Attempting to initalize object int arrTest3 with invalid type of void')
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[13], "Error : can not use 'NEW' with type void without it setting variable arrTest3 to be an array")
+            self.assertEqual(objectInitializerAndTypeVisitor.errors[14], "Error: Attempting to initalize object Fibonacci fibfff with invalid type of Test")
+
+#param:
+    #test for constructor with the same instance
+    #test for contsurctor with other object
+    #test for constructo wirh invalid object type
+
+#test New with invalid params

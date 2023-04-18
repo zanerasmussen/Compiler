@@ -5,13 +5,6 @@ from AbstractVisitor import ASTVisitor
 class Unique:
     def __init__(self):
         self.id = -1
-    # _instance = None
-
-    # def __new__(cls):
-    #     if cls._instance is None:
-    #         cls._instance = super().__new__(cls)
-    #         cls._instance.id = -1
-    #     return cls._instance
 
     def getID(self):
         self.id += 1

@@ -61,10 +61,28 @@ look at offset on symbol tables.
 #    //comment
 #]
 
-            while (i <= index) {
-                cout << i;
-                cout << ',';
-                cout << ' ';
-                cout << '\n';   //Why does this fail?
-                i = i + 1;
-            }
+
+
+limitations:
+    only one constructor. Can be constructor with parameters. No constructor overloading
+    class can have a DataMember of Another type without being initialized. Error will happen at run time. No way to verify if DataMember is initialized. 
+
+Visitors for Semantics:
+    1) SymbolTableVisitor: 
+            visits all 'id' and creates a symbol for them. This checks for duplicated/reinitialized variables. 
+            This also checks for objects 'id'
+            Checks for methods/dataMembers of the same name
+            Ensures constructors has the same name of class
+            Checks duplicated class Names
+            Checks for multiple constructors
+    2)UndeclaredVarVistitor: 
+            Ensures there are no calls to uninitialized variables. 
+    3)ObjectInitializerAndTypeVisitor:
+            Anytime VariableDeclaration is called for an object, it checks to make sure object is initiaed properly (excluding parameters)
+            Ensures all uses of 'Type' that aren't of default type (int,void, char, etc) are an instance of a class that actually exists. 
+
+    4)DotParam:
+            Checks to make sure all parameters are valid and all calls to that type are passing the correct type of parameters and the correct number. (constructor and methods)
+            does index checking
+            checks method and datamember calls. checks this statements and also <expression>.<identifier> expressions. 
+            checks for private and public calls

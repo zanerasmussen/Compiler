@@ -3,54 +3,35 @@ from AbstractVisitor import ASTVisitor
 from AST import *
 from theLexer import theLexerTester
 
-#check for undeclared variable and for objects calling invalid method names. 
-class Unique:
-    def __init__(self):
-        self.id = -1
-
-    def getID(self):
-        self.id += 1
-        return self.id
     
-class Symbol:
-    def __init__(self, whatAmI: str, name: str, type, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool):
-        self.whatAmI = whatAmI
-        self.Name = name
-        self.Type = type
-        self.Offset = offset
-        self.isPrivate = isPrivate
-        self.isPublic = isPublic
-        self.hasIndex = hasIndex
 
-class UndeclaredVisitor(ASTVisitor):
+
+class NewDotParamVisitor(ASTVisitor):
     def __init__(self):
-        self.UID = Unique()
-        self.symbol_tables = []
-        self.scope_stack = []
+        self.symbolTable = []
+        self.temp_SymbolTable = []
+        self.paramList = []
         self.has_Error = False
         self.errors = []
+        self.current_class = ""
+        self.current_method = ""
+        self.current_constructor = ""
 
-    def enter_scope(self):
-        new_scope = self.UID.getID()
-        self.scope_stack.append(new_scope)
-        self.symbol_tables.append({})
-
-    def exit_scope(self):
-        self.scope_stack.pop()
-
-    def create_symbol(self, whatAmI: str, name: str, type: str, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool) -> Symbol:
-        return Symbol(whatAmI = whatAmI, name=name, type=type, offset=offset, isPrivate=isPrivate, isPublic=isPublic, hasIndex=hasIndex)
-
-
-    def add_to_symbol_table(self, symbol: Symbol):
-        current_scope = self.scope_stack[-1]
-        name = symbol.Name
-        whatAmI = symbol.whatAmI
-
-        self.symbol_tables[current_scope][(name, whatAmI)] = {
-            "symbol": symbol,
-            "can_access_scopes": self.scope_stack.copy(),
-        }
+    def add_Param(self, class_name: str, method_name: str, param_type: str, hasIndex: bool):
+        method_found = False
+        for param in self.paramList:
+            if param['className'] == class_name and param['methodName'] == method_name:
+                method_found = True
+                param['numberOfParams'] += 1
+                if param_type:
+                    param['paramTypes'].append((param_type, hasIndex))
+                else:
+                    param['paramTypes'].append(())
+                break
+        if not method_found:
+            new_method = {'className': class_name, 'methodName': method_name,
+                        'numberOfParams': 1, 'paramTypes': [(param_type, hasIndex)]}
+            self.paramList.append(new_method)
 
     def pre_visit_Argument(self, node: ASTArgument):
         pass
@@ -71,27 +52,22 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_Case(self, node: ASTCase):
-        type = theLexerTester(str(node.NumOrChar))
-        symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False)
-        self.add_to_symbol_table(symbol)
-        self.enter_scope()
+        pass
 
     def post_visit_Case(self, node: ASTCase):
-        self.exit_scope()
+        pass
 
     def pre_visit_CaseBlock(self, node: ASTCaseBlock):
-        self.enter_scope()
+        pass
 
     def post_visit_CaseBlock(self, node: ASTCaseBlock):
-        self.exit_scope()
+        pass
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
-        self.enter_scope()
-        symbol = self.create_symbol(str("class"), str(node.ID), str(node.Class), 12, False, True, False)
-        self.add_to_symbol_table(symbol)
+        self.current_class = str(node.ID)
     
     def post_visit_ClassDefinition(self, node: ASTClassDefinition):
-        self.exit_scope()
+        self.current_class = ""
 
     def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
         pass
@@ -100,32 +76,19 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_CompilationUnit(self, node: ASTCompilationUnit):
-        self.enter_scope()
-        symbol = self.create_symbol(str("function"), str(node.main), str(node.void), 12, False, True, False)
-        self.add_to_symbol_table(symbol)
-
-    def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
-        self.exit_scope()
-        
-    def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False)
-        self.add_to_symbol_table(symbol)
-
-    def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         pass
 
+    def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
+        pass
+
+    def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
+        self.current_constructor = str(node.ID)
+
+    def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
+        self.current_constructor = ""
+
     def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
-        isPrivate = False
-        isPublic = False
-        hasIndex = False
-        if node.Modifier == 'private':
-            isPrivate = True
-        if node.Modifier == 'public':
-            isPublic = True
-        if node.VariableDeclaration.LRSquare is not None:
-            hasIndex = True
-        symbol = self.create_symbol(str("dataMember"), str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, isPrivate, isPublic, hasIndex)
-        self.add_to_symbol_table(symbol)
+        pass
 
     def post_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         pass
@@ -150,7 +113,7 @@ class UndeclaredVisitor(ASTVisitor):
 
     def pre_visit_ExpressionNew(self, node: ASTExpressionNew):
         pass
-    
+
     def post_visit_ExpressionNew(self, node: ASTExpressionNew):
         pass
 
@@ -317,21 +280,10 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
-        isPrivate = False
-        isPublic = False
-        hasIndex = False
-        if node.Modifier == 'private':
-            isPrivate = True
-        if node.Modifier == 'public':
-            isPublic = True
-        if node.LRSquare is not None:
-            hasIndex = True
-        symbol = self.create_symbol(str("method"), str(node.ID), str(node.Type), 12, isPrivate, isPublic, hasIndex)
-        self.add_to_symbol_table(symbol)
-        self.enter_scope()
+        pass
 
     def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
-        self.exit_scope()
+        pass
 
     def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
         pass
@@ -376,11 +328,13 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_Parameter(self, node: ASTParameter):
-        hasIndex = False
-        if node.LRSquare is not None:
-            hasIndex = True
-        symbol = self.create_symbol("variable", str(node.ID), str(node.Type), 12, False, False, hasIndex)
-        self.add_to_symbol_table(symbol)
+        hasIndex = True
+        if node.LRSquare is None:
+            hasIndex = False
+        if self.current_class == self.current_constructor and str(node.Type) == self.current_class:
+            self.has_Error = True
+            self.errors.append(f"Error: Since only one constructor is allowed, it is illegal to have a parameter {node.Type} {node.ID} be of the same type as the class {self.current_class}")
+        self.add_Param(str(self.current_class), str(self.current_constructor), str(node.Type), hasIndex)
 
     def post_visit_Parameter(self, node: ASTParameter):
         pass
@@ -416,34 +370,25 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementIF(self, node: ASTStatementIF):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
-        self.exit_scope()
+        pass
 
     def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-       self.exit_scope()
+       pass
 
     def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        self.exit_scope()
+        pass
 
     def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
-        hasIndex = False
-        if node.VariableDeclaration.LRSquare is not None:
-            hasIndex = True
-        if node.VariableDeclaration.Type != 'void' and node.VariableDeclaration.Type != 'int' and node.VariableDeclaration.Type != 'char' and node.VariableDeclaration.Type != 'bool' and node.VariableDeclaration.Type != 'string':
-            symbol = self.create_symbol("object", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
-        else:
-            symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
-
-        self.add_to_symbol_table(symbol)
-
+        pass
 
     def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         pass
@@ -461,10 +406,10 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementWhile(self, node: ASTStatementWhile):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
-        self.exit_scope()
+        pass
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         pass
@@ -473,20 +418,7 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_Terminal(self, node: ASTTerminal):
-        tokType = theLexerTester(str(node.Terminal))
-        varName = tokType.value
-        varType = tokType.type
-        varExists = False
-        if varType == 'ID':
-            for x in self.scope_stack:
-                for item in self.symbol_tables[x]:
-                     if item[0] == varName:
-                         varExists = True
-            if varExists == False:
-                self.has_Error = True
-                self.errors.append(f"Error: {varName} is used but never declared or used before it is declared")
-        else:
-            pass
+        pass
 
     def post_visit_Terminal(self, node: ASTTerminal):
         pass

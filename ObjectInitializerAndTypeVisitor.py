@@ -1,56 +1,51 @@
 from abc import ABCMeta, abstractmethod
 from AbstractVisitor import ASTVisitor
 from AST import *
-from theLexer import theLexerTester
 
-#check for undeclared variable and for objects calling invalid method names. 
-class Unique:
+
+class ObjectInitializerAndTypeVisitor(ASTVisitor):
     def __init__(self):
-        self.id = -1
-
-    def getID(self):
-        self.id += 1
-        return self.id
-    
-class Symbol:
-    def __init__(self, whatAmI: str, name: str, type, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool):
-        self.whatAmI = whatAmI
-        self.Name = name
-        self.Type = type
-        self.Offset = offset
-        self.isPrivate = isPrivate
-        self.isPublic = isPublic
-        self.hasIndex = hasIndex
-
-class UndeclaredVisitor(ASTVisitor):
-    def __init__(self):
-        self.UID = Unique()
         self.symbol_tables = []
-        self.scope_stack = []
         self.has_Error = False
         self.errors = []
 
-    def enter_scope(self):
-        new_scope = self.UID.getID()
-        self.scope_stack.append(new_scope)
-        self.symbol_tables.append({})
+    def checkNew(self, node: ASTVariableDeclaration):
+        #make sure New is of right type
+        if node.Type != node.Initializer.Initializer.Expression.Type:
+            self.has_Error = True
+            self.errors.append(f"Error: Attempting to initalize object {node.Type} {node.ID} with invalid type of {node.Initializer.Initializer.Expression.Type}")
+                    
+        #make sure NEW isn't of invalid type
+        if ((node.Initializer.Initializer.Expression.Type == "void") or (node.Initializer.Initializer.Expression.Type == "int") or (node.Initializer.Initializer.Expression.Type == "char") or (node.Initializer.Initializer.Expression.Type == "bool") or (node.Initializer.Initializer.Expression.Type == "string")):
+            if node.LRSquare== None:
+                self.has_Error = True
+                self.errors.append(f"Error : can not use 'NEW' with type {node.Initializer.Initializer.Expression.Type} without it setting variable {node.ID} to be an array")
+            else:
+                if str(node.Initializer.Initializer.Expression.ArgOrIdx.Arg_Idx.__class__) == "<class 'AST.ASTIndex'>":
+                    pass
+                else:
+                    self.has_Error = True
+                    self.errors.append(f"Error : can not use 'NEW' with type {node.Initializer.Initializer.Expression.Type} when {node.ID} is an array type")
+        else:       
+            if (node.LRSquare != None and str(node.Initializer.Initializer.Expression.ArgOrIdx.Arg_Idx.__class__) == "<class 'AST.ASTIndex'>") or (node.LRSquare == None and str(node.Initializer.Initializer.Expression.ArgOrIdx.Arg_Idx.__class__) == "<class 'AST.ASTArgument'>"):
+                pass
+            else:
+                self.has_Error = True
+                self.errors.append(f"Error: error when attempting to initialize object {node.Type} {node.ID}")
 
-    def exit_scope(self):
-        self.scope_stack.pop()
-
-    def create_symbol(self, whatAmI: str, name: str, type: str, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool) -> Symbol:
-        return Symbol(whatAmI = whatAmI, name=name, type=type, offset=offset, isPrivate=isPrivate, isPublic=isPublic, hasIndex=hasIndex)
-
-
-    def add_to_symbol_table(self, symbol: Symbol):
-        current_scope = self.scope_stack[-1]
-        name = symbol.Name
-        whatAmI = symbol.whatAmI
-
-        self.symbol_tables[current_scope][(name, whatAmI)] = {
-            "symbol": symbol,
-            "can_access_scopes": self.scope_stack.copy(),
-        }
+    def checkType(self, type: str):
+        if (type == 'void') or (type == 'int') or (type == 'char') or (type == 'bool') or (type == 'string'):
+            pass
+        else:
+            doesClassExist = False
+            for table in self.symbol_tables:
+                for key, value in table.items():
+                    symbol = value["symbol"]
+                    if symbol.whatAmI == 'class' and symbol.Name== type:
+                        doesClassExist = True
+            if doesClassExist == False:
+                self.has_Error = True
+                self.errors.append(f"Error: there is no class '{type}'. Attempting to use a variable of that type is illegal")
 
     def pre_visit_Argument(self, node: ASTArgument):
         pass
@@ -71,27 +66,22 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_Case(self, node: ASTCase):
-        type = theLexerTester(str(node.NumOrChar))
-        symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False)
-        self.add_to_symbol_table(symbol)
-        self.enter_scope()
+        pass
 
     def post_visit_Case(self, node: ASTCase):
-        self.exit_scope()
+        pass
 
     def pre_visit_CaseBlock(self, node: ASTCaseBlock):
-        self.enter_scope()
+        pass
 
     def post_visit_CaseBlock(self, node: ASTCaseBlock):
-        self.exit_scope()
+        pass
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
-        self.enter_scope()
-        symbol = self.create_symbol(str("class"), str(node.ID), str(node.Class), 12, False, True, False)
-        self.add_to_symbol_table(symbol)
-    
+        pass
+
     def post_visit_ClassDefinition(self, node: ASTClassDefinition):
-        self.exit_scope()
+        pass
 
     def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
         pass
@@ -100,32 +90,19 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_CompilationUnit(self, node: ASTCompilationUnit):
-        self.enter_scope()
-        symbol = self.create_symbol(str("function"), str(node.main), str(node.void), 12, False, True, False)
-        self.add_to_symbol_table(symbol)
+        pass
 
     def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
-        self.exit_scope()
+        pass
         
     def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False)
-        self.add_to_symbol_table(symbol)
+        pass
 
     def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         pass
 
     def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
-        isPrivate = False
-        isPublic = False
-        hasIndex = False
-        if node.Modifier == 'private':
-            isPrivate = True
-        if node.Modifier == 'public':
-            isPublic = True
-        if node.VariableDeclaration.LRSquare is not None:
-            hasIndex = True
-        symbol = self.create_symbol(str("dataMember"), str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, isPrivate, isPublic, hasIndex)
-        self.add_to_symbol_table(symbol)
+        pass
 
     def post_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         pass
@@ -149,7 +126,7 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_ExpressionNew(self, node: ASTExpressionNew):
-        pass
+        self.checkType(node.Type)
     
     def post_visit_ExpressionNew(self, node: ASTExpressionNew):
         pass
@@ -317,21 +294,10 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
-        isPrivate = False
-        isPublic = False
-        hasIndex = False
-        if node.Modifier == 'private':
-            isPrivate = True
-        if node.Modifier == 'public':
-            isPublic = True
-        if node.LRSquare is not None:
-            hasIndex = True
-        symbol = self.create_symbol(str("method"), str(node.ID), str(node.Type), 12, isPrivate, isPublic, hasIndex)
-        self.add_to_symbol_table(symbol)
-        self.enter_scope()
+        self.checkType(node.Type)
 
     def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
-        self.exit_scope()
+        pass
 
     def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
         pass
@@ -376,11 +342,7 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_Parameter(self, node: ASTParameter):
-        hasIndex = False
-        if node.LRSquare is not None:
-            hasIndex = True
-        symbol = self.create_symbol("variable", str(node.ID), str(node.Type), 12, False, False, hasIndex)
-        self.add_to_symbol_table(symbol)
+        self.checkType(node.Type)
 
     def post_visit_Parameter(self, node: ASTParameter):
         pass
@@ -416,34 +378,25 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementIF(self, node: ASTStatementIF):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
-        self.exit_scope()
+        pass
 
     def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-       self.exit_scope()
+        pass
 
     def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        self.exit_scope()
+        pass
 
     def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
-        hasIndex = False
-        if node.VariableDeclaration.LRSquare is not None:
-            hasIndex = True
-        if node.VariableDeclaration.Type != 'void' and node.VariableDeclaration.Type != 'int' and node.VariableDeclaration.Type != 'char' and node.VariableDeclaration.Type != 'bool' and node.VariableDeclaration.Type != 'string':
-            symbol = self.create_symbol("object", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
-        else:
-            symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
-
-        self.add_to_symbol_table(symbol)
-
+        pass
 
     def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         pass
@@ -461,32 +414,22 @@ class UndeclaredVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementWhile(self, node: ASTStatementWhile):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
-        self.exit_scope()
+        pass
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
-        pass
+        self.checkType(node.Type)
+        if node.Initializer.Initializer != None:
+            if str(node.Initializer.Initializer.Expression.__class__) == "<class 'AST.ASTExpressionNew'>":
+                self.checkNew(node)
 
     def post_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         pass
 
     def pre_visit_Terminal(self, node: ASTTerminal):
-        tokType = theLexerTester(str(node.Terminal))
-        varName = tokType.value
-        varType = tokType.type
-        varExists = False
-        if varType == 'ID':
-            for x in self.scope_stack:
-                for item in self.symbol_tables[x]:
-                     if item[0] == varName:
-                         varExists = True
-            if varExists == False:
-                self.has_Error = True
-                self.errors.append(f"Error: {varName} is used but never declared or used before it is declared")
-        else:
-            pass
+        pass
 
     def post_visit_Terminal(self, node: ASTTerminal):
         pass

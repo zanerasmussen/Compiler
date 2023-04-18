@@ -1,6 +1,81 @@
+// Tests criteria under the C tier
+// (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+class Fibonacci {
+    Fibonacci(int x, int y, bool t, string[] array, Test temp, Non exxx) {}
+    public Dumb thisISTest = new Dumb();
+    public Test[] thisISTest2 = new Test[0];
+    public object compute(int x) {
+        int y = 3;
+        if (x == 0) {
+            y = 3;
+            return 0;
+        } else if (x == 1) {
+            return 1;
+        }
+        return compute(1-x) + this.compute(x-2);
+    }
+}
+
+class Test {
+    Test() {}
+    public int test(int x) {
+        cout << x;
+        char l = '\n';
+        cout << '\n';
+        if (x == 5) {
+            cout << this.test(x + 5);
+            cout << '\n';
+        }
+        return x + 5;
+    }
+}
 
 void kxi2023 main() {
-    if (1==1) cout << "1==1\n";
+    char t;
+    int index;
+    int i = 0;
+    Fibonacci fib = new Fibonaccissss();
+    Fibonacci[] fib2 = new Fibonacci();
+    fib.thisIsATest;
+    fib.fib2;
+    cin >> t;
+    cout << t;
+    cin >> t;
+    cout << t;
+    cin >> index;
+    while (i <= index) {
+        cout << i;
+        cout << ',';
+        cout << ' ';
+        cout << fib.compute(i);
+        cout << '\n';
+        i = i + 1;
+    }
+
+    int[] arrTest = new int[5];
+    Test test = new Test();
+    cout << test.test(5);
+    cout << '\n';
+    arrTest[1] = 3;
+
+    int a = 0;
+
+    while (a != 10) {
+        cin >> a;
+        switch (a) {
+            case 1:
+                cout << '-';
+                break;
+            case 0:
+                cout << '.';
+            case 3:
+                cout << ',';
+                break;
+            default:
+                cout << '+';
+        }
+    }
+        if (1==1) cout << "1==1\n";
     if (-1==-1) cout << "-1==-1\n";
     if (1==2) cout << "1==2 fail\n";
     if (2==1) cout << "2==1 fail\n";
@@ -72,35 +147,35 @@ void kxi2023 main() {
     // ASSIGNMENT
     cout << "assneq: ";
 
-    int test = 0-1;
+    int tes = 0-1;
     
-    test += 1;
-    if (test == 0) {
+    tes += 1;
+    if (tes == 0) {
         cout << '+';
     } else {
         cout << '-';
-        cout << test;
+        cout << tes;
     }
     cout << '|';
 
-    test -= 1;
-    if (test == -1) {
-        cout << '+';
-    } else {
-        cout << '-';
-    }
-    cout << '|';
-
-    test *= 2;
-    if (test == -2) {
+    tes -= 1;
+    if (tes == -1) {
         cout << '+';
     } else {
         cout << '-';
     }
     cout << '|';
 
-    test /= 2;
-    if (test == -1) {
+    tes *= 2;
+    if (tes == -2) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    tes /= 2;
+    if (tes == -1) {
         cout << '+';
     } else {
         cout << '-';
@@ -111,18 +186,18 @@ void kxi2023 main() {
     // BOOL EXPRESSIONS
     cout << "bool: ";
 
-    bool t = true;
+    bool tr = true;
     bool f = false;
-    int a = 0;
+    a = 0;
     int b = 1;
 
-    if (t) {
+    if (tr) {
         cout << '+';
     } else {
         cout << '-';
     }
     cout << '|';
-    if (t != f) {
+    if (tr != f) {
         cout << '+';
     } else {
         cout << '-';
