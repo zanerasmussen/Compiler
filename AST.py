@@ -1,7 +1,8 @@
 from AbstractNode import ASTBASENODE
 
 class ASTArgument(ASTBASENODE):
-    def __init__(self, LPAREN, MaybeArgumentList, RPAREN):
+    def __init__(self, lineno, LPAREN, MaybeArgumentList, RPAREN):
+        self.lineno = lineno
         self.LPAREN = LPAREN
         self.MaybeArgumentList = MaybeArgumentList
         self.RPAREN = RPAREN
@@ -11,6 +12,15 @@ class ASTArgument(ASTBASENODE):
         if self.MaybeArgumentList != None:
             self.MaybeArgumentList.accept(visitor)
         visitor.post_visit_Argument(self)
+
+class ASTArgOrIdx(ASTBASENODE):
+    def __init__(self, Arg_Idx):
+        self.Arg_Idx = Arg_Idx
+
+    def accept(self, visitor):
+        visitor.pre_visit_ArgOrIdx(self)
+        self.Arg_Idx.accept(visitor)
+        visitor.post_visit_ArgOrIdx(self)
 
 class ASTArgumentList(ASTBASENODE):
     def __init__(self, Expression, MultipleCommaExpression):
@@ -25,17 +35,9 @@ class ASTArgumentList(ASTBASENODE):
             self.MultipleCommaExpression.accept(visitor)
         visitor.post_visit_ArgumentList(self)
 
-class ASTArgOrIdx(ASTBASENODE):
-    def __init__(self, Arg_Idx):
-        self.Arg_Idx = Arg_Idx
-
-    def accept(self, visitor):
-        visitor.pre_visit_ArgOrIdx(self)
-        self.Arg_Idx.accept(visitor)
-        visitor.post_visit_ArgOrIdx(self)
-
 class ASTCase(ASTBASENODE):
-    def __init__(self, CASE, NumOrChar, COLON, MultipleStatement):
+    def __init__(self, lineno, CASE, NumOrChar, COLON, MultipleStatement):
+        self.lineno = lineno
         self.CASE = CASE
         self.NumOrChar = NumOrChar
         self.COLON = COLON
@@ -48,7 +50,8 @@ class ASTCase(ASTBASENODE):
         visitor.post_visit_Case(self)
 
 class ASTCaseBlock(ASTBASENODE):
-    def __init__(self, LCURLY, MultipleCase, DEFAULT, COLON, MultipleStatement, RCURLY):
+    def __init__(self, lineno, LCURLY, MultipleCase, DEFAULT, COLON, MultipleStatement, RCURLY):
+        self.lineno = lineno
         self.LCURLY = LCURLY
         self.MultipleCase = MultipleCase
         self.DEFAULT = DEFAULT
@@ -65,7 +68,8 @@ class ASTCaseBlock(ASTBASENODE):
         visitor.post_visit_CaseBlock(self)
 
 class ASTClassDefinition(ASTBASENODE):
-    def __init__(self, Class, ID, LCURLY, MultipleClassMemberDefinition, RCURLY):
+    def __init__(self, lineno, Class, ID, LCURLY, MultipleClassMemberDefinition, RCURLY):
+        self.lineno = lineno
         self.Class = Class
         self.ID = ID
         self.LCURLY = LCURLY
@@ -89,7 +93,8 @@ class ASTClassMemberDefinition(ASTBASENODE):
         visitor.post_visit_ClassMemberDefinition(self)
 
 class ASTCompilationUnit(ASTBASENODE):
-    def __init__(self, MultipleClassDefinition, void, kxi2023, main, LPAREN, RPAREN, MethodBody):
+    def __init__(self, lineno, MultipleClassDefinition, void, kxi2023, main, LPAREN, RPAREN, MethodBody):
+        self.lineno = lineno
         self.MultipleClassDefinition = MultipleClassDefinition
         self.void = void
         self.kxi2023 = kxi2023
@@ -108,7 +113,8 @@ class ASTCompilationUnit(ASTBASENODE):
             visitor.post_visit_CompilationUnit(self)
   
 class ASTConstructorDeclaration(ASTBASENODE):
-    def __init__(self, ID, MethodSuffix):
+    def __init__(self, lineno, ID, MethodSuffix):
+        self.lineno = lineno
         self.ID = ID
         self.MethodSuffix = MethodSuffix
 
@@ -143,7 +149,8 @@ class ASTExpressionArgIdx(ASTBASENODE):
         visitor.post_visit_ExpressionArgIdx(self)
 
 class ASTExpressionDotID(ASTBASENODE):
-    def __init__(self, Expression, PERIOD, ID):
+    def __init__(self, lineno, Expression, PERIOD, ID):
+        self.lineno = lineno
         self.Expression = Expression
         self.PERIOD = PERIOD
         self.ID = ID
@@ -155,7 +162,8 @@ class ASTExpressionDotID(ASTBASENODE):
         visitor.post_visit_ExpressionDotID(self)
 
 class ASTExpressionMinus(ASTBASENODE):
-    def __init__(self, MINUS, Expression):
+    def __init__(self, lineno, MINUS, Expression):
+        self.lineno = lineno
         self.MINUS = MINUS
         self.Expression = Expression
 
@@ -166,7 +174,8 @@ class ASTExpressionMinus(ASTBASENODE):
         visitor.post_visit_ExpressionMinus(self)
 
 class ASTExpressionNew(ASTBASENODE):
-    def __init__(self, NEW, Type, ArgOrIdx):
+    def __init__(self, lineno, NEW, Type, ArgOrIdx):
+        self.lineno = lineno
         self.NEW = NEW
         self.Type = Type
         self.ArgOrIdx = ArgOrIdx
@@ -178,7 +187,8 @@ class ASTExpressionNew(ASTBASENODE):
         visitor.post_visit_ExpressionNew(self)
 
 class ASTExpressionNot(ASTBASENODE):
-    def __init__(self, NOT, Expression):
+    def __init__(self, lineno, NOT, Expression):
+        self.lineno = lineno
         self.NOT = NOT
         self.Expression = Expression
 
@@ -189,7 +199,8 @@ class ASTExpressionNot(ASTBASENODE):
         visitor.post_visit_ExpressionNot(self)
 
 class ASTExpressionPlus(ASTBASENODE):
-    def __init__(self, PLUS, Expression):
+    def __init__(self, lineno, PLUS, Expression):
+        self.lineno = lineno
         self.PLUS = PLUS
         self.Expression = Expression
 
@@ -200,7 +211,8 @@ class ASTExpressionPlus(ASTBASENODE):
         visitor.post_visit_ExpressionPlus(self)
 
 class ASTExpressionPAREN(ASTBASENODE):
-    def __init__(self, LPAREN, Expression, RPAREN):
+    def __init__(self, lineno, LPAREN, Expression, RPAREN):
+        self.lineno = lineno
         self.LPAREN = LPAREN
         self.Expression = Expression
         self.RPAREN = RPAREN
@@ -212,7 +224,8 @@ class ASTExpressionPAREN(ASTBASENODE):
         visitor.post_visit_ExpressionPAREN(self)
 
 class ASTExpressionEAANDE(ASTBASENODE):
-    def __init__(self, Expression, AAND, Expression2):
+    def __init__(self, lineno, Expression, AAND, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.AAND = AAND
         self.Expression2 = Expression2
@@ -226,7 +239,8 @@ class ASTExpressionEAANDE(ASTBASENODE):
         visitor.post_visit_ExpressionEAANDE(self)
 
 class ASTExpressionECEqualE(ASTBASENODE):
-    def __init__(self, Expression, CEQUAL, Expression2):
+    def __init__(self, lineno, Expression, CEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.CEQUAL = CEQUAL
         self.Expression2 = Expression2
@@ -240,7 +254,8 @@ class ASTExpressionECEqualE(ASTBASENODE):
         visitor.post_visit_ExpresssionECEqualE(self)
 
 class ASTExpressionEDivideE(ASTBASENODE):
-    def __init__(self, Expression, DIVIDE, Expression2):
+    def __init__(self, lineno, Expression, DIVIDE, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.DIVIDE = DIVIDE
         self.Expression2 = Expression2
@@ -254,7 +269,8 @@ class ASTExpressionEDivideE(ASTBASENODE):
         visitor.post_visit_ExpressionEDivideE(self)
 
 class ASTExpressionEDivideEqualE(ASTBASENODE):
-    def __init__(self, Expression, DIVIDEEQUAL, Expression2):
+    def __init__(self, lineno, Expression, DIVIDEEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.DIVIDEEQUAL = DIVIDEEQUAL
         self.Expression2 = Expression2
@@ -268,7 +284,8 @@ class ASTExpressionEDivideEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionEDivideEqualE(self)
 
 class ASTExpressionEEqualE(ASTBASENODE):
-    def __init__(self, Expression, EQUAL, Expression2):
+    def __init__(self, lineno, Expression, EQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.EQUAL = EQUAL
         self.Expression2 = Expression2
@@ -282,7 +299,8 @@ class ASTExpressionEEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionEEqualE(self)
 
 class ASTExpressionEGreaterE(ASTBASENODE):
-    def __init__(self, Expression, GREATER, Expression2):
+    def __init__(self, lineno, Expression, GREATER, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.GREATER = GREATER
         self.Expression2 = Expression2
@@ -296,7 +314,8 @@ class ASTExpressionEGreaterE(ASTBASENODE):
         visitor.post_visit_ExpressionEGreaterE(self)
 
 class ASTExpressionEGreaterEqualE(ASTBASENODE):
-    def __init__(self, Expression, GREATEQUAL, Expression2):
+    def __init__(self, lineno, Expression, GREATEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.GREATEQUAL = GREATEQUAL
         self.Expression2 = Expression2
@@ -310,7 +329,8 @@ class ASTExpressionEGreaterEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionEGreaterEqualE(self)
 
 class ASTExpressionELessE(ASTBASENODE):
-    def __init__(self, Expression, LESS, Expression2):
+    def __init__(self, lineno, Expression, LESS, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.LESS = LESS
         self.Expression2 = Expression2
@@ -324,7 +344,8 @@ class ASTExpressionELessE(ASTBASENODE):
         visitor.post_visit_ExpressionELessE(self)
 
 class ASTExpressionELessEqualE(ASTBASENODE):
-    def __init__(self, Expression, LESSEQUAL, Expression2):
+    def __init__(self, lineno, Expression, LESSEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.LESSEQUAL = LESSEQUAL
         self.Expression2 = Expression2
@@ -338,7 +359,8 @@ class ASTExpressionELessEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionELessEqualE(self)
 
 class ASTExpressionEMinusE(ASTBASENODE):
-    def __init__(self, Expression, MINUS, Expression2):
+    def __init__(self, lineno, Expression, MINUS, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.MINUS = MINUS
         self.Expression2 = Expression2
@@ -352,7 +374,8 @@ class ASTExpressionEMinusE(ASTBASENODE):
         visitor.post_visit_ExpressionEMinusE(self)
 
 class ASTExpressionEMinusEqualE(ASTBASENODE):
-    def __init__(self, Expression, MINUSEQUAL, Expression2):
+    def __init__(self, lineno, Expression, MINUSEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.MINUSEQUAL = MINUSEQUAL
         self.Expression2 = Expression2
@@ -366,7 +389,8 @@ class ASTExpressionEMinusEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionEMinusEqualE(self)
 
 class ASTExpressionENotEqualE(ASTBASENODE):
-    def __init__(self, Expression, NEQUAL, Expression2):
+    def __init__(self, lineno, Expression, NEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.NEQUAL = NEQUAL
         self.Expression2 = Expression2
@@ -380,7 +404,8 @@ class ASTExpressionENotEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionENotEqualE(self)
 
 class ASTExpressionEOORE(ASTBASENODE):
-    def __init__(self, Expression, OOR, Expression2):
+    def __init__(self, lineno, Expression, OOR, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.OOR = OOR
         self.Expression2 = Expression2
@@ -394,7 +419,8 @@ class ASTExpressionEOORE(ASTBASENODE):
         visitor.post_visit_ExpressionEOORE(self)
 
 class ASTExpressionEPlusE(ASTBASENODE):
-    def __init__(self, Expression, PLUS, Expression2):
+    def __init__(self, lineno, Expression, PLUS, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.PLUS = PLUS
         self.Expression2 = Expression2
@@ -408,7 +434,8 @@ class ASTExpressionEPlusE(ASTBASENODE):
         visitor.post_visit_ExpressionEPlusE(self)
 
 class ASTExpressionEPlusEqualE(ASTBASENODE):
-    def __init__(self, Expression, PLUSEQUAL, Expression2):
+    def __init__(self, lineno, Expression, PLUSEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.PLUSEQUAL = PLUSEQUAL
         self.Expression2 = Expression2
@@ -422,7 +449,8 @@ class ASTExpressionEPlusEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionEPlusEqualE(self)
 
 class ASTExpressionETimesE(ASTBASENODE):
-    def __init__(self, Expression, TIMES, Expression2):
+    def __init__(self, lineno, Expression, TIMES, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.TIMES = TIMES
         self.Expression2 = Expression2
@@ -436,7 +464,8 @@ class ASTExpressionETimesE(ASTBASENODE):
         visitor.post_visit_ExpressionETimesE(self)
 
 class ASTExpressionETimesEqualE(ASTBASENODE):
-    def __init__(self, Expression, TIMESEQUAL, Expression2):
+    def __init__(self, lineno, Expression, TIMESEQUAL, Expression2):
+        self.lineno = lineno
         self.Expression = Expression
         self.TIMESEQUAL = TIMESEQUAL
         self.Expression2 = Expression2
@@ -450,7 +479,8 @@ class ASTExpressionETimesEqualE(ASTBASENODE):
         visitor.post_visit_ExpressionETimesEqualE(self)
 
 class ASTIndex(ASTBASENODE):
-    def __init__(self, LSQUARE, Expression, RSQUARE):
+    def __init__(self, lineno, LSQUARE, Expression, RSQUARE):
+        self.lineno = lineno
         self.LSQUARE = LSQUARE
         self.Expression = Expression
         self.RSQUARE = RSQUARE
@@ -462,7 +492,8 @@ class ASTIndex(ASTBASENODE):
         visitor.post_visit_Index(self)
 
 class ASTInitializer(ASTBASENODE):
-    def __init__(self, EQUAL, Expression):
+    def __init__(self, lineno, EQUAL, Expression):
+        self.lineno = lineno
         self.EQUAL = EQUAL
         self.Expression = Expression
 
@@ -517,7 +548,8 @@ class ASTMaybeParamList(ASTBASENODE):
             visitor.post_visit_MaybeParamList(self)
 
 class ASTMethodBody(ASTBASENODE):
-    def __init__(self, LCURLY, MultipleStatement, RCURLY):
+    def __init__(self, lineno, LCURLY, MultipleStatement, RCURLY):
+        self.lineno = lineno
         self.LCURLY = LCURLY
         self.MultipleStatement = MultipleStatement
         self.RCURLY = RCURLY
@@ -530,7 +562,8 @@ class ASTMethodBody(ASTBASENODE):
             visitor.post_visit_MethodBody(self)
 
 class ASTMethodDeclaration(ASTBASENODE):
-    def __init__(self, Modifier, Type, LRSquare, ID, MethodSuffix):
+    def __init__(self, lineno, Modifier, Type, LRSquare, ID, MethodSuffix):
+        self.lineno = lineno
         self.Modifier = Modifier
         self.Type = Type
         self.LRSquare = LRSquare
@@ -544,7 +577,8 @@ class ASTMethodDeclaration(ASTBASENODE):
             visitor.post_visit_MethodDeclaration(self)
 
 class ASTMethodSuffix(ASTBASENODE):
-    def __init__(self, LPAREN, MaybeParameterList, RPAREN, MethodBody):
+    def __init__(self, lineno, LPAREN, MaybeParameterList, RPAREN, MethodBody):
+        self.lineno = lineno
         self.LPAREN = LPAREN
         self.MaybeParameterList = MaybeParameterList
         self.RPAREN = RPAREN
@@ -643,7 +677,8 @@ class ASTMultipleStatement(ASTBASENODE):
             visitor.post_visit_MultipleStatement(self)
 
 class ASTParameter(ASTBASENODE):
-    def __init__(self, Type, LRSquare, ID):
+    def __init__(self, lineno, Type, LRSquare, ID):
+        self.lineno = lineno
         self.Type = Type
         self.LRSquare = LRSquare
         self.ID = ID
@@ -666,7 +701,8 @@ class ASTParameterList(ASTBASENODE):
         visitor.post_visit_ParameterList(self)
 
 class ASTStatementBreak(ASTBASENODE):
-    def __init__(self, BREAK, SEMICOLON):
+    def __init__(self, lineno, BREAK, SEMICOLON):
+        self.lineno = lineno
         self.BREAK = BREAK
         self.SEMICOLON = SEMICOLON
 
@@ -675,7 +711,8 @@ class ASTStatementBreak(ASTBASENODE):
         visitor.post_visit_StatementBreak(self)
 
 class ASTStatementCIN(ASTBASENODE):
-    def __init__(self, CIN, RIGHTSHIFT, Expression, SEMICOLON):
+    def __init__(self, lineno, CIN, RIGHTSHIFT, Expression, SEMICOLON):
+        self.lineno = lineno
         self.CIN = CIN
         self.RIGHTSHIFT = RIGHTSHIFT
         self.Expression = Expression
@@ -688,7 +725,8 @@ class ASTStatementCIN(ASTBASENODE):
         visitor.post_visit_StatementCIN(self)
 
 class ASTStatementCOUT(ASTBASENODE):
-    def __init__(self, COUT, LEFTSHIFT, Expression, SEMICOLON):
+    def __init__(self, lineno, COUT, LEFTSHIFT, Expression, SEMICOLON):
+        self.lineno = lineno
         self.COUT = COUT
         self.LEFTSHIFT = LEFTSHIFT
         self.Expression = Expression
@@ -701,7 +739,8 @@ class ASTStatementCOUT(ASTBASENODE):
         visitor.post_visit_StatementCOUT(self)
 
 class ASTStatementExpression(ASTBASENODE):
-    def __init__(self, Expression, SEMICOLON):
+    def __init__(self, lineno, Expression, SEMICOLON):
+        self.lineno = lineno
         self.Expression = Expression
         self.SEMICOLON = SEMICOLON
 
@@ -712,7 +751,8 @@ class ASTStatementExpression(ASTBASENODE):
         visitor.post_visit_StatementExpression(self)
 
 class ASTStatementIF(ASTBASENODE):
-    def __init__(self, IF, LPAREN, Expression, RPAREN, Statement):
+    def __init__(self, lineno, IF, LPAREN, Expression, RPAREN, Statement):
+        self.lineno = lineno
         self.IF = IF
         self.LPAREN = LPAREN
         self.Expression = Expression
@@ -728,7 +768,8 @@ class ASTStatementIF(ASTBASENODE):
         visitor.post_visit_StatementIF(self)
 
 class ASTStatementIFELSE(ASTBASENODE):
-    def __init__(self, IF, LPAREN, Expression, RPAREN, Statement, ELSE, Statement2):
+    def __init__(self, lineno, IF, LPAREN, Expression, RPAREN, Statement, ELSE, Statement2):
+        self.lineno = lineno
         self.IF = IF
         self.LPAREN = LPAREN
         self.Expression = Expression
@@ -748,7 +789,8 @@ class ASTStatementIFELSE(ASTBASENODE):
         visitor.post_visit_StatementIFELSE(self)
 
 class ASTStatementMultipleStatement(ASTBASENODE):
-    def __init__(self, LCURLY, MultipleStatement, RCURLY):
+    def __init__(self, lineno, LCURLY, MultipleStatement, RCURLY):
+        self.lineno = lineno
         self.LCURLY = LCURLY
         self.MultipleStatement = MultipleStatement
         self.RCURLY = RCURLY
@@ -770,7 +812,8 @@ class ASTStatementToVariableDeclaration(ASTBASENODE):
         visitor.post_visit_StatementToVariableDeclaration(self)
 
 class ASTStatementReturn(ASTBASENODE):
-    def __init__(self, RETURN, MaybeExpression, SEMICOLON):
+    def __init__(self, lineno, RETURN, MaybeExpression, SEMICOLON):
+        self.lineno = lineno
         self.RETURN = RETURN
         self.MaybeExpression = MaybeExpression
         self.SEMICOLON = SEMICOLON
@@ -782,7 +825,8 @@ class ASTStatementReturn(ASTBASENODE):
         visitor.post_visit_StatementReturn(self)
 
 class ASTStatementSwitch(ASTBASENODE):
-    def __init__(self, SWITCH, LPAREN, Expression, RPAREN, CaseBlock):
+    def __init__(self, lineno, SWITCH, LPAREN, Expression, RPAREN, CaseBlock):
+        self.lineno = lineno
         self.SWITCH = SWITCH
         self.LPAREN = LPAREN
         self.Expression = Expression
@@ -798,7 +842,8 @@ class ASTStatementSwitch(ASTBASENODE):
         visitor.post_visit_StatementSwitch(self)
 
 class ASTStatementWhile(ASTBASENODE):
-    def __init__(self, WHILE, LPAREN, Expression, RPAREN, Statement):
+    def __init__(self, lineno, WHILE, LPAREN, Expression, RPAREN, Statement):
+        self.lineno = lineno
         self.WHILE = WHILE
         self.LPAREN = LPAREN
         self.Expression = Expression
@@ -814,7 +859,8 @@ class ASTStatementWhile(ASTBASENODE):
         visitor.post_visit_StatementWhile(self)
 
 class ASTVariableDeclaration(ASTBASENODE):
-    def __init__(self, Type, LRSquare, ID, Initializer, SEMICOLON):
+    def __init__(self, lineno, Type, LRSquare, ID, Initializer, SEMICOLON):
+        self.lineno = lineno
         self.Type = Type
         self.LRSquare = LRSquare
         self.ID = ID
@@ -828,7 +874,8 @@ class ASTVariableDeclaration(ASTBASENODE):
         visitor.post_visit_VariableDeclaration(self)
 
 class ASTTerminal(ASTBASENODE):
-    def __init__(self, Terminal):
+    def __init__(self, lineno, Terminal):
+        self.lineno = lineno
         self.Terminal = Terminal
 
     def accept(self, visitor):

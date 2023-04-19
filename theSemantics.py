@@ -1,7 +1,7 @@
 from SymbolTableVisitor import SymbolTableVisitor
 from UndeclaredVarVistitor import *
 from ObjectInitializerAndTypeVisitor import ObjectInitializerAndTypeVisitor
-from NewDotParamVisitor import NewDotParamVisitor
+from TypeParamModifierVistior import TypeParamModifierVistior
 import sys
 
 def semantics(parsed_AST):
@@ -14,11 +14,13 @@ def semantics(parsed_AST):
 
     symbols = symbolTable.symbol_tables
     undeclaredVariableVistior = UndeclaredVisitor()
+    undeclaredVariableVistior.oldSymbols = symbols
     parsed_AST.accept(undeclaredVariableVistior)
     if undeclaredVariableVistior.has_Error == True:
         for x in undeclaredVariableVistior.errors:
             print(x)
         sys.exit(2)
+    parameters = undeclaredVariableVistior.paramList
 
     objectInitializerAndTypeVisitor = ObjectInitializerAndTypeVisitor()
     objectInitializerAndTypeVisitor.symbol_tables = symbols
@@ -28,13 +30,12 @@ def semantics(parsed_AST):
             print(x)
         sys.exit(3)
 
-
-
-    DotParamVisitor = NewDotParamVisitor()
-    DotParamVisitor.symbolTable = symbols
-    parsed_AST.accept(DotParamVisitor)
-    if DotParamVisitor.has_Error == True:
-        for x in DotParamVisitor.errors:
+    typeParamModifierVistior = TypeParamModifierVistior()
+    typeParamModifierVistior.symbolTable = symbols
+    typeParamModifierVistior.paramList = parameters
+    parsed_AST.accept(typeParamModifierVistior)
+    if typeParamModifierVistior.has_Error == True:
+        for x in typeParamModifierVistior.errors:
             print(x)
         sys.exit(5)
 

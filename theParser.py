@@ -7,12 +7,12 @@ from PrintVisitor import PrintDotVisitor
 ###########################
 def p_Arguments(p):
     """Arguments : LPAREN MaybeArgumentList RPAREN"""
-    p[0] = AST.ASTArgument(p[1], p[2], p[3])
+    p[0] = AST.ASTArgument(p.lineno(1), p[1], p[2], p[3])
 
 def p_ArgOrIdx(p):
     """ArgOrIdx : Arguments
                     | Index"""
-    p[0] =AST.ASTArgOrIdx(p[1])
+    p[0] =AST.ASTArgOrIdx( p[1])
 
 def p_ArgumentList(p):
     """ArgumentList : Expression MultipleCommaExpression"""
@@ -20,15 +20,15 @@ def p_ArgumentList(p):
 
 def p_Case(p):
     """Case : CASE NumOrChar COLON MultipleStatement"""
-    p[0] = AST.ASTCase(p[1], p[2], p[3], p[4])
+    p[0] = AST.ASTCase(p.lineno(1), p[1], p[2], p[3], p[4])
 
 def p_CaseBlock(p):
     """CaseBlock : LCURLY MultipleCase DEFAULT COLON MultipleStatement RCURLY"""
-    p[0] = AST.ASTCaseBlock(p[1], p[2], p[3], p[4], p[5], p[6])
+    p[0] = AST.ASTCaseBlock(p.lineno(1), p[1], p[2], p[3], p[4], p[5], p[6])
 
 def p_ClassDefinition(p):
     """ClassDefinition : CLASS ID LCURLY MultipleClassMemberDefinition RCURLY"""
-    p[0] = AST.ASTClassDefinition(p[1], p[2], p[3], p[4], p[5])
+    p[0] = AST.ASTClassDefinition(p.lineno(1), p[1], p[2], p[3], p[4], p[5])
 
 def p_ClassMemberDefinition(p):
     """ClassMemberDefinition : MethodDeclaration
@@ -38,11 +38,11 @@ def p_ClassMemberDefinition(p):
    
 def p_CompilationUnit(p):
     """CompilationUnit : MultipleClassDefinition VOID KXI2023 Main LPAREN RPAREN MethodBody"""
-    p[0] = AST.ASTCompilationUnit(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
+    p[0] = AST.ASTCompilationUnit(p.lineno(2), p[1], p[2], p[3], p[4], p[5], p[6], p[7])
 
 def p_ConstructorDeclaration(p):
     """ConstructorDeclaration : ID MethodSuffix"""
-    p[0] = AST.ASTConstructorDeclaration(p[1], p[2])
+    p[0] = AST.ASTConstructorDeclaration(p.lineno(1), p[1], p[2])
 
 def p_DataMemberDeclaration(p): 
     """DataMemberDeclaration : Modifier VariableDeclaration"""
@@ -89,63 +89,63 @@ def p_Expression(p):
                     | NEW ID ArgOrIdx"""
 
     if len(p) == 2:
-        p[0] = AST.ASTTerminal(p[1])
+        p[0] = AST.ASTTerminal(p.lineno(1), p[1])
     elif len(p) == 3 and p[1] == '-':
-        p[0] = AST.ASTExpressionMinus(p[1], p[2])
+        p[0] = AST.ASTExpressionMinus(p.lineno(1), p[1], p[2])
     elif len(p) == 3 and p[1] == '!':
-        p[0] = AST.ASTExpressionNot(p[1], p[2])     
+        p[0] = AST.ASTExpressionNot(p.lineno(1), p[1], p[2])     
     elif len(p) == 3 and p[1] == '+':
-        p[0] = AST.ASTExpressionPlus(p[1], p[2])   
+        p[0] = AST.ASTExpressionPlus(p.lineno(1), p[1], p[2])   
     elif len(p) == 3:
         p[0] = AST.ASTExpressionArgIdx(p[1], p[2])
     elif len(p) == 4 and p[2] == '.':
-        p[0] = AST.ASTExpressionDotID(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionDotID(p.lineno(3), p[1], p[2], p[3])
     elif len(p) == 4 and p[1] == "new":
-        p[0] = AST.ASTExpressionNew(p[1], p[2], p[3])   
+        p[0] = AST.ASTExpressionNew(p.lineno(1), p[1], p[2], p[3])   
     elif len(p) == 4 and p[2] == "*=":
-        p[0] = AST.ASTExpressionETimesEqualE(p[1], p[2], p[3])   
+        p[0] = AST.ASTExpressionETimesEqualE(p.lineno(2), p[1], p[2], p[3])   
     elif len(p) == 4 and p[2] == "*":
-        p[0] = AST.ASTExpressionETimesE(p[1], p[2], p[3])      
+        p[0] = AST.ASTExpressionETimesE(p.lineno(2), p[1], p[2], p[3])      
     elif len(p) == 4 and p[2] == "+=":
-        p[0] = AST.ASTExpressionEPlusEqualE(p[1], p[2], p[3])    
+        p[0] = AST.ASTExpressionEPlusEqualE(p.lineno(2), p[1], p[2], p[3])    
     elif len(p) == 4 and p[2] == "+":
-        p[0] = AST.ASTExpressionEPlusE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEPlusE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "||":
-        p[0] = AST.ASTExpressionEOORE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEOORE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "!=":
-        p[0] = AST.ASTExpressionENotEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionENotEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "-=":
-        p[0] = AST.ASTExpressionEMinusEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEMinusEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "-":
-        p[0] = AST.ASTExpressionEMinusE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEMinusE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "<=":
-        p[0] = AST.ASTExpressionELessEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionELessEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "<":
-        p[0] = AST.ASTExpressionELessE(p[1], p[2], p[3])    
+        p[0] = AST.ASTExpressionELessE(p.lineno(2), p[1], p[2], p[3])    
     elif len(p) == 4 and p[2] == ">=":
-        p[0] = AST.ASTExpressionEGreaterEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEGreaterEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == ">":
-        p[0] = AST.ASTExpressionEGreaterE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEGreaterE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "=":
-        p[0] = AST.ASTExpressionEEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "/=":
-        p[0] = AST.ASTExpressionEDivideEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEDivideEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "/":
-        p[0] = AST.ASTExpressionEDivideE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEDivideE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "==":
-        p[0] = AST.ASTExpressionECEqualE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionECEqualE(p.lineno(2), p[1], p[2], p[3])
     elif len(p) == 4 and p[2] == "&&":
-        p[0] = AST.ASTExpressionEAANDE(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionEAANDE(p.lineno(2), p[1], p[2], p[3])
     else:
-        p[0] = AST.ASTExpressionPAREN(p[1], p[2], p[3])
+        p[0] = AST.ASTExpressionPAREN(p.lineno(1), p[1], p[2], p[3])
 
 def p_Index(p):
     """Index : LSQUARE Expression RSQUARE"""
-    p[0] = AST.ASTIndex(p[1], p[2], p[3])
+    p[0] = AST.ASTIndex(p.lineno(1), p[1], p[2], p[3])
 
 def p_Initializer(p):
     """Initializer : EQUAL Expression"""
-    p[0] = AST.ASTInitializer(p[1], p[2])
+    p[0] = AST.ASTInitializer(p.lineno(1), p[1], p[2])
 
 def p_Main(p):
     """Main : ID"""
@@ -196,7 +196,7 @@ def p_MaybeParamList(p):
 
 def p_MethodBody(p):
     """MethodBody : LCURLY MultipleStatement RCURLY"""
-    p[0] = AST.ASTMethodBody(p[1], p[2], p[3])
+    p[0] = AST.ASTMethodBody(p.lineno(1), p[1], p[2], p[3])
 
 def p_MethodDeclaration(p):
     """MethodDeclaration : Modifier VOID MaybeLRSquare ID MethodSuffix
@@ -205,11 +205,11 @@ def p_MethodDeclaration(p):
                             | Modifier BOOL MaybeLRSquare ID MethodSuffix
                             | Modifier STRING MaybeLRSquare ID MethodSuffix
                             | Modifier ID MaybeLRSquare ID MethodSuffix"""
-    p[0] = AST.ASTMethodDeclaration(p[1], p[2], p[3], p[4], p[5])
+    p[0] = AST.ASTMethodDeclaration(p.lineno(2), p[1], p[2], p[3], p[4], p[5])
 
 def p_MethodSuffix(p):
     """MethodSuffix : LPAREN MaybeParamList RPAREN MethodBody"""
-    p[0] = AST.ASTMethodSuffix(p[1], p[2], p[3], p[4])
+    p[0] = AST.ASTMethodSuffix(p.lineno(1), p[1], p[2], p[3], p[4])
 
 def p_Modifier(p):
     """Modifier : PUBLIC
@@ -279,7 +279,7 @@ def p_Parameter(p):
                     | BOOL MaybeLRSquare ID
                     | STRING MaybeLRSquare ID
                     | ID MaybeLRSquare ID"""
-    p[0] = AST.ASTParameter(p[1], p[2], p[3])
+    p[0] = AST.ASTParameter(p.lineno(1), p[1], p[2], p[3])
 
 def p_ParameterList(p):
     """ParameterList : Parameter MultipleCommaParameter"""
@@ -300,25 +300,25 @@ def p_Statement(p):
     if len(p) == 2:
         p[0] = AST.ASTStatementToVariableDeclaration(p[1])
     elif len(p) == 3 and p[1] == 'break':
-        p[0] = AST.ASTStatementBreak(p[1], p[2])
+        p[0] = AST.ASTStatementBreak(p.lineno(1), p[1], p[2])
     elif len(p) == 3:
-        p[0] = AST.ASTStatementExpression(p[1], p[2])
+        p[0] = AST.ASTStatementExpression(p.lineno(2), p[1], p[2])
     elif p[1] == '{':
-        p[0] = AST.ASTStatementMultipleStatement(p[1], p[2], p[3])
+        p[0] = AST.ASTStatementMultipleStatement(p.lineno(1), p[1], p[2], p[3])
     elif p[1] == 'return':
-        p[0] = AST.ASTStatementReturn(p[1], p[2], p[3])
+        p[0] = AST.ASTStatementReturn(p.lineno(1), p[1], p[2], p[3])
     elif p[1] == 'cout':
-        p[0] = AST.ASTStatementCOUT(p[1], p[2], p[3], p[4])
+        p[0] = AST.ASTStatementCOUT(p.lineno(1), p[1], p[2], p[3], p[4])
     elif p[1] == 'cin':
-        p[0] = AST.ASTStatementCIN(p[1], p[2], p[3], p[4])
+        p[0] = AST.ASTStatementCIN(p.lineno(1), p[1], p[2], p[3], p[4])
     elif p[1] == 'while':
-        p[0] = AST.ASTStatementWhile(p[1], p[2], p[3], p[4], p[5])
+        p[0] = AST.ASTStatementWhile(p.lineno(1), p[1], p[2], p[3], p[4], p[5])
     elif p[1] == 'switch':
-        p[0] = AST.ASTStatementSwitch(p[1], p[2], p[3], p[4], p[5])
+        p[0] = AST.ASTStatementSwitch(p.lineno(1), p[1], p[2], p[3], p[4], p[5])
     elif p[1] == 'if' and len(p) == 6:
-        p[0] = AST.ASTStatementIF(p[1], p[2], p[3], p[4], p[5])
+        p[0] = AST.ASTStatementIF(p.lineno(1), p[1], p[2], p[3], p[4], p[5])
     else:
-        p[0] = AST.ASTStatementIFELSE(p[1], p[2], p[3], p[4], p[5], p[6], p[7])
+        p[0] = AST.ASTStatementIFELSE(p.lineno(1), p[1], p[2], p[3], p[4], p[5], p[6], p[7])
 
 def p_VariableDeclaration(p):
     """VariableDeclaration : VOID MaybeLRSquare ID MaybeInitializer SEMICOLON
@@ -327,11 +327,13 @@ def p_VariableDeclaration(p):
                                 | BOOL MaybeLRSquare ID MaybeInitializer SEMICOLON
                                 | STRING MaybeLRSquare ID MaybeInitializer SEMICOLON
                                 | ID MaybeLRSquare ID MaybeInitializer SEMICOLON"""
-    p[0] = AST.ASTVariableDeclaration(p[1], p[2], p[3], p[4], p[5])
+    p[0] = AST.ASTVariableDeclaration(p.lineno(1), p[1], p[2], p[3], p[4], p[5])
 
 def p_error(p):
     if p != None:
-        print("Syntax error in input! " + str(p.type) + " / " + str(p.value) + " was given. This is found on line #" + str(p.lineno))
+        input_str = p.lexer.lexdata
+        line_num = input_str.count('\n', 0, p.lexpos) + 1
+        print(f"Syntax error in input! {p.type}/{p.value} was given. This is found near line #{line_num}.")
     else:
         print("None Object")
 

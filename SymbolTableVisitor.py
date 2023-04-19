@@ -11,7 +11,7 @@ class Unique:
         return self.id
 
 class Symbol:
-    def __init__(self, whatAmI: str, name: str, type, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool):
+    def __init__(self, whatAmI: str, name: str, type, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool, isInitialized: bool):
         self.whatAmI = whatAmI
         self.Name = name
         self.Type = type
@@ -19,6 +19,7 @@ class Symbol:
         self.isPrivate = isPrivate
         self.isPublic = isPublic
         self.hasIndex = hasIndex
+        self.isInitialized = isInitialized
 
 class SymbolTableVisitor(ASTVisitor):
     def __init__(self):
@@ -37,11 +38,11 @@ class SymbolTableVisitor(ASTVisitor):
     def exit_scope(self):
         self.scope_stack.pop()
 
-    def create_symbol(self, whatAmI: str, name: str, type: str, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool) -> Symbol:
-        return Symbol(whatAmI = whatAmI, name=name, type=type, offset=offset, isPrivate=isPrivate, isPublic=isPublic, hasIndex=hasIndex)
+    def create_symbol(self, whatAmI: str, name: str, type: str, offset: int, isPrivate: bool, isPublic: bool, hasIndex: bool, isInitialized: bool) -> Symbol:
+        return Symbol(whatAmI = whatAmI, name=name, type=type, offset=offset, isPrivate=isPrivate, isPublic=isPublic, hasIndex=hasIndex, isInitialized=isInitialized)
 
 
-    def add_to_symbol_table(self, symbol: Symbol):
+    def add_to_symbol_table(self, symbol: Symbol, lineno: int):
         current_scope = self.scope_stack[-1]
         name = symbol.Name
         whatAmI = symbol.whatAmI
@@ -50,7 +51,7 @@ class SymbolTableVisitor(ASTVisitor):
             if(name,'class') in self.symbol_tables[current_scope]:
                 pass
             else:
-                self.errors.append(f"Error: Constructor {name} is being called in a class with a different name. Names must be the same for a constructor.")
+                self.errors.append(f"Error: Constructor {name} is being called in a class with a different name. Names must be the same for a constructor. Around line {lineno}")
                 self.has_Error = True
 
         if whatAmI == 'object':
@@ -60,53 +61,59 @@ class SymbolTableVisitor(ASTVisitor):
                 if (className, 'class') in self.symbol_tables[i]:
                     classExist = True
             if classExist == False:
-                self.errors.append(f"Error: symbol {name} tried to create an object of {className} which doesn't exist")
+                self.errors.append(f"Error: symbol {name} tried to create an object of {className} which doesn't exist. Around line {lineno}")
                 self.has_Error = True
             if(name,'variable') in self.symbol_tables[current_scope]:
-                self.errors.append(f"Error: {name} is already defined as an object")
+                self.errors.append(f"Error: {name} is already defined as an object. Around line {lineno}")
                 self.has_Error = True
 
         #Data Members and Methods can not be the same name
         if whatAmI == 'dataMember':
             if(name,'method') in self.symbol_tables[current_scope]:
-                self.errors.append(f"Error: symbol {name} already defined as a method")
+                self.errors.append(f"Error: symbol {name} already defined as a method. Around line {lineno}")
                 self.has_Error = True
             if(name,'class') in self.symbol_tables[current_scope]:
-                self.errors.append(f"Error: dataMember {name} is defined in class with the same name")
+                self.errors.append(f"Error: dataMember {name} is defined in class with the same name. Around line {lineno}")
                 self.has_Error = True
 
         elif whatAmI == 'variable':
             if(name,'object') in self.symbol_tables[current_scope]:
-                self.errors.append(f"Error: {name} is already defined as a variable")
+                self.errors.append(f"Error: {name} is already defined as a variable. Around line {lineno}")
                 self.has_Error = True
 
         elif whatAmI == 'method':
             if(name,'dataMember') in self.symbol_tables[current_scope]:
-                self.errors.append(f"Error: symbol {name} already defined as a dataMember")
+                self.errors.append(f"Error: symbol {name} already defined as a dataMember. Around line {lineno}")
                 self.has_Error = True
             if(name,'class') in self.symbol_tables[current_scope]:
-                self.errors.append(f"Error: method {name} is defined in class with the same name")
+                self.errors.append(f"Error: method {name} is defined in class with the same name. Around line {lineno}")
                 self.has_Error = True
 
         elif whatAmI == 'class':
             for i in range(len(self.symbol_tables)-2, -1, -1):
                 if (name, 'class') in self.symbol_tables[i]:
-                    self.errors.append(f"Error: class {name} is already as a class")
+                    self.errors.append(f"Error: class {name} is already as a class. Around line {lineno}")
                     self.has_Error = True
 
         if (name, whatAmI) in self.symbol_tables[current_scope]:
             #can have more than one constructor but must have the same name as the class defining it. 
             if whatAmI == 'constructor':
-                self.errors.append(f"Error: Only one constructor is allowed. {name} is duplicated.")
+                self.errors.append(f"Error: Only one constructor is allowed. {name} is duplicated. Around line {lineno}")
                 self.has_Error = True
             else:
-                self.errors.append(f"Error: symbol {name} already defined")
+                self.errors.append(f"Error: symbol {name} already defined. Around line {lineno}")
                 self.has_Error = True
-
-        self.symbol_tables[current_scope][(name, whatAmI)] = {
-            "symbol": symbol,
-            "can_access_scopes": self.scope_stack.copy(),
-        }
+        
+        if symbol.isPrivate == True:
+            self.symbol_tables[current_scope][(name, whatAmI)] = {
+                "symbol": symbol,
+                "can_access_scopes": [current_scope]
+            }
+        else:
+            self.symbol_tables[current_scope][(name, whatAmI)] = {
+                "symbol": symbol,
+                "can_access_scopes": self.scope_stack.copy(),
+            }
 
     def pre_visit_Argument(self, node: ASTArgument):
         pass
@@ -128,12 +135,12 @@ class SymbolTableVisitor(ASTVisitor):
 
     def pre_visit_Case(self, node: ASTCase):
         type = theLexerTester(str(node.NumOrChar))
-        symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False)
-        self.add_to_symbol_table(symbol)
-        self.enter_scope()
+        symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False, True)
+        lineno = node.lineno
+        self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_Case(self, node: ASTCase):
-        self.exit_scope()
+        pass
 
     def pre_visit_CaseBlock(self, node: ASTCaseBlock):
         self.enter_scope()
@@ -143,9 +150,10 @@ class SymbolTableVisitor(ASTVisitor):
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
         self.enter_scope()
-        symbol = self.create_symbol(str("class"), str(node.ID), str(node.Class), 12, False, True, False)
-        self.add_to_symbol_table(symbol)
-    
+        symbol = self.create_symbol(str("class"), str(node.ID), str(node.Class), 12, False, True, False, True)
+        lineno = node.lineno
+        self.add_to_symbol_table(symbol, lineno)
+
     def post_visit_ClassDefinition(self, node: ASTClassDefinition):
         self.exit_scope()
 
@@ -157,15 +165,17 @@ class SymbolTableVisitor(ASTVisitor):
 
     def pre_visit_CompilationUnit(self, node: ASTCompilationUnit):
         self.enter_scope()
-        symbol = self.create_symbol(str("function"), str(node.main), str(node.void), 12, False, True, False)
-        self.add_to_symbol_table(symbol)
+        symbol = self.create_symbol(str("function"), str(node.main), str(node.void), 12, False, True, False, True)
+        lineno = node.lineno
+        self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
         self.exit_scope()
         
     def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False)
-        self.add_to_symbol_table(symbol)
+        symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False, True)
+        lineno = node.lineno
+        self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
         pass
@@ -174,14 +184,18 @@ class SymbolTableVisitor(ASTVisitor):
         isPrivate = False
         isPublic = False
         hasIndex = False
-        if node.Modifier == 'private':
+        isInitialized = False
+        if node.Modifier == 'PRIVATE':
             isPrivate = True
-        if node.Modifier == 'public':
+        if node.Modifier == 'PUBLIC':
             isPublic = True
         if node.VariableDeclaration.LRSquare is not None:
             hasIndex = True
-        symbol = self.create_symbol(str("dataMember"), str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, isPrivate, isPublic, hasIndex)
-        self.add_to_symbol_table(symbol)
+        if node.VariableDeclaration.Initializer.Initializer is not None:
+            isInitialized = True
+        symbol = self.create_symbol(str("dataMember"), str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, isPrivate, isPublic, hasIndex, isInitialized)
+        lineno = node.VariableDeclaration.lineno
+        self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         pass
@@ -376,14 +390,15 @@ class SymbolTableVisitor(ASTVisitor):
         isPrivate = False
         isPublic = False
         hasIndex = False
-        if node.Modifier == 'private':
+        if node.Modifier == 'PRIVATE':
             isPrivate = True
-        if node.Modifier == 'public':
+        if node.Modifier == 'PUBLIC':
             isPublic = True
         if node.LRSquare is not None:
             hasIndex = True
-        symbol = self.create_symbol(str("method"), str(node.ID), str(node.Type), 12, isPrivate, isPublic, hasIndex)
-        self.add_to_symbol_table(symbol)
+        symbol = self.create_symbol(str("method"), str(node.ID), str(node.Type), 12, isPrivate, isPublic, hasIndex, True)
+        lineno = node.lineno
+        self.add_to_symbol_table(symbol, lineno)
         self.enter_scope()
 
     def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
@@ -435,8 +450,9 @@ class SymbolTableVisitor(ASTVisitor):
         hasIndex = False
         if node.LRSquare is not None:
             hasIndex = True
-        symbol = self.create_symbol("variable", str(node.ID), str(node.Type), 12, False, False, hasIndex)
-        self.add_to_symbol_table(symbol)
+        symbol = self.create_symbol("variable", str(node.ID), str(node.Type), 12, False, False, hasIndex, True)
+        lineno = node.lineno
+        self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_Parameter(self, node: ASTParameter):
         pass
@@ -472,33 +488,37 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementIF(self, node: ASTStatementIF):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
-        self.exit_scope()
+        pass
 
     def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-       self.exit_scope()
+        pass
 
     def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        self.exit_scope()
+        pass
 
     def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         hasIndex = False
+        isInitialized = False
         if node.VariableDeclaration.LRSquare is not None:
             hasIndex = True
+        if node.VariableDeclaration.Initializer.Initializer is not None:
+            isInitialized = True
         if node.VariableDeclaration.Type != 'void' and node.VariableDeclaration.Type != 'int' and node.VariableDeclaration.Type != 'char' and node.VariableDeclaration.Type != 'bool' and node.VariableDeclaration.Type != 'string':
-            symbol = self.create_symbol("object", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
+            symbol = self.create_symbol("object", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex, isInitialized)
         else:
-            symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex)
+            symbol = self.create_symbol("variable", str(node.VariableDeclaration.ID), str(node.VariableDeclaration.Type), 12, False, False, hasIndex, isInitialized)
 
-        self.add_to_symbol_table(symbol)
+        lineno = node.VariableDeclaration.lineno
+        self.add_to_symbol_table(symbol, lineno)
 
 
     def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
@@ -517,10 +537,10 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementWhile(self, node: ASTStatementWhile):
-        self.enter_scope()
+        pass
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
-        self.exit_scope()
+        pass
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         pass

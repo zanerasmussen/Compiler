@@ -328,8 +328,10 @@ class Test_Lexer(unittest.TestCase):
 class Test_parser(unittest.TestCase):
 
     def test_Arguments_empty(self):
-        data = """()"""
-        theLexer.theLexerReturnFucntion(data)
+        data = """
+        ()
+        """
+        temp = theLexer.theLexerReturnFucntion(data)
         parsed = theParser.ParseTester("Arguments", data)
         self.assertEqual(parsed.LPAREN, '(')
         self.assertEqual(parsed.MaybeArgumentList.ArgumentList, None)
@@ -2118,7 +2120,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol x already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol x already defined. Around line 4")
 
     def test_duplicate_class(self):
         data = """
@@ -2134,7 +2136,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: class TempClass is already as a class")
+        self.assertEqual(symbolTable.errors[0], "Error: class TempClass is already as a class. Around line 3")
 
     def test_classMain(self):
         data = """
@@ -2177,7 +2179,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: Only one constructor is allowed. Class is duplicated.")
+        self.assertEqual(symbolTable.errors[0], "Error: Only one constructor is allowed. Class is duplicated. Around line 4")
 
     def test_classConstructors_multiple2(self):
         data = """
@@ -2193,7 +2195,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: Only one constructor is allowed. Test is duplicated.")
+        self.assertEqual(symbolTable.errors[0], "Error: Only one constructor is allowed. Test is duplicated. Around line 4")
 
     def test_classConstructors_wrongName(self):
         data = """
@@ -2208,7 +2210,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: Constructor Test is being called in a class with a different name. Names must be the same for a constructor.")
+        self.assertEqual(symbolTable.errors[0], "Error: Constructor Test is being called in a class with a different name. Names must be the same for a constructor. Around line 3")
 
     def test_class_duplicate(self):
         data = """
@@ -2227,7 +2229,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: class Temp is already as a class")
+        self.assertEqual(symbolTable.errors[0], "Error: class Temp is already as a class. Around line 6")
         
     def test_methodDeclaration(self):
         data = """
@@ -2282,7 +2284,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined. Around line 12")
         
     def test_methodDeclaration_duplicate_notSameType(self):
         data = """
@@ -2314,7 +2316,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined. Around line 12")
 
     def test_methodDeclaration_same_name_as_class(self):
         data = """
@@ -2339,7 +2341,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: method Temp is defined in class with the same name")
+        self.assertEqual(symbolTable.errors[0], "Error: method Temp is defined in class with the same name. Around line 3")
         
     def test_DataMemberDeclaration(self):
         data = """
@@ -2391,7 +2393,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol test already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol test already defined. Around line 13")
 
     def test_DataMemberDeclaration_duplicate_notSameType(self):
         data = """
@@ -2418,7 +2420,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol test already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol test already defined. Around line 13")
 
     def test_DataMemberDeclaration_same_name_as_class(self):
         data = """
@@ -2444,7 +2446,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: dataMember Temp is defined in class with the same name")
+        self.assertEqual(symbolTable.errors[0], "Error: dataMember Temp is defined in class with the same name. Around line 3")
         
     def test_DataMemberDeclaration_and_MethodDeclaration(self):
         data = """
@@ -2494,7 +2496,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined as a method")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined as a method. Around line 12")
         
     def test_DataMemberDeclaration_and_MethodDeclaration_sameName2(self):
         data = """
@@ -2519,7 +2521,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined as a dataMember")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol compute already defined as a dataMember. Around line 5")
         
     def test_Method_with_declarations(self):
         data = """
@@ -2570,7 +2572,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         myAST = theParser.Parse(data)
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
-        self.assertEqual(symbolTable.has_Error, False)
+        self.assertEqual(symbolTable.has_Error, True)
         
     def test_Method_with_declarations_nested_same_name(self):
         data = """
@@ -2580,8 +2582,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
             public int Method(int x) {
                 int dataMember;
                 if (x == 0) {
-                    int dataMember = 3;
-                    char x = 4;
+                    char y = 4;
                     string Method = "this is a string";
                     return 0;
                 } else if (x == 1) {
@@ -2627,7 +2628,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         myAST = theParser.Parse(data)
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
-        self.assertEqual(symbolTable.has_Error, False)
+        self.assertEqual(symbolTable.has_Error, True)
         
     def test_Method_with_declarations_nested_same_name_else_error(self):
         data = """
@@ -2658,7 +2659,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined. Around line 8")
         
     def test_Method_with_declarations_nested_same_name_else_error2(self):
         data = """
@@ -2689,7 +2690,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol dataMember already defined. Around line 8")
         
     def test_multiple_Method_with_declarations_nested_same_name(self):
         data = """
@@ -2730,7 +2731,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         myAST = theParser.Parse(data)
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
-        self.assertEqual(symbolTable.has_Error, False)
+        self.assertEqual(symbolTable.has_Error, True)
 
     def test_MethodBody(self):
         data = """
@@ -2860,7 +2861,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         myAST = theParser.Parse(data)
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
-        self.assertEqual(symbolTable.has_Error, False)
+        self.assertEqual(symbolTable.has_Error, True)
 
     def test_MethodBody_error(self):
         data = """
@@ -2930,7 +2931,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol main already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol index already defined. Around line 25")
 
     def test_object(self):
         data = """
@@ -2980,7 +2981,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol fib already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol fib already defined. Around line 16")
 
     def test_object_same_name_as_Int(self):
         data = """
@@ -3006,7 +3007,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: fib is already defined as a variable")
+        self.assertEqual(symbolTable.errors[0], "Error: fib is already defined as a variable. Around line 16")
 
     def test_object_same_name_as_Int_2(self):
         data = """
@@ -3032,7 +3033,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: fib is already defined as an object")
+        self.assertEqual(symbolTable.errors[0], "Error: fib is already defined as an object. Around line 16")
 
     def test_object_with_no_class(self):
         data = """
@@ -3058,7 +3059,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol fib tried to create an object of Fibonaccis which doesn't exist")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol fib tried to create an object of Fibonaccis which doesn't exist. Around line 16")
 
     def test_object_nested(self):
         data = """
@@ -3082,7 +3083,6 @@ class Test_SymbolTableVisitor(unittest.TestCase):
                 cin >> a;
                 switch (a) {
                     case 1:
-                        Fibonacci fib = new Fibonacci();
                         cout << '-';
                         break;
                     case 0:
@@ -3091,8 +3091,6 @@ class Test_SymbolTableVisitor(unittest.TestCase):
                         cout << ',';
                         break;
                     default:
-                        Fibonacci fib = new Fibonacci();
-                        int a;
                         cout << '+';
                 }
             }
@@ -3126,7 +3124,6 @@ class Test_SymbolTableVisitor(unittest.TestCase):
                 cin >> a;
                 switch (a) {
                     case 1:
-                        Fibonacci fib = new Fibonacci();
                         cout << '-';
                         break;
                     case 0:
@@ -3149,7 +3146,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         symbolTable = SymbolTableVisitor()
         myAST.accept(symbolTable)
         self.assertEqual(symbolTable.has_Error, True)
-        self.assertEqual(symbolTable.errors[0], "Error: symbol 0 already defined")
+        self.assertEqual(symbolTable.errors[0], "Error: symbol 0 already defined. Around line 26")
 
     def test_big_test_pass(self):
         data = """
@@ -3157,7 +3154,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
             Fibonacci() {}
             public int compute(int x) {
                 if (x == 0) {
-                    char x = 'a';
+                    char y = 'a';
                     return 0;
                 } else if (x == 1) {
                     return 1;
@@ -3174,7 +3171,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
                 cin >> a;
                 switch (a) {
                     case 1:
-                        Fibonacci fib = new Fibonacci();
+                        Fibonacci fib1 = new Fibonacci();
                         a = 1;
                         cout << '-';
                         break;
@@ -3185,8 +3182,8 @@ class Test_SymbolTableVisitor(unittest.TestCase):
                         cout << ',';
                         break;
                     default:
-                        Fibonacci fib = new Fibonacci();
-                        int a;
+                        Fibonacci fib2 = new Fibonacci();
+                        int b;
                         cout << '+';
                 }
             }
@@ -3602,7 +3599,6 @@ class Test_UndeclaredVariables(unittest.TestCase):
                 cout << x;
                 cout << '\\n';
                 myVar4 = true;
-                int i = x;
                 int j = 0;
                 while(j < 3) {
                     cout << "nested while: ";
@@ -3852,6 +3848,95 @@ class Test_UndeclaredVariables(unittest.TestCase):
         self.assertEqual(undeclaredVariableVistior.has_Error, True)
         self.assertEqual(undeclaredVariableVistior.errors[0], "Error: ThisIsATest is used but never declared or used before it is declared")
 
+    def test_parameters(self):
+            data = """
+            // Tests criteria under the C tier
+            // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+            class Fibonacci {
+                Fibonacci() {}
+                public Test myTest;
+                public Test myTest2 = new Test();
+                public int compute(int x) {
+                    if (x == 0) {
+                        return 0;
+                    } else if (x == 1) {
+                        return 1;
+                    }
+                    return compute(1-x) + this.compute(x-2);
+                }
+            }
+
+            class Test {
+                Test() {}
+                private Fibonacci fib;
+                public Fibonacci fib2 = new Fibonacci();
+                private Fibonacci[] fib3 = new Fibonacci[0];
+                public int test(int x) {
+                    cout << x;
+                    char l = '\\n';
+                    cout << '\\n';
+                    if (x == 5) {
+                        cout << this.test(x + 5);
+                        cout << '\\n';
+                    }
+                    return x + 5;
+                }
+            }
+
+            void kxi2023 main() {
+                char t;
+                int index;
+                int i = 0;
+                Fibonacci fib = new Fibonacci();
+                Fibonacci[] fibs = new Fibonacci[0];
+                cin >> t;
+                cout << t;
+                cin >> t;
+                cout << t;
+                cin >> index;
+                while (i <= index) {
+                    cout << i;
+                    cout << ',';
+                    cout << ' ';
+                    cout << fib.compute(i);
+                    cout << '\\n';
+                    i = i + 1;
+                }
+
+                int[] arrTest = new int[5];
+                Test test = new Test();
+                cout << test.test(5);
+                cout << '\\n';
+                arrTest[1] = 3;
+
+                int a = 0;
+
+                while (a != 10) {
+                    cin >> a;
+                    switch (a) {
+                        case 1:
+                            cout << '-';
+                            break;
+                        case 0:
+                            cout << '.';
+                        case 3:
+                            cout << ',';
+                            break;
+                        default:
+                            cout << '+';
+                    }
+                }
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(symbolTable.has_Error, False)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(undeclaredVariableVistior.has_Error, False)
+
 class Test_ObjectInitializerAndType(unittest.TestCase):
 
     def test_basic(self):
@@ -4063,6 +4148,7 @@ class Test_ObjectInitializerAndType(unittest.TestCase):
             self.assertEqual(objectInitializerAndTypeVisitor.errors[12], 'Error: Attempting to initalize object int arrTest3 with invalid type of void')
             self.assertEqual(objectInitializerAndTypeVisitor.errors[13], "Error : can not use 'NEW' with type void without it setting variable arrTest3 to be an array")
             self.assertEqual(objectInitializerAndTypeVisitor.errors[14], "Error: Attempting to initalize object Fibonacci fibfff with invalid type of Test")
+
 
 #param:
     #test for constructor with the same instance

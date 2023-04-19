@@ -65,6 +65,7 @@ look at offset on symbol tables.
 
 limitations:
     only one constructor. Can be constructor with parameters. No constructor overloading
+    removed block level scoping for ease of use
     class can have a DataMember of Another type without being initialized. Error will happen at run time. No way to verify if DataMember is initialized. 
 
 Visitors for Semantics:
@@ -75,14 +76,35 @@ Visitors for Semantics:
             Ensures constructors has the same name of class
             Checks duplicated class Names
             Checks for multiple constructors
+            Symbol includes 'isInitialized' to help with future usage of variables. 
+    
     2)UndeclaredVarVistitor: 
             Ensures there are no calls to uninitialized variables. 
+            
+
+            Makes a new table for parameters and what is needed
+
+
     3)ObjectInitializerAndTypeVisitor:
             Anytime VariableDeclaration is called for an object, it checks to make sure object is initiaed properly (excluding parameters)
             Ensures all uses of 'Type' that aren't of default type (int,void, char, etc) are an instance of a class that actually exists. 
 
-    4)DotParam:
+    5)DotParamVisitor:
             Checks to make sure all parameters are valid and all calls to that type are passing the correct type of parameters and the correct number. (constructor and methods)
             does index checking
             checks method and datamember calls. checks this statements and also <expression>.<identifier> expressions. 
             checks for private and public calls
+
+
+
+
+
+Things to think about:
+    Are the following cin operations allowed in kxi?
+        int arr = new int[1]; 
+        cin >> arr[0];
+        cin >> arr;
+    
+    Additionally if we were to instantiate an array with new int[expr], am I correct an assuming we don't need to check if expr is a negative number since that could only be checked during run time?
+
+    

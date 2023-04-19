@@ -9,7 +9,6 @@ def main(argv):
         file = open("TestFile.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
-        tokenChecker(tokens)
         parsed = Parse(file)
         semantics(parsed)
         print("Done")

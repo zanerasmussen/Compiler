@@ -6,32 +6,13 @@ from theLexer import theLexerTester
     
 
 
-class NewDotParamVisitor(ASTVisitor):
+class TypeParamModifierVistior(ASTVisitor):
     def __init__(self):
         self.symbolTable = []
-        self.temp_SymbolTable = []
         self.paramList = []
         self.has_Error = False
         self.errors = []
-        self.current_class = ""
-        self.current_method = ""
-        self.current_constructor = ""
-
-    def add_Param(self, class_name: str, method_name: str, param_type: str, hasIndex: bool):
-        method_found = False
-        for param in self.paramList:
-            if param['className'] == class_name and param['methodName'] == method_name:
-                method_found = True
-                param['numberOfParams'] += 1
-                if param_type:
-                    param['paramTypes'].append((param_type, hasIndex))
-                else:
-                    param['paramTypes'].append(())
-                break
-        if not method_found:
-            new_method = {'className': class_name, 'methodName': method_name,
-                        'numberOfParams': 1, 'paramTypes': [(param_type, hasIndex)]}
-            self.paramList.append(new_method)
+        self.Terminal_stack = []
 
     def pre_visit_Argument(self, node: ASTArgument):
         pass
@@ -64,10 +45,10 @@ class NewDotParamVisitor(ASTVisitor):
         pass
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
-        self.current_class = str(node.ID)
+        pass
     
     def post_visit_ClassDefinition(self, node: ASTClassDefinition):
-        self.current_class = ""
+        pass
 
     def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
         pass
@@ -82,10 +63,10 @@ class NewDotParamVisitor(ASTVisitor):
         pass
 
     def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        self.current_constructor = str(node.ID)
+        pass
 
     def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        self.current_constructor = ""
+        pass
 
     def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         pass
@@ -213,8 +194,16 @@ class NewDotParamVisitor(ASTVisitor):
     def post_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         pass
 
+    def add_Terminal(self, node: ASTTerminal):
+            tok = theLexerTester(str(node.Terminal)) 
+    
+
     def pre_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
-        pass
+        if str(node.Expression.__class__) == "<class 'AST.ASTTerminal'>":
+            self.add_Terminal(node.Expression)
+            tok = theLexerTester(str(node.Expression.Terminal))
+
+            self.Terminal_stack.append((tok.type))
     
     def post_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         pass
@@ -328,13 +317,7 @@ class NewDotParamVisitor(ASTVisitor):
         pass
 
     def pre_visit_Parameter(self, node: ASTParameter):
-        hasIndex = True
-        if node.LRSquare is None:
-            hasIndex = False
-        if self.current_class == self.current_constructor and str(node.Type) == self.current_class:
-            self.has_Error = True
-            self.errors.append(f"Error: Since only one constructor is allowed, it is illegal to have a parameter {node.Type} {node.ID} be of the same type as the class {self.current_class}")
-        self.add_Param(str(self.current_class), str(self.current_constructor), str(node.Type), hasIndex)
+        pass
 
     def post_visit_Parameter(self, node: ASTParameter):
         pass
