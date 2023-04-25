@@ -1,12 +1,12 @@
 import sys
-from mainHelper import *
-from theLexer import *
-from theParser import *
-from theSemantics import *
+from SupportFiles.mainHelper import *
+from SupportFiles.theLexer import *
+from SupportFiles.theParser import *
+from SupportFiles.theSemantics import *
 
 def main(argv):
     if len(argv) == 0:
-        file = open("TestFile.kxi", "r")
+        file = open(".\TestFiles\BGrade.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
         parsed = Parse(file)

@@ -13,25 +13,29 @@ class ObjectInitializerAndTypeVisitor(ASTVisitor):
         #make sure New is of right type
         if node.Type != node.Initializer.Initializer.Expression.Type:
             self.has_Error = True
-            self.errors.append(f"Error: Attempting to initalize object {node.Type} {node.ID} with invalid type of {node.Initializer.Initializer.Expression.Type}")
+            self.errors.append(f"Error: Attempting to initalize object {node.Type} {node.ID} with invalid type of {node.Initializer.Initializer.Expression.Type}. Around line {node.lineno}")
                     
         #make sure NEW isn't of invalid type
-        if ((node.Initializer.Initializer.Expression.Type == "void") or (node.Initializer.Initializer.Expression.Type == "int") or (node.Initializer.Initializer.Expression.Type == "char") or (node.Initializer.Initializer.Expression.Type == "bool") or (node.Initializer.Initializer.Expression.Type == "string")):
+        if node.Initializer.Initializer.Expression.Type == "void":
+            self.has_Error = True
+            self.errors.append(f"Error: Can not use void to declare a variable. Around line {node.lineno}")
+
+        if ((node.Initializer.Initializer.Expression.Type == "int") or (node.Initializer.Initializer.Expression.Type == "char") or (node.Initializer.Initializer.Expression.Type == "bool") or (node.Initializer.Initializer.Expression.Type == "string")):
             if node.LRSquare== None:
                 self.has_Error = True
-                self.errors.append(f"Error : can not use 'NEW' with type {node.Initializer.Initializer.Expression.Type} without it setting variable {node.ID} to be an array")
+                self.errors.append(f"Error : can not use 'NEW' with type {node.Initializer.Initializer.Expression.Type} without it setting variable {node.ID} to be an array. Around line {node.lineno}")
             else:
                 if str(node.Initializer.Initializer.Expression.ArgOrIdx.Arg_Idx.__class__) == "<class 'AST.ASTIndex'>":
                     pass
                 else:
                     self.has_Error = True
-                    self.errors.append(f"Error : can not use 'NEW' with type {node.Initializer.Initializer.Expression.Type} when {node.ID} is an array type")
+                    self.errors.append(f"Error : can not use 'NEW' with type {node.Initializer.Initializer.Expression.Type} when {node.ID} is an array type. Around line {node.lineno}")
         else:       
             if (node.LRSquare != None and str(node.Initializer.Initializer.Expression.ArgOrIdx.Arg_Idx.__class__) == "<class 'AST.ASTIndex'>") or (node.LRSquare == None and str(node.Initializer.Initializer.Expression.ArgOrIdx.Arg_Idx.__class__) == "<class 'AST.ASTArgument'>"):
                 pass
             else:
                 self.has_Error = True
-                self.errors.append(f"Error: error when attempting to initialize object {node.Type} {node.ID}")
+                self.errors.append(f"Error: error when attempting to initialize object {node.Type} {node.ID}. Around line {node.lineno}")
 
     def checkType(self, type: str):
         if (type == 'void') or (type == 'int') or (type == 'char') or (type == 'bool') or (type == 'string'):

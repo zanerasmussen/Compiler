@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from theLexer import tokens
+from SupportFiles.theLexer import tokens
 import AST as AST
 from PrintVisitor import PrintDotVisitor
 

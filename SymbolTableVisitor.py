@@ -1,5 +1,5 @@
 from AST import *
-from theLexer import theLexerTester
+from SupportFiles.theLexer import theLexerTester
 from AbstractVisitor import ASTVisitor
 
 class Unique:
@@ -27,7 +27,11 @@ class SymbolTableVisitor(ASTVisitor):
         self.symbol_tables = []
         self.scope_stack = []
         self.has_Error = False
-        self.errors = []
+        self.errors = [] 
+        self.paramList = []
+        self.current_class = ""
+        self.current_method = ""
+        self.current_constructor = ""
 
 
     def enter_scope(self):
@@ -115,6 +119,22 @@ class SymbolTableVisitor(ASTVisitor):
                 "can_access_scopes": self.scope_stack.copy(),
             }
 
+    def add_Param(self, class_name: str, method_name: str, param_type: str, hasIndex: bool):
+        method_found = False
+        for param in self.paramList:
+            if param['className'] == class_name and param['methodName'] == method_name:
+                method_found = True
+                param['numberOfParams'] += 1
+                if param_type:
+                    param['paramTypes'].append((param_type, hasIndex))
+                else:
+                    param['paramTypes'].append(())
+                break
+        if not method_found:
+            new_method = {'className': class_name, 'methodName': method_name,
+                        'numberOfParams': 1, 'paramTypes': [(param_type, hasIndex)]}
+            self.paramList.append(new_method)
+
     def pre_visit_Argument(self, node: ASTArgument):
         pass
 
@@ -135,6 +155,9 @@ class SymbolTableVisitor(ASTVisitor):
 
     def pre_visit_Case(self, node: ASTCase):
         type = theLexerTester(str(node.NumOrChar))
+        if not (type.type == 'INT' or type.type == 'CHAR'):
+            self.has_Error = True
+            self.errors.append(f"Error: case can only be followed by an int or char. You gave case {type.value} {type.type}. Around line {node.lineno}")
         symbol = self.create_symbol(str("case"), str(node.NumOrChar), str(type.type), 12, False, False, False, True)
         lineno = node.lineno
         self.add_to_symbol_table(symbol, lineno)
@@ -143,18 +166,20 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_CaseBlock(self, node: ASTCaseBlock):
-        self.enter_scope()
+        pass
 
     def post_visit_CaseBlock(self, node: ASTCaseBlock):
-        self.exit_scope()
+        pass
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
+        self.current_class = str(node.ID)
         self.enter_scope()
         symbol = self.create_symbol(str("class"), str(node.ID), str(node.Class), 12, False, True, False, True)
         lineno = node.lineno
         self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_ClassDefinition(self, node: ASTClassDefinition):
+        self.current_class = ""
         self.exit_scope()
 
     def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
@@ -173,18 +198,22 @@ class SymbolTableVisitor(ASTVisitor):
         self.exit_scope()
         
     def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
+        self.current_constructor = str(node.ID)
         symbol = self.create_symbol(str("constructor"), str(node.ID), "ID", 4, False, False, False, True)
         lineno = node.lineno
         self.add_to_symbol_table(symbol, lineno)
 
     def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        pass
+        self.current_constructor = ""
 
     def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
         isPrivate = False
         isPublic = False
         hasIndex = False
         isInitialized = False
+        if node.VariableDeclaration.Type == "void":
+            self.has_Error = True
+            self.errors.append(f"Error: DataMember can not have the type VOID. Near Class {self.current_class}")
         if node.Modifier == 'PRIVATE':
             isPrivate = True
         if node.Modifier == 'PUBLIC':
@@ -375,7 +404,11 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_MaybeParamList(self, node: ASTMaybeParamList):
-        pass
+        if (self.current_class != "" and self.current_constructor!= ""):
+            self.add_Param(str(self.current_class), str(self.current_constructor), None, False)
+        if (self.current_class != "" and self.current_method!= ""):
+            self.add_Param(str(self.current_class), str(self.current_method), None, False)
+
 
     def post_visit_MaybeParamList(self, node: ASTMaybeParamList):
         pass
@@ -387,6 +420,7 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
+        self.current_method = str(node.ID)
         isPrivate = False
         isPublic = False
         hasIndex = False
@@ -403,6 +437,7 @@ class SymbolTableVisitor(ASTVisitor):
 
     def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
         self.exit_scope()
+        self.current_method = ""
 
     def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
         pass
@@ -447,12 +482,28 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_Parameter(self, node: ASTParameter):
+        if node.Type == 'void':
+            self.has_Error = True
+            self.errors.append(f"Error: Parameter {node.ID} can not be of type void. Around line {node.lineno}")
+
         hasIndex = False
         if node.LRSquare is not None:
             hasIndex = True
         symbol = self.create_symbol("variable", str(node.ID), str(node.Type), 12, False, False, hasIndex, True)
         lineno = node.lineno
         self.add_to_symbol_table(symbol, lineno)
+        
+        hasIndex = True
+        if node.LRSquare is None:
+            hasIndex = False
+        if self.current_class == self.current_constructor and str(node.Type) == self.current_class:
+            self.has_Error = True
+            self.errors.append(f"Error: Since only one constructor is allowed, it is illegal to have a parameter {node.Type} {node.ID} be of the same type as the class {self.current_class}. Around line {node.lineno}")
+        else:
+            if self.current_constructor != "":
+                self.add_Param(str(self.current_class), str(self.current_constructor), str(node.Type), hasIndex)
+            else:
+                self.add_Param(str(self.current_class), str(self.current_method), str(node.Type), hasIndex)
 
     def post_visit_Parameter(self, node: ASTParameter):
         pass
@@ -506,6 +557,9 @@ class SymbolTableVisitor(ASTVisitor):
         pass
 
     def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
+        if node.VariableDeclaration.Type == 'void':
+            self.has_Error = True
+            self.errors.append(f"Error: Parameter {node.VariableDeclaration.ID} can not be of type void. Around line {node.VariableDeclaration.lineno}")
         hasIndex = False
         isInitialized = False
         if node.VariableDeclaration.LRSquare is not None:

@@ -12,18 +12,17 @@ python3 -m PyInstaller -F ./main.py
 symantics needs to handle  invalid assignement. such as 3 = 5 of function f = function g.
 
 
-Big Questions:
-    1) repeat class
-
-
-
-
-Questions for Caiden:
-
-
 
 Questions for passoff:
-1) unknown token?
+1) function calls???
+2) .id has to be dataMEmber or mehtod?
+3) what is f().a? 
+4) how can you have f = g (both functions functions are 2nd class)
+
+
+
+
+3) summer? options?
 
 
 
@@ -77,26 +76,29 @@ Visitors for Semantics:
             Checks duplicated class Names
             Checks for multiple constructors
             Symbol includes 'isInitialized' to help with future usage of variables. 
+            create 'paramlist' for eash use for methods and constructors
     
     2)UndeclaredVarVistitor: 
             Ensures there are no calls to uninitialized variables. 
+            This can not be used in function of main
+            Ensures '.'ID is a method or dataMember
+            checks to see if method/datamember that is private is trying to be accessed outside of class
+            ensures any object is initialized before calling
             
-
-            Makes a new table for parameters and what is needed
-
 
     3)ObjectInitializerAndTypeVisitor:
             Anytime VariableDeclaration is called for an object, it checks to make sure object is initiaed properly (excluding parameters)
             Ensures all uses of 'Type' that aren't of default type (int,void, char, etc) are an instance of a class that actually exists. 
 
-    5)DotParamVisitor:
-            Checks to make sure all parameters are valid and all calls to that type are passing the correct type of parameters and the correct number. (constructor and methods)
-            does index checking
-            checks method and datamember calls. checks this statements and also <expression>.<identifier> expressions. 
-            checks for private and public calls
+    
 
 
-
+added case can only be int/char in symbol table
+added checking for void
+int[] a;
+cout << a[2]; //error thrown for not initialized
+int[] b = new int[5];
+cout << b[8] //passes but failed at runtime.
 
 
 Things to think about:
@@ -107,4 +109,22 @@ Things to think about:
     
     Additionally if we were to instantiate an array with new int[expr], am I correct an assuming we don't need to check if expr is a negative number since that could only be checked during run time?
 
-    
+
+things to check for in semantics:
+    calling declared but not intialized variables
+    number of and types of parameters passed when calling functions
+        creating objects inside of a class
+        calling methods and datamembers inside a class
+    Checks to make sure all parameters are valid and all calls to that type are passing the correct type of parameters and the correct number. (constructor and methods)
+    does index checking
+    checks method and datamember calls. checks this statements and also <expression>.<identifier> expressions. j
+    if method is of type void. 
+        no return expression can be found
+
+
+    2nd class function calls
+    check for illegal calls such as f = g
+    using DataMembers, constructors, methods, and classes as variabls.
+
+
+    <= and >= need to compare ints and char (separate)

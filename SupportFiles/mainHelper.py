@@ -1,6 +1,6 @@
-from theLexer import *
-from theParser import *
-from theSemantics import *
+from SupportFiles.theLexer import *
+from SupportFiles.theParser import *
+from SupportFiles.theSemantics import *
 
 def DoLexer():
     stuff = input("Enter path to KXI file:") 
