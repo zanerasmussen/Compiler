@@ -65,7 +65,8 @@ look at offset on symbol tables.
 limitations:
     only one constructor. Can be constructor with parameters. No constructor overloading
     removed block level scoping for ease of use
-    class can have a DataMember of Another type without being initialized. Error will happen at run time. No way to verify if DataMember is initialized. 
+    variables are static. (public int pub can not be accessed in main without an object)
+    C++ style of methods/dataMembers. Have to be declared before using them (forward declaring)
 
 Visitors for Semantics:
     1) SymbolTableVisitor: 

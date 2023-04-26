@@ -1,4 +1,5 @@
 from SemanticsVisitors.CreateSymbolTableVisitor import SymbolTableVisitor
+from SemanticsVisitors.UndeclaredVisitor import UndeclaredVisitor
 
 def semantics(parsed_AST):
     symbolTable = SymbolTableVisitor()
@@ -7,6 +8,13 @@ def semantics(parsed_AST):
         for x in symbolTable.errors:
             print(x)
     print("semantics")
+
+    undeclared = UndeclaredVisitor()
+    undeclared.oldSymbols = symbolTable.symbol_tables
+    parsed_AST.accept(undeclared)
+    if len(undeclared.errors) != 0:
+        for x in undeclared.errors:
+            print(x)
 
 # from SymbolTableVisitor import SymbolTableVisitor
 # from UndeclaredVarVistitor import *
