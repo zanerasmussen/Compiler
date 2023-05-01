@@ -75,3 +75,4 @@ things to check for in semantics:
     <= and >= need to compare ints and char (separate)
 
 check when initialized
+check for new on left side

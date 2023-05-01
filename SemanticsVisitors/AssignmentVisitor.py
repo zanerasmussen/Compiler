@@ -20,7 +20,6 @@ class AssignmentVisitor(ASTVisitor):
         self.scope_stack = []
         self.symbol_tables = []
         self.current_class = ""
-        self.arguments = []
 
     def enter_scope(self):
         new_scope = self.UID.getID()
@@ -82,18 +81,17 @@ class AssignmentVisitor(ASTVisitor):
                     if inClass == True:
                         if key[0] == node.ID and (key[1] == 'constructor' or key[1] == 'method' or key[1] == 'dataMember'):
                             symbol = value['symbol']
-                            return symbol.Type
+                            return (symbol.Type, str(symbol.isInitialized).lower())
 
         elif isinstance(node, ASTExpressionMinus):
             return self.get_type(node.Expression)
         
         elif isinstance(node, ASTExpressionNew):
             type = node.Type
-            
             if isinstance (node.ArgOrIdx.Arg_Idx, ASTIndex):
-                return (str(type) + '[]')
+                return (str(type) + '[]', "true")
             else:
-                return str(type)
+                return (str(type), "true")
                  
         elif isinstance(node, ASTExpressionNot):
             return self.get_type(node.Expression)
@@ -106,114 +104,182 @@ class AssignmentVisitor(ASTVisitor):
         
         elif isinstance(node, ASTExpressionEAANDE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if (left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'bool' or right_side == 'true' or right_side == 'false'):
-                return ("bool")
+            right_side_init = right_side[1]
+            if left_side_init != "false" and right_side_init != "false":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionECEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if ((left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'bool' or right_side == 'true' or right_side == 'false')) or (left_side == right_side):
-                return ("bool")
+            right_side_init = right_side[1]
+            if left_side_init != "false" and right_side_init != "false":
+                return ("bool", "true")
 
         elif isinstance(node, ASTExpressionEDivideE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return('int')
+            right_side_init = right_side[1]
+            if left_side_init == "true" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
             
         elif isinstance(node, ASTExpressionEDivideEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return('int')
-
+            right_side_init = right_side[1]
+            if left_side_init != "terminal" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
+             
         elif isinstance(node, ASTExpressionEEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side:
-                return str(left_side)
-            
+            right_side_init = right_side[1]
+            if left_side_init != "terminal" and right_side_init != "false":
+                return (str(left_side[0]), "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
+   
         elif isinstance(node, ASTExpressionEGreaterE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == 'int' or left_side == 'char' and (left_side == right_side):
-                return ("bool")
+            right_side_init = right_side[1]
+            if right_side_init != "false" and left_side_init != "false":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionEGreaterEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == 'int' or left_side == 'char' and (left_side == right_side):
-                return ("bool")
+            right_side_init = right_side[1]
+            if right_side_init != "false" and left_side_init != "terminal":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionELessE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == 'int' or left_side == 'char' and (left_side == right_side):
-                return ("bool")
+            right_side_init = right_side[1]
+            if right_side_init != "false" and left_side_init != "false":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionELessEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == 'int' or left_side == 'char' and (left_side == right_side):
-                return ("bool")
+            right_side_init = right_side[1]
+            if right_side_init != "false" and left_side_init != "terminal":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionEMinusE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return('int')       
+            right_side_init = right_side[1]
+            if left_side_init == "true" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")   
                       
         elif isinstance(node, ASTExpressionEMinusEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return('int')                 
-
+            right_side_init = right_side[1]
+            if left_side_init != "terminal" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
+             
         elif isinstance(node, ASTExpressionENotEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if ((left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'bool' or right_side == 'true' or right_side == 'false')) or (left_side == right_side):
-                return ("bool")
+            right_side_init = right_side[1]
+            if right_side_init != "false" and left_side_init != "terminal":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionEOORE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if ((left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'bool' or right_side == 'true' or right_side == 'false')):
-                return ("bool")
+            right_side_init = right_side[1]
+            if left_side_init != "false" and right_side_init != "false":
+                return ("bool", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
 
         elif isinstance(node, ASTExpressionEPlusE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return ("int")
-        
+            right_side_init = right_side[1]
+            if left_side_init == "true" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
+                
         elif isinstance(node, ASTExpressionEPlusEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return ("int")
-
+            right_side_init = right_side[1]
+            if left_side_init != "terminal" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
+            
         elif isinstance(node, ASTExpressionETimesE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return ("int")
-        
+            right_side_init = right_side[1]
+            if left_side_init == "true" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0] } and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
+            
         elif isinstance(node, ASTExpressionETimesEqualE):
             left_side = self.get_type(node.Expression)
+            left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
-            if left_side == right_side and left_side == 'int':
-                return ("int")
+            right_side_init = right_side[1]
+            if left_side_init != "terminal" and right_side_init != "false":
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use {left_side[0] } and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
             
         elif isinstance(node, ASTIndex):
             idx = self.get_type(node.Expression)
-            if idx == 'int':
-                return ("int")
+            idx_init = idx[1]
+            if idx_init != 'false':
+                return ("int", "true")
+            else:
+                self.errors.append(f"Error: Attemping to use an index {idx[0]} that is not initialied. Around line {node.lineno}")
             
         elif isinstance(node, ASTInitializer):
-            type = self.get_type(node.Expression)
-            return type
+            return self.get_type(node.Expression)
                  
         elif isinstance(node, ASTMaybeArgumentList):
             pass
@@ -223,7 +289,7 @@ class AssignmentVisitor(ASTVisitor):
                  
         elif isinstance(node, ASTMaybeInitializer):
             if node.Initializer == None:
-                return ("null")
+                return ("null", "false")
                  
         elif isinstance(node, ASTMaybeParamList):
             pass
@@ -298,22 +364,23 @@ class AssignmentVisitor(ASTVisitor):
             type = node.Type
             if node.LRSquare != None:
                 type = type + '[]'
-            return str(type)
- 
+            if node.Initializer.Initializer == None:
+                return (str(type), "false")
+            return (str(type), "true")
+        
         elif isinstance(node, ASTTerminal):
             tokType = theLexerTester(str(node.Terminal))
-            if tokType.type != 'ID' and tokType.type != 'char':
-                return(str(tokType.type).lower())
+            if tokType.type != 'ID':
+                return(str(tokType.type).lower(), "terminal")
             else:
                 for x in (self.scope_stack):
                     for key, value in self.symbol_tables[x].items():
                         if key[0] == str(node.Terminal):
                             symbol = value['symbol']
-                            return(str(symbol.Type))
+                            return(str(symbol.Type), str(symbol.isInitialized).lower())
 
         else:
             self.errors.append("didn't find expression")
-
 
 
     def pre_visit_Argument(self, node: ASTArgument):
@@ -323,8 +390,7 @@ class AssignmentVisitor(ASTVisitor):
         pass
 
     def pre_visit_ArgumentList(self, node: ASTArgumentList):
-        type = self.get_type(node.Expression)
-        self.arguments.append(type)
+        pass
 
     def post_visit_ArgumentList(self, node: ASTArgumentList):
         pass
@@ -384,125 +450,47 @@ class AssignmentVisitor(ASTVisitor):
 
     def post_visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
         expressionType = self.get_type(node.Expression)
-        if isinstance(node.ArgOrIdx, ASTIndex):
-            idxType = self.get_type(node.ArgOrIdx)
-            if idxType != "int":
-                self.errors.append(f"Error: attempting to access an index and the index value is not an int.")
-            if len(expressionType) > 2:
-                if expressionType[-2:] != '[]':
-                    self.errors.append(f"Error: attempting to get an index when variable is not an array.")
-            else:
-                self.errors.append(f"Error: attempting to get an index when variable is not an array.")
-         
-        else:
-            if isinstance(node.Expression, ASTExpressionDotID):
-                theClass = self.get_type(node.Expression.Expression)
-                if theClass == 'this':
-                    theClass = self.current_class
-                method = node.Expression.ID
-                for x in self.paramList:
-                    if x['className'] == theClass and x['methodName'] == method:
-                        if len(self.arguments) != len(x['paramTypes']):
-                            self.errors.append(f"Error: When calling a method {method}. {len(x['paramTypes'])} were expected and {len(self.arguments)} was given.")
-                        else:
-                            for i in range(len(x['paramTypes'])):
-                                if x['paramTypes'][i] != self.arguments[i]:
-                                    if (x['paramTypes'][i] == 'bool' and (self.arguments[i] == 'false' or self.arguments[i] == 'true')) or (self.arguments[i] == 'bool' and (x['paramTypes'][i] == 'true' or x['paramTypes'][i] == 'false')):
-                                        pass
-                                    else:
-                                        self.errors.append(f"Error: attempting to call method {method}. Argument {x['paramTypes'][i]} was expected and {self.arguments[i]} was given.")
-            
-            elif isinstance(node.Expression, ASTTerminal):
-                theClass = self.current_class
-                method = node.Expression.Terminal
-                for x in self.paramList:
-                    if x['className'] == theClass and x['methodName'] == method:
-                        if len(self.arguments) != len(x['paramTypes']):
-                            self.errors.append(f"Error: When calling a method {method}. {len(x['paramTypes'])} were expected and {len(self.arguments)} was given.")
-                        else:
-                            for i in range(len(x['paramTypes'])):
-                                if x['paramTypes'][i] != self.arguments[i]:
-                                    self.errors.append(f"Error: attempting to call method {method}. Argument {x['paramTypes'][i]} was expected and {self.arguments[i]} was given.")
-            
-            self.arguments = []
-        #find what method is being called and check argument stack with parameters
+        if expressionType != None:
+            if expressionType[1] != "true":
+                self.errors.append(f"Error: attemping to call on an expression that hasn't been initialized.")
 
     def pre_visit_ExpressionDotID(self, node: ASTExpressionDotID):
         pass
 
     def post_visit_ExpressionDotID(self, node: ASTExpressionDotID):
-        isValid = False
         left_side = self.get_type(node.Expression)
-        if left_side == 'this':
-            left_side = self.current_class
-  
-        for x in range(len(self.symbol_tables)):
-            inClass = False
-            for key, value in self.symbol_tables[x].items():
-                if [key[0] == left_side and key[1] == 'class']:
-                    inClass = True
-                if inClass == True:
-                    if key[0] == node.ID and (key[1] == 'constructor' or key[1] == 'method' or key[1] == 'dataMember'):
-                        isValid = True
-
-        if isValid == False:
-            self.errors.append(f"Error: Invalid expression at line {node.lineno}. {left_side}.{node.ID} is not a valid method or dataMember")
+        if left_side[1] != "true":
+            self.errors.append(f"Error: Attempting to use an object {left_side[0]} that hasn't been initialized")
 
     def pre_visit_ExpressionMinus(self, node: ASTExpressionMinus):
         pass
 
     def post_visit_ExpressionMinus(self, node: ASTExpressionMinus):
         right_side = self.get_type(node.Expression)
-        if right_side != 'int':
-            self.errors.append(f"Error: Attempting to '-' an invalid type. '{right_side}'. Need to be an 'int'. Around line {node.lineno}")
+        if right_side[1] == "false":
+            self.errors.append(f"Error: Attemping to uniary '-' and it hasn't been initialized. Around line {node.lineno}")
 
     def pre_visit_ExpressionNew(self, node: ASTExpressionNew):
         pass
 
     def post_visit_ExpressionNew(self, node: ASTExpressionNew):
-        type = self.get_type(node)
-        if type == 'int' or type == 'char' or type == 'bool' or type == 'string':
-            pass
-        else:
-            if len(type) > 2:
-                if type[-2:] == '[]':
-                    pass
-            
-                else: 
-                    #object with arguments
-                    constructExists = False
-                    for x in range(len(self.symbol_tables)):
-                        for key, value in self.symbol_tables[x].items():
-                            if key[0] == type and key[1] == 'constructor':
-                                constructExists = True
-                    if constructExists == False:
-                        self.errors.append(f"Error: Attempting to initialize an object {type} and there is no constructor of that type. Around line {node.lineno}")
-
-                    for x in self.paramList:
-                        if x['className'] == type and x['methodName'] == type:
-                            if len(self.arguments) != len(x['paramTypes']):
-                                self.errors.append(f"Error: When initializing an object of type {type}. {len(x['paramTypes'])} were expected and {len(self.arguments)} was given. around line {node.lineno}")
-                            else:
-                                for i in range(len(x['paramTypes'])):
-                                    if x['paramTypes'][i] != self.arguments[i]:
-                                        self.errors.append(f"Error: attempting to initialize an object of type '{type}'. Argument {x['paramTypes'][i]} was expected and {self.arguments[i]} was given. Around line {node.lineno}")
-        self.arguments = []
+        pass
 
     def pre_visit_ExpressionNot(self, node: ASTExpressionNot):
         pass
 
     def post_visit_ExpressionNot(self, node: ASTExpressionNot):
-        left_side = self.get_type(node.Expression)
-        if left_side != 'bool':
-            self.errors.append(f"Error: Attempting to '!' an invalid type. '{left_side}' Needs to be an 'bool'. Around line {node.lineno}")
+        right_side = self.get_type(node.Expression)
+        if right_side[1] == 'false':
+            self.errors.append(f"Error: Attemping to '!' that hasn't been initialized. Around line {node.lineno}")
 
     def pre_visit_ExpressionPlus(self, node: ASTExpressionPlus):
         pass
 
     def post_visit_ExpressionPlus(self, node: ASTExpressionPlus):
         right_side = self.get_type(node.Expression)
-        if right_side != 'int':
-            self.errors.append(f"Error: Attempting to '+' an invalid type. '{right_side}'. Need to be an 'int'. Around line {node.lineno}")
+        if right_side[1] == 'false':
+            self.errors.append(f"Error: Attemping to '+' that hasn't been initialized. Around line {node.lineno}")
 
     def pre_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
         pass
@@ -516,11 +504,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
-            isValid = True
-        if left_side != right_side and isValid == False:
-            self.errors.append(f"Error: Attempting to '&&'' different types. {left_side} and {right_side}. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '&&' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
         pass
@@ -528,11 +513,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
-            isValid = True
-        if left_side != right_side and isValid == False:
-            self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '&&' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
         pass
@@ -540,11 +522,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '/' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '/' a variable of type {left_side} Only 'int' is able to be divided. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '/' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
         pass
@@ -552,11 +531,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '/=' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '/=' a variable of type {left_side} Only 'int' is able to be divided. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '/=' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         pass
@@ -564,24 +540,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        isValid = False
-        if left_side != right_side:
-            isValid = False
-        if len(left_side) > 2:
-            if left_side[-2:] == '[]':
-                if right_side == 'null':
-                    isValid = True
-        if right_side == 'null' and (left_side == 'int[]' or left_side == 'char[]' or left_side == 'bool[]' or left_side == 'string[]'):
-            isValid = True
-        else:
-            if right_side == 'null' and (left_side == 'int' or left_side == 'char' or left_side == 'bool' or left_side == 'string'):
-                self.errors.append(f"Error: null can only be assigned to a class or array type not {left_side}. Around line {node.lineno}")
-            else:
-                isValid = True
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
-            isValid = True
-        if isValid == False:
-            self.errors.append(f"Error: Attempting to assign different types. {left_side} and {right_side}. Around line {node.lineno}")
+        if left_side[1] == 'terminal' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '=' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         pass
@@ -589,10 +549,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
-            self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
         pass
@@ -600,10 +558,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
-            self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionELessE(self, node: ASTExpressionELessE):
         pass
@@ -611,10 +567,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionELessE(self, node: ASTExpressionELessE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
-            self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         pass
@@ -622,10 +576,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
-            self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
         pass
@@ -633,11 +585,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '-' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '-' a variable of type {left_side} Only 'int' is able to be subtracted. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '-' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
         pass
@@ -645,11 +594,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '-=' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '-=' a variable of type {left_side} Only 'int' is able to be subtracted. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
         pass
@@ -657,11 +603,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2) 
-        isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
-            isValid = True
-        if left_side != right_side and isValid == False:
-            self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '!=' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         pass
@@ -669,11 +612,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
-            isValid = True
-        if left_side != right_side and isValid == False:
-            self.errors.append(f"Error: Attempting to '||' different types. {left_side} and {right_side}. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '&&' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         pass
@@ -681,11 +621,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '+' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '+' a variable of type {left_side} Only 'int' is able to be added. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '+' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         pass
@@ -693,11 +630,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '+=' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '+=' a variable of type {left_side} Only 'int' is able to be added. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
         pass
@@ -705,11 +639,8 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '*' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '*' a variable of type {left_side} Only 'int' is able to be multiplied. Around line {node.lineno}")
+        if left_side[1] == 'false' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '*' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
         pass
@@ -717,19 +648,16 @@ class AssignmentVisitor(ASTVisitor):
     def post_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
-        if left_side != right_side:
-            self.errors.append(f"Error: Attempting to '*=' a variable of type {left_side} with {right_side}. Around line {node.lineno}")
-        else:
-            if left_side != "int":
-                self.errors.append(f"Error: Attempting to '*=' a variable of type {left_side} Only 'int' is able to be multiplied. Around line {node.lineno}")
+        if left_side[1] != 'true' or right_side[1] == 'false':
+            self.errors.append(f"Error: Attempting to '<' something that hasn't been initialized yet. Around line {node.lineno}")
 
     def pre_visit_Index(self, node: ASTIndex):
         pass
 
     def post_visit_Index(self, node: ASTIndex):
         idx = self.get_type(node.Expression)
-        if idx != 'int':
-            self.errors.append(f"Error: attempting to access index and 'int' was not given. {idx} was given. Around line {node.lineno}")
+        if idx[1] == False:
+            self.errrors.append(f"Error: index value is not initialized. Around line {node.lineno}")
     
     def pre_visit_Initializer(self, node: ASTInitializer):
         pass
@@ -738,7 +666,7 @@ class AssignmentVisitor(ASTVisitor):
         pass
 
     def pre_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
-        self.arguments.append(None)
+        pass
             
     def post_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
         pass
@@ -798,9 +726,7 @@ class AssignmentVisitor(ASTVisitor):
         pass
 
     def pre_visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
-        if node.Expression != None:
-            type = self.get_type(node.Expression)
-            self.arguments.append(type)
+        pass
 
     def post_visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
         pass

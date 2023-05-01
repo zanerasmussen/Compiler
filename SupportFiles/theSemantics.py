@@ -2,6 +2,7 @@ from SemanticsVisitors.CreateSymbolTableVisitor import SymbolTableVisitor
 from SemanticsVisitors.UndeclaredVisitor import UndeclaredVisitor
 from SemanticsVisitors.TypeChecking import TypeChecking
 from SemanticsVisitors.AssignmentVisitor import AssignmentVisitor
+from SemanticsVisitors.BreakReturnVisitor import BreakReturnVisitor
 import sys
 
 def semantics(parsed_AST):
@@ -32,11 +33,19 @@ def semantics(parsed_AST):
     assignmentCheck = AssignmentVisitor()
     assignmentCheck.paramList = symbolTable.paramList
     assignmentCheck.symbol_tables = symbolTable.symbol_tables
-    parsed_AST.accept(assignmentCheck)
+    parsed_AST.accept(undeclared)
     if len(assignmentCheck.errors) != 0:
         for x in assignmentCheck.errors:
             print(x)
         sys.exit(4)
+
+    breakReturn = BreakReturnVisitor()
+    breakReturn.symbol_tables = symbolTable.symbol_tables
+    parsed_AST.accept(undeclared)
+    if len(breakReturn.errors) != 0:
+        for x in breakReturn.errors:
+            print(x)
+        sys.exit(5)
 
     print("semantics")
     
