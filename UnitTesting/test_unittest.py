@@ -3,6 +3,7 @@ import SupportFiles.theLexer as theLexer
 import SupportFiles.theParser as theParser
 from SemanticsVisitors.CreateSymbolTableVisitor import SymbolTableVisitor
 from SemanticsVisitors.UndeclaredVisitor import UndeclaredVisitor
+from SemanticsVisitors.TypeChecking import TypeChecking
 #from ObjectInitializerAndTypeVisitor import ObjectInitializerAndTypeVisitor
 
 class Test_Lexer(unittest.TestCase):
@@ -4070,7 +4071,7 @@ class Test_UndeclaredVariables(unittest.TestCase):
         undeclaredVariableVistior = UndeclaredVisitor()
         undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
         myAST.accept(undeclaredVariableVistior)
-        self.assertEqual(len(symbolTable.errors), 0)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
 
     def test_undeclared_in_method(self):
         data = """
@@ -5793,229 +5794,1083 @@ class Test_UndeclaredVariables(unittest.TestCase):
     #     self.assertEqual(len(undeclaredVariableVistior.errors), 1)
     #     self.assertEqual(undeclaredVariableVistior.errors[0], 'Error: bb is used but never declared or used before it is declared. Around line 3')
 
+class Test_TypeChecking(unittest.TestCase):
+
+    def test_big(self):
+        data = """
+    void kxi2023 main() {
+    if (1==1) cout << "1==1\\n";
+    if (-1==-1) cout << "-1==-1\\n";
+    if (1==2) cout << "1==2 fail\\n";
+    if (2==1) cout << "2==1 fail\\n";
 
 
+    if (1!=2) cout << "1!=2\\n";
+    if (2!=1) cout << "2!=1\\n";
+    if (1!=1) cout << "1!=1 fail\\n";
 
 
-# class Test_ObjectInitializerAndType(unittest.TestCase):
-
-#     def test_basic(self):
-#         data = """
-#         // Tests criteria under the C tier
-#         // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
-#         class Fibonacci {
-#             Fibonacci() {}
-#             public Test myTest;
-#             public Test myTest2 = new Test();
-#             public int compute(int x) {
-
-#                 if (x == 0) {
-#                     return 0;
-#                 } else if (x == 1) {
-#                     return 1;
-#                 }
-#                 return compute(1-x) + this.compute(x-2);
-#             }
-#         }
-
-#         class Test {
-#             Test() {}
-#             private Fibonacci fib;
-#             public Fibonacci fib2 = new Fibonacci();
-#             private Fibonacci[] fib3 = new Fibonacci[0];
-#             public int test(int x) {
-#                 cout << x;
-#                 char l = '\\n';
-#                 cout << '\\n';
-#                 if (x == 5) {
-#                     cout << this.test(x + 5);
-#                     cout << '\\n';
-#                 }
-#                 return x + 5;
-#             }
-#         }
-
-#         void kxi2023 main() {
-#             char t;
-#             int index;
-#             int i = 0;
-#             Fibonacci fib = new Fibonacci();
-#             Fibonacci[] fibs = new Fibonacci[0];
-#             cin >> t;
-#             cout << t;
-#             cin >> t;
-#             cout << t;
-#             cin >> index;
-#             while (i <= index) {
-#                 cout << i;
-#                 cout << ',';
-#                 cout << ' ';
-#                 cout << fib.compute(i);
-#                 cout << '\\n';
-#                 i = i + 1;
-#             }
-
-#             int[] arrTest = new int[5];
-#             Test test = new Test();
-#             cout << test.test(5);
-#             cout << '\\n';
-#             arrTest[1] = 3;
-
-#             int a = 0;
-
-#             while (a != 10) {
-#                 cin >> a;
-#                 switch (a) {
-#                     case 1:
-#                         cout << '-';
-#                         break;
-#                     case 0:
-#                         cout << '.';
-#                     case 3:
-#                         cout << ',';
-#                         break;
-#                     default:
-#                         cout << '+';
-#                 }
-#             }
-#         }
-#         """
-#         theLexer.theLexerReturnFucntion(data)
-#         myAST = theParser.Parse(data)
-#         symbolTable = SymbolTableVisitor()
-#         myAST.accept(symbolTable)
-#         self.assertEqual(symbolTable.has_Error, False)
-#         undeclaredVariableVistior = UndeclaredVisitor()
-#         myAST.accept(undeclaredVariableVistior)
-#         self.assertEqual(undeclaredVariableVistior.has_Error, False)
-#         objectInitializerAndTypeVisitor = ObjectInitializerAndTypeVisitor()
-#         symbols = symbolTable.symbol_tables
-#         objectInitializerAndTypeVisitor.symbol_tables = symbols
-#         myAST.accept(objectInitializerAndTypeVisitor)
-#         self.assertEqual(objectInitializerAndTypeVisitor.has_Error, False)
-
-#     def test_errors_with_Objects_and_Types(self):
-#             data = """
-#             // Tests criteria under the C tier
-#             // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
-#             class Fibonacci {
-#                 Fibonacci(notInt X, notTest tesss, int aaa) {}
-#                 public Test myTest = new NotATest();
-#                 public Test myTest2 = new Test[1];
-#                 public int compute(int x) {
-
-#                     if (x == 0) {
-#                         return 0;
-#                     } else if (x == 1) {
-#                         return 1;
-#                     }
-#                     return compute(1-x) + this.compute(x-2);
-#                 }
-#             }
-
-#             class Test {
-#                 Test() {}
-#                 private Fibonacci fib;
-#                 public Fibonacci[] fib2 = new Fibonacci();
-#                 private Fibonacci[] fib3 = new Fibonacci();
-#                 public void test(int x) {
-#                     cout << x;
-#                     char l = '\\n';
-#                     cout << '\\n';
-#                     if (x == 5) {
-#                         cout << this.test(x + 5);
-#                         cout << '\\n';
-#                     }
-#                     return x + 5;
-#                 }
-#             }
-
-#             void kxi2023 main() {
-#                 char t;
-#                 int index;
-#                 int i = 0;
-#                 Fibonacci fib = new Fibonaccisss();
-#                 Fibonacci[] fibs = new Fibonacci[0];
-#                 cin >> t;
-#                 cout << t;
-#                 cin >> t;
-#                 cout << t;
-#                 cin >> index;
-#                 while (i <= index) {
-#                     cout << i;
-#                     cout << ',';
-#                     cout << ' ';
-#                     cout << fib.compute(i);
-#                     cout << '\\n';
-#                     i = i + 1;
-#                 }
-
-#                 int[] arrTest = new int[5];
-                
-#                 int[] arrTest1 = new void[5];
-#                 int[] arrTest2 = new void();
-#                 int arrTest3 = new void[5];
-#                 Test test = new Test();
-#                 cout << test.test(5);
-#                 cout << '\\n';
-#                 arrTest[1] = 3;
-
-#                 Fibonacci fibfff = new Test();
-#                 int a = 0;
-
-#                 while (a != 10) {
-#                     cin >> a;
-#                     switch (a) {
-#                         case 1:
-#                             cout << '-';
-#                             break;
-#                         case 0:
-#                             cout << '.';
-#                         case 3:
-#                             cout << ',';
-#                             break;
-#                         default:
-#                             cout << '+';
-#                     }
-#                 }
-#             }
-#             """
-#             theLexer.theLexerReturnFucntion(data)
-#             myAST = theParser.Parse(data)
-#             symbolTable = SymbolTableVisitor()
-#             myAST.accept(symbolTable)
-#             self.assertEqual(symbolTable.has_Error, False)
-#             undeclaredVariableVistior = UndeclaredVisitor()
-#             myAST.accept(undeclaredVariableVistior)
-#             self.assertEqual(undeclaredVariableVistior.has_Error, False)
-#             objectInitializerAndTypeVisitor = ObjectInitializerAndTypeVisitor()
-#             symbols = symbolTable.symbol_tables
-#             objectInitializerAndTypeVisitor.symbol_tables = symbols
-#             myAST.accept(objectInitializerAndTypeVisitor)
-#             self.assertEqual(objectInitializerAndTypeVisitor.has_Error, True)
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[0], "Error: there is no class 'notInt'. Attempting to use a variable of that type is illegal")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[1], "Error: there is no class 'notTest'. Attempting to use a variable of that type is illegal")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[2], 'Error: Attempting to initalize object Test myTest with invalid type of NotATest. Around line 6')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[3], "Error: there is no class 'NotATest'. Attempting to use a variable of that type is illegal")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[4], 'Error: error when attempting to initialize object Test myTest2. Around line 7')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[5], 'Error: error when attempting to initialize object Fibonacci fib2. Around line 22')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[6], 'Error: error when attempting to initialize object Fibonacci fib3. Around line 23')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[7], 'Error: Attempting to initalize object Fibonacci fib with invalid type of Fibonaccisss. Around line 40')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[8], "Error: there is no class 'Fibonaccisss'. Attempting to use a variable of that type is illegal")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[9], "Error: Attempting to initalize object int arrTest1 with invalid type of void. Around line 58")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[10], 'Error: Can not use void to declare a variable. Around line 58')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[11], 'Error: Attempting to initalize object int arrTest2 with invalid type of void. Around line 59')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[12], 'Error: Can not use void to declare a variable. Around line 59')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[13], "Error: error when attempting to initialize object int arrTest2. Around line 59")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[14], 'Error: Attempting to initalize object int arrTest3 with invalid type of void. Around line 60')
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[15], "Error: Can not use void to declare a variable. Around line 60")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[16], "Error: error when attempting to initialize object int arrTest3. Around line 60")
-#             self.assertEqual(objectInitializerAndTypeVisitor.errors[17], "Error: Attempting to initalize object Fibonacci fibfff with invalid type of Test. Around line 66")
+    if (1 < 2) cout << "1<2\\n";
+    if (1 < 1) cout << "1<1 fail\\n";
+    if (2 < 1) cout << "2<1 fail\\n";
 
 
+    if (2 > 1) cout << "2>1\\n";
+    if (1 > 1) cout << "1>1 fail\\n";
+    if (1 > 2) cout << "1>2 fail\\n";
+
+    if (1 <= 2) cout << "1<=2\\n";
+    if (1 <= 1) cout << "1<=1\\n";
+    if (2 <= 1) cout << "2<=1 fail\\n";
+
+    if (2 >= 1) cout << "2>=1\\n";
+    if (1 >= 1) cout << "1>=1\\n";
+    if (1 >= 2) cout << "1>=2 fail\\n";
+
+    if (-1 == -(1))
+        cout << "-1==-(1)\\n";
+
+    if (1 * 2 / 2 + 4 - 5 * 8 / 8 == 0)
+        cout << "good math\\n";
+
+    if (     'a' == 'a'
+        &&   'b' == 'b'
+        && !('c' == 'd')
+        &&   'c' != 'd'
+        &&   'd' <  'e'
+        &&   'a' >  'A' )
+        cout << "char comparison is good\\n";
+
+    int un_test = 2;
+    un_test = +++++++un_test;
+    cout << un_test;
+    cout << '\\n';
+
+
+    int x = 1;
+    while (x <= 128) {
+        cout << "while: ";
+        cout << x;
+        cout << '\\n';
+
+        int i = x;
+        int j = 0;
+        while(j < 3) {
+            cout << "nested while: ";
+            cout << i * 3;
+            cout << '\\n';
+            i *= 3;
+            j += 1;
+        }
+        x *= 2;
+    }
+
+    //x = j = i;
+    //cout << x; cout << '\\n';
+
+    // ASSIGNMENT
+    cout << "assneq: ";
+
+    int test = 0-1;
+    
+    test += 1;
+    if (test == 0) {
+        cout << '+';
+    } else {
+        cout << '-';
+        cout << test;
+    }
+    cout << '|';
+
+    test -= 1;
+    if (test == -1) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    test *= 2;
+    if (test == -2) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+
+    test /= 2;
+    if (test == -1) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    cout << '\\n';
+
+    // BOOL EXPRESSIONS
+    cout << "bool: ";
+
+    bool t = true;
+    bool f = false;
+    int a = 0;
+    int b = 1;
+
+    if (t) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (t != f) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (a < b) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (b > a) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (a <= 0) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    if (b >= 1) {
+        cout << '+';
+    } else {
+        cout << '-';
+    }
+    cout << '|';
+    cout << '\\n';
+    
+
+    // SWITCH CASE
+    cout << "switch: ";
+
+    a = 0;
+    switch (a) {
+        case 1:
+            cout << '-';
+            break;
+        case 0:
+            cout << '.';
+        case 3:
+            cout << ',';
+        default:
+            cout << '+';
+    }
+    cout << '|';
+    cout << '\\n';
+
+    int v1 = 1;
+    int v2 = 2;
+    int v3 = 3;
+
+    v1 = v2 = v3;
+
+    if (v1 == 3 && v2 == 3 && v3 == 3) cout << "v1 = v2 = v3 pass\\n";
+    else cout << "v1 = v2 = v3 fail\\n";
+
+    v1 += v1 = 2;
+    if (v1 == 4) cout << "v1 += v1 = 2 pass\\n";
+    else cout << "v1 += v1 = 2 fail\\n";
+
+    v1 = v2 = v3 = 1 + 2 + 3;
+    if (v1 == 6 && v2 == 6 && v3 == 6) cout << "v1 = v2 = v3 = 1 + 2 + 3 pass\\n";
+    else cout << "v1 = v2 = v3 = 1 + 2 + 3 fail\\n";
+}
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(len(symbolTable.errors), 0)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+        typeCheck = TypeChecking()
+        typeCheck.paramList = symbolTable.paramList
+        typeCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(typeCheck)
+        self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big1(self):
+            data = """
+            // Tests criteria under the C tier
+            // (Everything up to B, sequential code in the main function plus functions including recursion, plus objects and primitive array).
+            class Fibonacci {
+                Fibonacci() {}
+                public int compute(int x) {
+
+                    if (x == 0) {
+                        return 0;
+                    } else if (x == 1) {
+                        return 1;
+                    }
+                    //return compute(1-x) + this.compute(x-2);
+                    return this.compute(1-x) + compute(x-2);
+                }
+            }
+
+            class Test {
+                Test() {}
+                private bool[] asdfasdf;
+                public int test(int x) {
+                    cout << x;
+                    char l = '\\n';
+                    cout << '\\n';
+                    if (x == 5) {
+                        cout << this.test(x + 5);
+                        cout << '\\n';
+                    }
+                    return x + 5;
+                }
+            }
+
+            void kxi2023 main() {
+                char t;
+                int index;
+                int i = 0;
+                Fibonacci fib = new Fibonacci();
+                cin >> t;
+                cout << t;
+                cin >> t;
+                cout << t;
+                cin >> index;
+                while (i <= index) {
+                    cout << i;
+                    cout << ',';
+                    cout << ' ';
+                    cout << fib.compute(i);
+                    cout << '\\n';
+                    i = i + 1;
+                }
+
+                int[] arrTest = new int[5];
+                Test test = new Test();
+                cout << test.test(5);
+                cout << '\\n';
+                arrTest[1] = 3;
+
+                int a = 0;
+
+                while (a != 10) {
+                    cin >> a;
+                    switch (a) {
+                        case 1:
+                            cout << '-';
+                            break;
+                        case 0:
+                            cout << '.';
+                        case 3:
+                            cout << ',';
+                            break;
+                        default:
+                            cout << '+';
+                    }
+                }
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big2(self):
+            data = """
+            class AnotherTest
+            {
+            private char memeberVarThree;
+
+                public void FuncThree(char j)
+            {
+                    int k;
+                }
+            }
+
+            class AnotherTest2
+            {
+                private char memeberVar4;
+
+                public void Func4(char B)
+                {
+                    int T;
+                }
+            }
+
+
+            void kxi2023 main()
+            {
+                cout << "Hello World!";
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big3(self):
+            data = """
+            class MyClass {
+                public char [] id1 = new char[3];
+            }
+
+            class OtherClass{
+                private int id2;
+                private bool id4;
+                public string id5;
+            }
+
+            class TempClass{
+
+            }
+
+            void kxi2023 main (){}
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big4(self):
+            data = """
+            class MyClass {}
+
+            void kxi2023 main (){}
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big5(self):
+            data = """
+            class MyClass {
+                public int a;
+                public bool b = true;
+
+                public int c(){}
+                private char d(){}
+
+                MyClass(){}
+            }
+
+            void kxi2023 main (){}
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big6(self):
+            data = """
+            class MyClass {
+            public int a;
+            public bool b = true;
+
+            public int c(){
+                if (b == false) true; else false;
+                if (true == false) true; else false;
+            }
+            private char d(){
+                a = a + 1;
+            }
+
+            MyClass(int g){
+                a = g;
+            }
+        }
+
+        void kxi2023 main (){}
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big7(self):
+            data = """
+            void kxi2023 main (){
+                bool b;
+                int a = 1 + 2;
+                char char1 = 'c';
+
+                string beef = "beef";
+                string beef_more = "no more \\n beef";
+            
+            int[] array = new int[2];
+            while (array[0] != 10){
+                array[0] += 1;
+                array[1] -= 2;
+            }
+
+            cout << beef;
+
+            cout << beef_more;
+
+            array[0];
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_big8(self):
+            data = """
+            void kxi2023 main (){
+                //Statements
+
+                // { Statement *}
+                { 
+                    break ; 
+                    return; 
+                }
+
+                //if ( 〈Expression〉 ) 〈Statement〉 (else 〈Statement〉)?
+                bool a;
+                int x;
+                int z;
+                if (a == true) {
+                    true;
+                } else {
+                    false;
+                }
+                if (true) x = 10;
+
+                //while ( 〈Expression〉 ) 〈Statement〉
+                while( x != z ){
+                    z += 1;
+                    x = z;
+                }
+
+                //return 〈Expression〉?;
+                return true;
+                return;
+
+                //cout 
+                cout << false;
+                //cin
+                cin >> x;
+
+                //switch and break
+                char myVar;
+                switch (myVar){
+                    case 'a':
+                    myVar = 'b';
+                    case 'c':
+                    myVar = 'b';
+                    default :
+                    break;
+                }
+
+                //VariableDeclaration been done already
+
+
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_int_variableDeclaration_Main(self):
+        data = """
+        class IntClass{
+            IntClass(){}
+            public int a = 1;
+            private int b;
+            public int[] c;
+            private int d(){
+                int a = 1;
+                return a;
+            }
+            public int[] e(){
+                int[] f = new int[4];
+                return f;
+            }
+        }
+
+        class Other{
+            public int otherInt;
+            public int myMethod(int x){
+                x += 3;
+                return x;
+            }
+            Other(){}
+        }
+
+        void kxi2023 main (){
+            //do some initializing 
+            int a = new int[1];                 //error 0
+            int c;
+            int[] d = new int[1];
+            int[] e;
+            int f;
+            IntClass iii = new IntClass();
+            Other ooo = new Other();
+
+            //create variables of all types
+            char char1;
+            char[] char2;
+            bool boo = false;
+            bool[] boo2;
+            string str;
+            string[] str2;
+
+            
+            //assign to ints
+            c = iii.a;
+            c = iii.e();                           //error 1 line 47
+            e = iii.a;                             //error 2
+            e = iii.e();
+            c  = ooo.otherInt;
+            c = ooo.myMethod(f);
+            d[1] = 3;
+            f = -123;
+
+            //wrong type 
+            c = iii.otherInt;                   //error line 56
+            c = iii.myMethod(f);
+            int x = new Other();
+            int y;
+            int[] z;
+            y = char1;
+            y = char2;
+            y = boo;
+            y = boo2;
+            y = str;
+            y = str2;
+            y = iii;
+            z = char1;
+            z = char2;
+            z = boo;
+            z = boo2;
+            z = str;
+            z = str2;
+            z = iii;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(len(symbolTable.errors), 0)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+        typeCheck = TypeChecking()
+        typeCheck.paramList = symbolTable.paramList
+        typeCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(typeCheck)
+        self.assertEqual(len(typeCheck.errors), 23)
+
+    def test_char_variableDeclaration_Main(self):
+        data = """
+        class CharClass{
+            CharClass(){}
+            public char a = 'a';
+            private char b;
+            public char[] c;
+            private char d(){
+                char a = 'n';
+                return a;
+            }
+            public char[] e(){
+                char[] f = new char[4];
+                return f;
+            }
+        }
+
+        class Other{
+            public char otherChar;
+            public char myMethod(char x){
+                x = 'b';
+                return x;
+            }
+            Other(){}
+        }
+
+        void kxi2023 main (){
+            //do some initializing 
+            char a = new char[1];                 //error 0
+            char c;
+            char[] d = new char[1];
+            char[] e;
+            char f;
+            CharClass iii = new CharClass();
+            Other ooo = new Other();
+
+            //create variables of all types
+            int int1;
+            int[] int2;
+            char char1;
+            char[] char2;
+            bool boo = false;
+            bool[] boo2;
+            string str;
+            string[] str2;
+
+            
+            //assign to ints
+            c = iii.a;
+            c = iii.e();                           //error 1 line 49
+            e = iii.a;                             //error 2
+            e = iii.e();
+            c  = ooo.otherChar;
+            c = ooo.myMethod(f);
+            c = ooo.myMethod('a');
+            d[1] = 'a';
+            d = 'b';
+            f = 'a';
+
+            //wrong type 
+            c = iii.otherChar;                   //error line 56
+            c = ooo.myMethod(3);
+            char x = new Other();
+            char y;
+            char[] z;
+            y = char1;
+            y = char2;
+            y = boo;
+            y = boo2;
+            y = str;
+            y = str2;
+            y = iii;
+            y= int1;
+            y = int2;
+            z = char1;
+            z = char2;
+            z = boo;
+            z = boo2;
+            z = str;
+            z = str2;
+            z = iii;
+            z = int1;
+            z = int2;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(len(symbolTable.errors), 0)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+        typeCheck = TypeChecking()
+        typeCheck.paramList = symbolTable.paramList
+        typeCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(typeCheck)
+        self.assertEqual(len(typeCheck.errors), 24)
+
+    def test_bool_variableDeclaration_Main(self):
+        data = """
+        class BoolClass{
+            BoolClass(){}
+            public bool a = true;
+            private bool b;
+            public bool[] c;
+            private bool d(){
+                bool a = true;
+                return a;
+            }
+            public bool[] e(){
+                bool[] f = new bool[4];
+                return f;
+            }
+        }
+
+        class Other{
+            public bool otherBool;
+            public bool myMethod(bool x){
+                x = false;
+                return x;
+            }
+            Other(){}
+        }
+
+        void kxi2023 main (){
+            //do some initializing 
+            bool a = new bool[1];                 //error 0
+            bool c;
+            bool[] d = new bool[1];
+            bool[] e;
+            bool f;
+            BoolClass iii = new BoolClass();
+            Other ooo = new Other();
+
+            //create variables of all types
+            int int1;
+            int[] int2;
+            char char1;
+            char[] char2;
+            bool boo = false;
+            bool[] boo2;
+            string str;
+            string[] str2;
+
+            
+            //assign to ints
+            c = iii.a;
+            c = iii.e();                           //error 1 line 49
+            e = iii.a;                             //error 2
+            e = iii.e();
+            c  = ooo.otherBool;
+            c = ooo.myMethod(f);
+            c = ooo.myMethod(true);
+            d[1] = true;
+            d = false;
+            f = true;
+
+            //wrong type 
+            c = iii.otherBool;                   //error line 60
+            c = ooo.myMethod(3);
+            bool x = new Other();
+            bool y;
+            bool[] z;
+            y = char1;
+            y = char2;
+            y = boo;
+            y = boo2;
+            y = str;
+            y = str2;
+            y = iii;
+            y= int1;
+            y = int2;
+            z = char1;
+            z = char2;
+            z = boo;
+            z = boo2;
+            z = str;
+            z = str2;
+            z = iii;
+            z = int1;
+            z = int2;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(len(symbolTable.errors), 0)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+        typeCheck = TypeChecking()
+        typeCheck.paramList = symbolTable.paramList
+        typeCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(typeCheck)
+        self.assertEqual(len(typeCheck.errors), 23)
+
+    def test_string_variableDeclaration_Main(self):
+        data = """
+        class StringClass{
+            StringClass(){}
+            public string a = "true";
+            private string b;
+            public string[] c;
+            private string d(){
+                string a = "new string";
+                return a;
+            }
+            public string[] e(){
+                string[] f = new string[4];
+                return f;
+            }
+        }
+
+        class Other{
+            public string otherString;
+            public string myMethod(string x){
+                x = "other string";
+                return x;
+            }
+            Other(){}
+        }
+
+        void kxi2023 main (){
+            //do some initializing 
+            string a = new string[1];                 //error 0
+            string c;
+            string[] d = new string[1];
+            string[] e;
+            string f;
+            StringClass iii = new StringClass();
+            Other ooo = new Other();
+
+            //create variables of all types
+            int int1;
+            int[] int2;
+            char char1;
+            char[] char2;
+            bool boo = false;
+            bool[] boo2;
+            string str;
+            string[] str2;
+
+            
+            //assign to ints
+            c = iii.a;
+            c = iii.e();                           //error 1 line 49
+            e = iii.a;                             //error 2
+            e = iii.e();
+            c  = ooo.otherString;
+            c = ooo.myMethod(f);
+            c = ooo.myMethod("true");
+            d[1] = "asdfasdf";
+            d = "fffffff";
+            f = "aaaaaaaaaaa";
+
+            //wrong type 
+            c = iii.otherString;                   //error line 60
+            c = ooo.myMethod(3);
+            string x = new Other();
+            string y;
+            string[] z;
+            y = char1;
+            y = char2;
+            y = boo;
+            y = boo2;
+            y = str;
+            y = str2;
+            y = iii;
+            y= int1;
+            y = int2;
+            z = char1;
+            z = char2;
+            z = boo;
+            z = boo2;
+            z = str;
+            z = str2;
+            z = iii;
+            z = int1;
+            z = int2;
+        }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(len(symbolTable.errors), 0)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+        typeCheck = TypeChecking()
+        typeCheck.paramList = symbolTable.paramList
+        typeCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(typeCheck)
+        self.assertEqual(len(typeCheck.errors), 24)
+
+    def test_null(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int pubInt1 = 1;
+                public int[] pubInt2;
+                public char pubChar1;
+                public char[] pubChar2;
+                public bool pubBool1;
+                public bool[] pubBool2;
+                public string pubStr1;
+                public string[] pubStr2;
+                public OtherClass other1;
+            }
+
+            class OtherClass{
+                OtherClass(){}
+                public string[] otherSt1(){
+                    return "string";
+                }
+                public OtherClass otherother(){
+                    return 1;
+                }
+            }
+
+
+            void kxi2023 main (){
+                int int1 = null;
+                int[] int2 = null;
+                char char1 = null;
+                char[] char2 = null;
+                bool bool1 = null;
+                bool[] bool2 = null;
+                string str1 = null;
+                string[] str2 = null;
+
+                int int3 = 1;
+                int[] int4 = new int[3];
+                char char3 = 'a';
+                char[] char4 = new char[5];
+                bool bool3 = false;
+                bool[] bool4 = new bool[7];
+                string str3 = "test 1";
+                string[] str4 = new string[2];  
+
+                int3 = null;
+                int4 = null;
+                char3 = null;
+                char4 = null;
+                bool3 = null;
+                bool4 = null;
+                str3 = null;
+                str4 = null;     
+
+                MyClass myclass = new MyClass();
+                OtherClass otherclass = new OtherClass();
+
+                myclass.pubInt1 = null;
+                myclass.pubInt2 = null;   
+                myclass.pubChar1 = null;
+                myclass.pubChar2 = null;
+                myclass.pubBool1 = null; 
+                myclass.pubBool2 = null;
+                myclass.pubStr1 = null; 
+                myclass.pubStr2 = null; 
+
+                myclass = null;
+                otherclass = null;
+
+                MyClass[] myclass2 = new MyClass[2];
+                OtherClass[] otherclass2 = new OtherClass[1];
+
+                otherclass.otherother = null;
+                otherclass.otherSt1 = null;
+                otherclass2[2].otherother = null;
+                otherclass2[2].otherSt1 = null;
+
+                myclass2 = null;
+                otherclass2 = null;
+                myclass2[1] = null;
+                otherclass2[3] = null;
+
+                MyClass[] myclass3 = null;
+                OtherClass[] otherclass3 = null;
+                MyClass myclass4 = null;
+                OtherClass otherclass4 = null;
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 24)
 
 #new object calls constructor.  make sure class has constructor if calling new
 
 #test New with invalid params
-
+#Fibonacci fib = new Test();
 #test = with invalid assignments (terminals)
+#void datamember
+#void variable
+#void can only be used for method
+ #return this.compute(1-x) + compute(x-2);
+# int[] a;
+# cout << a[2]; //error thrown for not initialized
+# int[] b = new int[5];
+# cout << b[8] //passes but failed at runtime.
+#test parameters

@@ -1,12 +1,12 @@
-//class AnotherTest
-//{
- //   private char memeberVarThree;
+class AnotherTest
+{
+   private char memeberVarThree;
 
-//    public void FuncThree(char j)
- //   {
-//        int k;
-//    }
-//}
+    public void FuncThree(char j)
+   {
+        int k;
+    }
+}
 
 class AnotherTest2
 {

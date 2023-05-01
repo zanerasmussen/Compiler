@@ -1,3 +1,4 @@
-int 1234;
-char 'a';
-string "this is a stirf"
+
+void kxi2023 main() {
+    if (-1==-1) cout << "-1==-1\n";
+}

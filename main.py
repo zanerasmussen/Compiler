@@ -6,7 +6,7 @@ from SupportFiles.theSemantics import *
 
 def main(argv):
     if len(argv) == 0:
-        file = open(".\TestFiles\BGrade.kxi", "r")
+        file = open(".\TestFiles\\big_parser_test.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
         parsed = Parse(file)
@@ -15,7 +15,7 @@ def main(argv):
         
 
     elif argv[0] == '-l':
-        DoLexer()
+        DoLexer() 
 
     elif argv[0] == '-p':
         DoParser()

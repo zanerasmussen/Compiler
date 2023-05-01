@@ -16,7 +16,5 @@ void kxi2023 main (){
 
    cout << this.beans;
 
-   MyClass beef;
-   MyClass beef = 10;
    array[0];
 }

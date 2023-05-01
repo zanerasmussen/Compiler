@@ -62,7 +62,6 @@ def p_Expression(p):
                     | PLUS Expression
                     | NOT Expression
                     | MINUS Expression
-                    | Expression PERIOD ID
                     | LPAREN Expression RPAREN
                     | Expression AAND Expression
                     | Expression CEQUAL Expression
@@ -81,6 +80,7 @@ def p_Expression(p):
                     | Expression PLUSEQUAL Expression
                     | Expression TIMES Expression
                     | Expression TIMESEQUAL Expression
+                    | Expression PERIOD ID
                     | NEW VOID ArgOrIdx
                     | NEW INT ArgOrIdx
                     | NEW CHAR ArgOrIdx
@@ -339,16 +339,29 @@ def p_error(p):
 
 precedence = (
     ('left', 'IF'), ('left', 'ELSE'), 
+    ('right', 'NOT', 'AAND', 'OOR'),
+    ('right', 'CEQUAL', 'NEQUAL'),
+    ('right', 'GREATER', 'LESS', 'LESSEQUAL', 'GREATEQUAL'),
     ('left', 'TIMES', 'DIVIDE'),
     ('left', 'PLUS', 'MINUS'),
     ('right', 'RIGHTSHIFT', 'LEFTSHIFT'),
-    ('right', 'GREATER', 'LESS', 'LESSEQUAL', 'GREATEQUAL'),
-    ('right', 'CEQUAL', 'NEQUAL'),
-    ('right', 'NOT'),
-    ('right', 'AAND'),
-    ('right', 'OOR'),
     ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
+    ('right', 'PERIOD'),
+    ('right', 'RPAREN', 'LPAREN'),
 )
+
+# precedence = (
+#     ('left', 'IF'), ('left', 'ELSE'), 
+#     ('left', 'TIMES', 'DIVIDE'),
+#     ('left', 'PLUS', 'MINUS'),
+#     ('right', 'RIGHTSHIFT', 'LEFTSHIFT'),
+#     ('right', 'GREATER', 'LESS', 'LESSEQUAL', 'GREATEQUAL'),
+#     ('right', 'CEQUAL', 'NEQUAL'),
+#     ('right', 'NOT'),
+#     ('right', 'AAND'),
+#     ('right', 'OOR'),
+#     ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
+# )
 
 
 def Parse(file):

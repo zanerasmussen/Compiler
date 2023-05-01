@@ -1,6 +1,3 @@
-void kxi2023 main (){}
-
-
 class MyClass {
     public char [] id1 = this;
 }
