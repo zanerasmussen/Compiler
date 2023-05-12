@@ -347,7 +347,7 @@ precedence = (
     ('right', 'RIGHTSHIFT', 'LEFTSHIFT'),
     ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
     ('right', 'PERIOD'),
-    ('right', 'RPAREN', 'LPAREN'),
+    ('right', 'RPAREN', 'LPAREN', 'RSQUARE', 'LSQUARE'),
 )
 
 # precedence = (

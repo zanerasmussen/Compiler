@@ -11,7 +11,7 @@ class Unique:
         self.id += 1
         return self.id
     
-class BreakReturnVisitor(ASTVisitor):
+class BreakVisitor(ASTVisitor):
     def __init__(self):
         self.UID = Unique()
         self.errors = []

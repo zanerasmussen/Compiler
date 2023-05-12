@@ -4047,7 +4047,6 @@ state 161
     OOR             reduce using rule 24 (Expression -> PLUS Expression .)
     PLUS            reduce using rule 24 (Expression -> PLUS Expression .)
     TIMES           reduce using rule 24 (Expression -> PLUS Expression .)
-    LSQUARE         reduce using rule 24 (Expression -> PLUS Expression .)
     RPAREN          reduce using rule 24 (Expression -> PLUS Expression .)
     RSQUARE         reduce using rule 24 (Expression -> PLUS Expression .)
     COMMA           reduce using rule 24 (Expression -> PLUS Expression .)
@@ -4057,6 +4056,7 @@ state 161
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 24 (Expression -> PLUS Expression .) ]
@@ -4065,6 +4065,7 @@ state 161
   ! PLUSEQUAL       [ reduce using rule 24 (Expression -> PLUS Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 24 (Expression -> PLUS Expression .) ]
   ! PERIOD          [ reduce using rule 24 (Expression -> PLUS Expression .) ]
+  ! LSQUARE         [ reduce using rule 24 (Expression -> PLUS Expression .) ]
   ! LPAREN          [ reduce using rule 24 (Expression -> PLUS Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -4078,7 +4079,6 @@ state 161
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4110,7 +4110,6 @@ state 162
     (1) Arguments -> . LPAREN MaybeArgumentList RPAREN
 
     SEMICOLON       reduce using rule 25 (Expression -> NOT Expression .)
-    LSQUARE         reduce using rule 25 (Expression -> NOT Expression .)
     RPAREN          reduce using rule 25 (Expression -> NOT Expression .)
     RSQUARE         reduce using rule 25 (Expression -> NOT Expression .)
     COMMA           reduce using rule 25 (Expression -> NOT Expression .)
@@ -4132,6 +4131,7 @@ state 162
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! AAND            [ reduce using rule 25 (Expression -> NOT Expression .) ]
@@ -4152,8 +4152,8 @@ state 162
   ! TIMES           [ reduce using rule 25 (Expression -> NOT Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 25 (Expression -> NOT Expression .) ]
   ! PERIOD          [ reduce using rule 25 (Expression -> NOT Expression .) ]
+  ! LSQUARE         [ reduce using rule 25 (Expression -> NOT Expression .) ]
   ! LPAREN          [ reduce using rule 25 (Expression -> NOT Expression .) ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4197,7 +4197,6 @@ state 163
     OOR             reduce using rule 26 (Expression -> MINUS Expression .)
     PLUS            reduce using rule 26 (Expression -> MINUS Expression .)
     TIMES           reduce using rule 26 (Expression -> MINUS Expression .)
-    LSQUARE         reduce using rule 26 (Expression -> MINUS Expression .)
     RPAREN          reduce using rule 26 (Expression -> MINUS Expression .)
     RSQUARE         reduce using rule 26 (Expression -> MINUS Expression .)
     COMMA           reduce using rule 26 (Expression -> MINUS Expression .)
@@ -4207,6 +4206,7 @@ state 163
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 26 (Expression -> MINUS Expression .) ]
@@ -4215,6 +4215,7 @@ state 163
   ! PLUSEQUAL       [ reduce using rule 26 (Expression -> MINUS Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 26 (Expression -> MINUS Expression .) ]
   ! PERIOD          [ reduce using rule 26 (Expression -> MINUS Expression .) ]
+  ! LSQUARE         [ reduce using rule 26 (Expression -> MINUS Expression .) ]
   ! LPAREN          [ reduce using rule 26 (Expression -> MINUS Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -4228,7 +4229,6 @@ state 163
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4651,7 +4651,6 @@ state 179
     (1) Arguments -> . LPAREN MaybeArgumentList RPAREN
 
     SEMICOLON       reduce using rule 28 (Expression -> Expression AAND Expression .)
-    LSQUARE         reduce using rule 28 (Expression -> Expression AAND Expression .)
     RPAREN          reduce using rule 28 (Expression -> Expression AAND Expression .)
     RSQUARE         reduce using rule 28 (Expression -> Expression AAND Expression .)
     COMMA           reduce using rule 28 (Expression -> Expression AAND Expression .)
@@ -4673,6 +4672,7 @@ state 179
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! AAND            [ reduce using rule 28 (Expression -> Expression AAND Expression .) ]
@@ -4693,8 +4693,8 @@ state 179
   ! TIMES           [ reduce using rule 28 (Expression -> Expression AAND Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 28 (Expression -> Expression AAND Expression .) ]
   ! PERIOD          [ reduce using rule 28 (Expression -> Expression AAND Expression .) ]
+  ! LSQUARE         [ reduce using rule 28 (Expression -> Expression AAND Expression .) ]
   ! LPAREN          [ reduce using rule 28 (Expression -> Expression AAND Expression .) ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4728,7 +4728,6 @@ state 180
     SEMICOLON       reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
     AAND            reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
     OOR             reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
-    LSQUARE         reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
     RPAREN          reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
     RSQUARE         reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
     COMMA           reduce using rule 29 (Expression -> Expression CEQUAL Expression .)
@@ -4748,6 +4747,7 @@ state 180
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! CEQUAL          [ reduce using rule 29 (Expression -> Expression CEQUAL Expression .) ]
@@ -4766,10 +4766,10 @@ state 180
   ! TIMES           [ reduce using rule 29 (Expression -> Expression CEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 29 (Expression -> Expression CEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 29 (Expression -> Expression CEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 29 (Expression -> Expression CEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 29 (Expression -> Expression CEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! OOR             [ shift and go to state 135 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4811,7 +4811,6 @@ state 181
     NEQUAL          reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
     OOR             reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
     TIMES           reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
-    LSQUARE         reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
     RPAREN          reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
     RSQUARE         reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
     COMMA           reduce using rule 30 (Expression -> Expression DIVIDE Expression .)
@@ -4823,6 +4822,7 @@ state 181
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 30 (Expression -> Expression DIVIDE Expression .) ]
@@ -4833,6 +4833,7 @@ state 181
   ! PLUSEQUAL       [ reduce using rule 30 (Expression -> Expression DIVIDE Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 30 (Expression -> Expression DIVIDE Expression .) ]
   ! PERIOD          [ reduce using rule 30 (Expression -> Expression DIVIDE Expression .) ]
+  ! LSQUARE         [ reduce using rule 30 (Expression -> Expression DIVIDE Expression .) ]
   ! LPAREN          [ reduce using rule 30 (Expression -> Expression DIVIDE Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -4844,7 +4845,6 @@ state 181
   ! NEQUAL          [ shift and go to state 134 ]
   ! OOR             [ shift and go to state 135 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4888,7 +4888,6 @@ state 182
     OOR             reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
     PLUS            reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
     TIMES           reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
-    LSQUARE         reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
     RPAREN          reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
     RSQUARE         reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
     COMMA           reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .)
@@ -4898,6 +4897,7 @@ state 182
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .) ]
@@ -4906,6 +4906,7 @@ state 182
   ! PLUSEQUAL       [ reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 31 (Expression -> Expression DIVIDEEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -4919,7 +4920,6 @@ state 182
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -4963,7 +4963,6 @@ state 183
     OOR             reduce using rule 32 (Expression -> Expression EQUAL Expression .)
     PLUS            reduce using rule 32 (Expression -> Expression EQUAL Expression .)
     TIMES           reduce using rule 32 (Expression -> Expression EQUAL Expression .)
-    LSQUARE         reduce using rule 32 (Expression -> Expression EQUAL Expression .)
     RPAREN          reduce using rule 32 (Expression -> Expression EQUAL Expression .)
     RSQUARE         reduce using rule 32 (Expression -> Expression EQUAL Expression .)
     COMMA           reduce using rule 32 (Expression -> Expression EQUAL Expression .)
@@ -4973,6 +4972,7 @@ state 183
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 32 (Expression -> Expression EQUAL Expression .) ]
@@ -4981,6 +4981,7 @@ state 183
   ! PLUSEQUAL       [ reduce using rule 32 (Expression -> Expression EQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 32 (Expression -> Expression EQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 32 (Expression -> Expression EQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 32 (Expression -> Expression EQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 32 (Expression -> Expression EQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -4994,7 +4995,6 @@ state 183
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5030,7 +5030,6 @@ state 184
     CEQUAL          reduce using rule 33 (Expression -> Expression GREATER Expression .)
     NEQUAL          reduce using rule 33 (Expression -> Expression GREATER Expression .)
     OOR             reduce using rule 33 (Expression -> Expression GREATER Expression .)
-    LSQUARE         reduce using rule 33 (Expression -> Expression GREATER Expression .)
     RPAREN          reduce using rule 33 (Expression -> Expression GREATER Expression .)
     RSQUARE         reduce using rule 33 (Expression -> Expression GREATER Expression .)
     COMMA           reduce using rule 33 (Expression -> Expression GREATER Expression .)
@@ -5048,6 +5047,7 @@ state 184
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDE          [ reduce using rule 33 (Expression -> Expression GREATER Expression .) ]
@@ -5064,12 +5064,12 @@ state 184
   ! TIMES           [ reduce using rule 33 (Expression -> Expression GREATER Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 33 (Expression -> Expression GREATER Expression .) ]
   ! PERIOD          [ reduce using rule 33 (Expression -> Expression GREATER Expression .) ]
+  ! LSQUARE         [ reduce using rule 33 (Expression -> Expression GREATER Expression .) ]
   ! LPAREN          [ reduce using rule 33 (Expression -> Expression GREATER Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
   ! NEQUAL          [ shift and go to state 134 ]
   ! OOR             [ shift and go to state 135 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5105,7 +5105,6 @@ state 185
     CEQUAL          reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
     NEQUAL          reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
     OOR             reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
-    LSQUARE         reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
     RPAREN          reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
     RSQUARE         reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
     COMMA           reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .)
@@ -5123,6 +5122,7 @@ state 185
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDE          [ reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .) ]
@@ -5139,12 +5139,12 @@ state 185
   ! TIMES           [ reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 34 (Expression -> Expression GREATEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
   ! NEQUAL          [ shift and go to state 134 ]
   ! OOR             [ shift and go to state 135 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5180,7 +5180,6 @@ state 186
     CEQUAL          reduce using rule 35 (Expression -> Expression LESS Expression .)
     NEQUAL          reduce using rule 35 (Expression -> Expression LESS Expression .)
     OOR             reduce using rule 35 (Expression -> Expression LESS Expression .)
-    LSQUARE         reduce using rule 35 (Expression -> Expression LESS Expression .)
     RPAREN          reduce using rule 35 (Expression -> Expression LESS Expression .)
     RSQUARE         reduce using rule 35 (Expression -> Expression LESS Expression .)
     COMMA           reduce using rule 35 (Expression -> Expression LESS Expression .)
@@ -5198,6 +5197,7 @@ state 186
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDE          [ reduce using rule 35 (Expression -> Expression LESS Expression .) ]
@@ -5214,12 +5214,12 @@ state 186
   ! TIMES           [ reduce using rule 35 (Expression -> Expression LESS Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 35 (Expression -> Expression LESS Expression .) ]
   ! PERIOD          [ reduce using rule 35 (Expression -> Expression LESS Expression .) ]
+  ! LSQUARE         [ reduce using rule 35 (Expression -> Expression LESS Expression .) ]
   ! LPAREN          [ reduce using rule 35 (Expression -> Expression LESS Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
   ! NEQUAL          [ shift and go to state 134 ]
   ! OOR             [ shift and go to state 135 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5255,7 +5255,6 @@ state 187
     CEQUAL          reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
     NEQUAL          reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
     OOR             reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
-    LSQUARE         reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
     RPAREN          reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
     RSQUARE         reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
     COMMA           reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .)
@@ -5273,6 +5272,7 @@ state 187
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDE          [ reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .) ]
@@ -5289,12 +5289,12 @@ state 187
   ! TIMES           [ reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 36 (Expression -> Expression LESSEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
   ! NEQUAL          [ shift and go to state 134 ]
   ! OOR             [ shift and go to state 135 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5338,7 +5338,6 @@ state 188
     OOR             reduce using rule 37 (Expression -> Expression MINUS Expression .)
     PLUS            reduce using rule 37 (Expression -> Expression MINUS Expression .)
     TIMES           reduce using rule 37 (Expression -> Expression MINUS Expression .)
-    LSQUARE         reduce using rule 37 (Expression -> Expression MINUS Expression .)
     RPAREN          reduce using rule 37 (Expression -> Expression MINUS Expression .)
     RSQUARE         reduce using rule 37 (Expression -> Expression MINUS Expression .)
     COMMA           reduce using rule 37 (Expression -> Expression MINUS Expression .)
@@ -5348,6 +5347,7 @@ state 188
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 37 (Expression -> Expression MINUS Expression .) ]
@@ -5356,6 +5356,7 @@ state 188
   ! PLUSEQUAL       [ reduce using rule 37 (Expression -> Expression MINUS Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 37 (Expression -> Expression MINUS Expression .) ]
   ! PERIOD          [ reduce using rule 37 (Expression -> Expression MINUS Expression .) ]
+  ! LSQUARE         [ reduce using rule 37 (Expression -> Expression MINUS Expression .) ]
   ! LPAREN          [ reduce using rule 37 (Expression -> Expression MINUS Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -5369,7 +5370,6 @@ state 188
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5413,7 +5413,6 @@ state 189
     OOR             reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
     PLUS            reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
     TIMES           reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
-    LSQUARE         reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
     RPAREN          reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
     RSQUARE         reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
     COMMA           reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .)
@@ -5423,6 +5422,7 @@ state 189
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .) ]
@@ -5431,6 +5431,7 @@ state 189
   ! PLUSEQUAL       [ reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 38 (Expression -> Expression MINUSEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -5444,7 +5445,6 @@ state 189
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5478,7 +5478,6 @@ state 190
     SEMICOLON       reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
     AAND            reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
     OOR             reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
-    LSQUARE         reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
     RPAREN          reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
     RSQUARE         reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
     COMMA           reduce using rule 39 (Expression -> Expression NEQUAL Expression .)
@@ -5498,6 +5497,7 @@ state 190
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! CEQUAL          [ reduce using rule 39 (Expression -> Expression NEQUAL Expression .) ]
@@ -5516,10 +5516,10 @@ state 190
   ! TIMES           [ reduce using rule 39 (Expression -> Expression NEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 39 (Expression -> Expression NEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 39 (Expression -> Expression NEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 39 (Expression -> Expression NEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 39 (Expression -> Expression NEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! OOR             [ shift and go to state 135 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5551,7 +5551,6 @@ state 191
     (1) Arguments -> . LPAREN MaybeArgumentList RPAREN
 
     SEMICOLON       reduce using rule 40 (Expression -> Expression OOR Expression .)
-    LSQUARE         reduce using rule 40 (Expression -> Expression OOR Expression .)
     RPAREN          reduce using rule 40 (Expression -> Expression OOR Expression .)
     RSQUARE         reduce using rule 40 (Expression -> Expression OOR Expression .)
     COMMA           reduce using rule 40 (Expression -> Expression OOR Expression .)
@@ -5573,6 +5572,7 @@ state 191
     TIMES           shift and go to state 138
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! AAND            [ reduce using rule 40 (Expression -> Expression OOR Expression .) ]
@@ -5593,8 +5593,8 @@ state 191
   ! TIMES           [ reduce using rule 40 (Expression -> Expression OOR Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 40 (Expression -> Expression OOR Expression .) ]
   ! PERIOD          [ reduce using rule 40 (Expression -> Expression OOR Expression .) ]
+  ! LSQUARE         [ reduce using rule 40 (Expression -> Expression OOR Expression .) ]
   ! LPAREN          [ reduce using rule 40 (Expression -> Expression OOR Expression .) ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5638,7 +5638,6 @@ state 192
     OOR             reduce using rule 41 (Expression -> Expression PLUS Expression .)
     PLUS            reduce using rule 41 (Expression -> Expression PLUS Expression .)
     TIMES           reduce using rule 41 (Expression -> Expression PLUS Expression .)
-    LSQUARE         reduce using rule 41 (Expression -> Expression PLUS Expression .)
     RPAREN          reduce using rule 41 (Expression -> Expression PLUS Expression .)
     RSQUARE         reduce using rule 41 (Expression -> Expression PLUS Expression .)
     COMMA           reduce using rule 41 (Expression -> Expression PLUS Expression .)
@@ -5648,6 +5647,7 @@ state 192
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 41 (Expression -> Expression PLUS Expression .) ]
@@ -5656,6 +5656,7 @@ state 192
   ! PLUSEQUAL       [ reduce using rule 41 (Expression -> Expression PLUS Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 41 (Expression -> Expression PLUS Expression .) ]
   ! PERIOD          [ reduce using rule 41 (Expression -> Expression PLUS Expression .) ]
+  ! LSQUARE         [ reduce using rule 41 (Expression -> Expression PLUS Expression .) ]
   ! LPAREN          [ reduce using rule 41 (Expression -> Expression PLUS Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -5669,7 +5670,6 @@ state 192
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5713,7 +5713,6 @@ state 193
     OOR             reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
     PLUS            reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
     TIMES           reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
-    LSQUARE         reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
     RPAREN          reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
     RSQUARE         reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
     COMMA           reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .)
@@ -5723,6 +5722,7 @@ state 193
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .) ]
@@ -5731,6 +5731,7 @@ state 193
   ! PLUSEQUAL       [ reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 42 (Expression -> Expression PLUSEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -5744,7 +5745,6 @@ state 193
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5786,7 +5786,6 @@ state 194
     NEQUAL          reduce using rule 43 (Expression -> Expression TIMES Expression .)
     OOR             reduce using rule 43 (Expression -> Expression TIMES Expression .)
     TIMES           reduce using rule 43 (Expression -> Expression TIMES Expression .)
-    LSQUARE         reduce using rule 43 (Expression -> Expression TIMES Expression .)
     RPAREN          reduce using rule 43 (Expression -> Expression TIMES Expression .)
     RSQUARE         reduce using rule 43 (Expression -> Expression TIMES Expression .)
     COMMA           reduce using rule 43 (Expression -> Expression TIMES Expression .)
@@ -5798,6 +5797,7 @@ state 194
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 43 (Expression -> Expression TIMES Expression .) ]
@@ -5808,6 +5808,7 @@ state 194
   ! PLUSEQUAL       [ reduce using rule 43 (Expression -> Expression TIMES Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 43 (Expression -> Expression TIMES Expression .) ]
   ! PERIOD          [ reduce using rule 43 (Expression -> Expression TIMES Expression .) ]
+  ! LSQUARE         [ reduce using rule 43 (Expression -> Expression TIMES Expression .) ]
   ! LPAREN          [ reduce using rule 43 (Expression -> Expression TIMES Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -5819,7 +5820,6 @@ state 194
   ! NEQUAL          [ shift and go to state 134 ]
   ! OOR             [ shift and go to state 135 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122
@@ -5863,7 +5863,6 @@ state 195
     OOR             reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
     PLUS            reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
     TIMES           reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
-    LSQUARE         reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
     RPAREN          reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
     RSQUARE         reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
     COMMA           reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .)
@@ -5873,6 +5872,7 @@ state 195
     PLUSEQUAL       shift and go to state 137
     TIMESEQUAL      shift and go to state 139
     PERIOD          shift and go to state 140
+    LSQUARE         shift and go to state 141
     LPAREN          shift and go to state 142
 
   ! DIVIDEEQUAL     [ reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .) ]
@@ -5881,6 +5881,7 @@ state 195
   ! PLUSEQUAL       [ reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .) ]
   ! TIMESEQUAL      [ reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .) ]
   ! PERIOD          [ reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .) ]
+  ! LSQUARE         [ reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .) ]
   ! LPAREN          [ reduce using rule 44 (Expression -> Expression TIMESEQUAL Expression .) ]
   ! AAND            [ shift and go to state 123 ]
   ! CEQUAL          [ shift and go to state 124 ]
@@ -5894,7 +5895,6 @@ state 195
   ! OOR             [ shift and go to state 135 ]
   ! PLUS            [ shift and go to state 136 ]
   ! TIMES           [ shift and go to state 138 ]
-  ! LSQUARE         [ shift and go to state 141 ]
 
     Index                          shift and go to state 121
     Arguments                      shift and go to state 122

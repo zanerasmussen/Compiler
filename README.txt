@@ -76,3 +76,30 @@ things to check for in semantics:
 
 check when initialized
 check for new on left side
+
+
+
+
+
+
+
+remove 'abstract method' that will allow me to delete 'pass' definitions
+
+
+
+desguaring
+    write all visitor i believe i will need
+    go from bottom to top (suggestion) inside to outside, smallest to largest
+    fallthourgh for swithc statments (no case found)
+    comment on new design submition
+
+
+calander for peter (20-40 hours) and with a check in points with professor. check in. 
+
+talk with academic advisor about summer class/graduation
+
+
+Need to add error messages to parser. 
+Check to make sure 'return' is found in method
+ cin >> 1
+ cin << (1+3)

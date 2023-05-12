@@ -6200,8 +6200,12 @@ class Test_TypeChecking(unittest.TestCase):
                 public int a;
                 public bool b = true;
 
-                public int c(){}
-                private char d(){}
+                public int c(){
+                    return 1;
+                }
+                private char d(){
+                    return 'a';
+                }
 
                 MyClass(){}
             }
@@ -6232,9 +6236,11 @@ class Test_TypeChecking(unittest.TestCase):
             public int c(){
                 if (b == false) true; else false;
                 if (true == false) true; else false;
+                return 1;
             }
             private char d(){
                 a = a + 1;
+                return 'a';
             }
 
             MyClass(int g){
@@ -6280,74 +6286,6 @@ class Test_TypeChecking(unittest.TestCase):
             cout << beef_more;
 
             array[0];
-            }
-            """
-            theLexer.theLexerReturnFucntion(data)
-            myAST = theParser.Parse(data)
-            symbolTable = SymbolTableVisitor()
-            myAST.accept(symbolTable)
-            self.assertEqual(len(symbolTable.errors), 0)
-            undeclaredVariableVistior = UndeclaredVisitor()
-            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
-            myAST.accept(undeclaredVariableVistior)
-            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
-            typeCheck = TypeChecking()
-            typeCheck.paramList = symbolTable.paramList
-            typeCheck.symbol_tables = symbolTable.symbol_tables
-            myAST.accept(typeCheck)
-            self.assertEqual(len(typeCheck.errors), 0)
-
-    def test_big8(self):
-            data = """
-            void kxi2023 main (){
-                //Statements
-
-                // { Statement *}
-                { 
-                    break ; 
-                    return; 
-                }
-
-                //if ( 〈Expression〉 ) 〈Statement〉 (else 〈Statement〉)?
-                bool a;
-                int x;
-                int z;
-                if (a == true) {
-                    true;
-                } else {
-                    false;
-                }
-                if (true) x = 10;
-
-                //while ( 〈Expression〉 ) 〈Statement〉
-                while( x != z ){
-                    z += 1;
-                    x = z;
-                }
-
-                //return 〈Expression〉?;
-                return true;
-                return;
-
-                //cout 
-                cout << false;
-                //cin
-                cin >> x;
-
-                //switch and break
-                char myVar;
-                switch (myVar){
-                    case 'a':
-                    myVar = 'b';
-                    case 'c':
-                    myVar = 'b';
-                    default :
-                    break;
-                }
-
-                //VariableDeclaration been done already
-
-
             }
             """
             theLexer.theLexerReturnFucntion(data)
@@ -6655,7 +6593,7 @@ class Test_TypeChecking(unittest.TestCase):
         typeCheck.paramList = symbolTable.paramList
         typeCheck.symbol_tables = symbolTable.symbol_tables
         myAST.accept(typeCheck)
-        self.assertEqual(len(typeCheck.errors), 23)
+        self.assertEqual(len(typeCheck.errors), 24)
 
     def test_string_variableDeclaration_Main(self):
         data = """
@@ -6774,11 +6712,13 @@ class Test_TypeChecking(unittest.TestCase):
 
             class OtherClass{
                 OtherClass(){}
-                public string[] otherSt1(){
-                    return "string";
+                public string[]otherSt1(){
+                    string[] ssss = new string[2];
+                    return ssss;
                 }
                 public OtherClass otherother(){
-                    return 1;
+                    OtherClass ccc = new OtherClass();
+                    return ccc;
                 }
             }
 
@@ -6859,6 +6799,1863 @@ class Test_TypeChecking(unittest.TestCase):
             typeCheck.symbol_tables = symbolTable.symbol_tables
             myAST.accept(typeCheck)
             self.assertEqual(len(typeCheck.errors), 24)
+
+    def test_parameters(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public void myMethod(int int1, char[] charArray, bool b){}
+                public bool[] myBool;
+  
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc){}
+                public string sss = "this is a string";
+            }
+
+
+            void kxi2023 main (){
+                int x;
+                OtherClass other = new OtherClass(x, x, x, x, x);
+                OtherClass other1 = new OtherClass(); //5 errors
+
+                MyClass mine = new MyClass();
+                bool[] b;
+                string s = "this is a string";
+                char c = 'c';
+                OtherClass good = new OtherClass(mine, x, b, s, c);
+                OtherClass good1 = new OtherClass(mine, x, mine.myBool, good.sss, c);
+                OtherClass bad = new OtherClass(mine, x, b, s, s); // 6 errors
+
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 6)
+
+    def test_if_statements(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public bool[] myBool;
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                }
+
+                public bool bb;
+  
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                    if (b_array) cout << str; //error 1
+                }
+            }
+
+
+            void kxi2023 main (){
+                int x;
+                MyClass mine = new MyClass();
+                if (mine.myBool) false; //error 2
+                if (mine.boolMethod(x)) false;
+                if (mine.boolMethod()) false; //error 3
+                if (mine.bb) true;
+                if (mine.returnMyClass().bb) true;
+                if (mine.returnMyClass().myBool) true; //error 4
+                if ('a') true; //error 5
+                if (3 +3) cout << "done"; //error 6
+                if (true) true;
+                if (false) false;
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 6)
+
+    def test_while_statements(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public bool[] myBool;
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+
+                public bool bb;
+  
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+            }
+
+
+            void kxi2023 main (){
+                int x = 3;
+                MyClass mine = new MyClass();
+
+                while (x == 1) cout << "test1";
+                while (x == 'a') cout << "test2";       //error 1 and 2
+                while (x != 3) cout << "test3";      
+                while (x < 'a') cout << "test4";      //error3 
+                while (x < 1) cout << "test5";
+                while (x <= 1) cout << "test6";
+                while (x > 1) cout << "test7";
+                while (x >= 1) cout << "test8";
+                while (x >= 'a') cout << "test9";       //error 4
+                while( x && true) cout << "test10";     //error 5 and 6
+                while(x || false) cout << "test 11";    //error 7
+                while(mine.myBool || false) cout << "test 12";  //error 8
+                while(mine.boolMethod(x) || false) cout << "test 13";  
+                while(mine.bb || false) cout << "test 14";  
+                while(mine.returnMyClass().bb || false) cout << "test 15";  
+                while(mine.returnMyClass() || false) cout << "test 16";  //error 9
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 11)
+
+    def test_bool_comparisons(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public bool[] myBool;
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                }
+
+                public bool bb;
+  
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+            }
+
+
+            void kxi2023 main (){
+                true == true;
+                true == false;
+                false == false;
+                false == true;
+                
+                true != true;
+                true != false;
+                false != false;
+                false != true;
+                
+                true && true;
+                true && false;
+                false && false;
+                false && true;
+                
+                true && true;
+                true && false;
+                false && false;
+                false && true;
+                
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 0)
+
+    def test_return_type(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                    return 1;           //error 1
+                    return 'a';         //errror 2
+                    return true;        //error 3
+                    return "string";    //error 4
+
+                    int int1;
+                    int[] int2 = new int[3];
+                    char char1;
+                    char[] char2 = new char[3];
+                    bool bool1;
+                    bool[] bool2 = new bool[3];
+                    string str1;
+                    string[] str2 = new string[3];
+
+                    return int1;        //error 5
+                    return int2;         //error 6   
+                    return char1;       //error 7
+                    return char2;       //error 8
+                    return bool1;       //error 9
+                    return bool2;       //error 10
+                    return str1;        //error 11
+                    return str2;           //error 12 
+
+                }
+  
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+                public void Voooid(){           //error 13- 27
+                    MyClass nnn = new MyClass();
+                    return nnn;         //error
+                    return 1;           //error 1
+                    return 'a';         //errror 2
+                    return true;        //error 3
+                    return false;        //error 
+                    return "string";    //error 4
+
+                    int int1;
+                    int[] int2 = new int[3];
+                    char char1;
+                    char[] char2 = new char[3];
+                    bool bool1;
+                    bool[] bool2 = new bool[3];
+                    string str1;
+                    string[] str2 = new string[3];
+
+                    return int1;        //error 5
+                    return int2;         //error 6   
+                    return char1;       //error 7
+                    return char2;       //error 8
+                    return bool1;       //error 9
+                    return bool2;       //error 10
+                    return str1;        //error 11
+                    return str2;           //error 12 
+                }
+            }
+
+            class Working{
+                Working(){}
+
+                private int i3;
+                private int[] i5;
+                private char c3;
+                private char[] c5;
+                private bool b3;
+                private bool[] b5;
+                private string s3;
+                private string[] s5;
+                private MyClass m3;
+                private MyClass[] m5;
+
+                public void Vooid(){
+                    return;
+                }
+                public void Vooid2(){
+                    int x = 1;
+                }
+                public int I1(){
+                    return 1;
+                }
+                public int I2(){
+                    int iii = 1;
+                    return iii;
+                }
+                public int I3(){
+                    return i3;
+                }
+                private int[] I444(){
+                    int[] iii = new int[4];
+                    return iii;
+                }
+                public int[] I5(){
+                    return i5;
+                }
+
+                
+                public char C1(){
+                    return 'a';
+                }
+                public char C2(){
+                    char ccc = 'a';
+                    return ccc;
+                }
+                public char C3(){
+                    return c3;
+                }
+                private char[] C444(){
+                    char[] ccc = new char[4];
+                    return ccc;
+                }
+                public char[] C5(){
+                    return c5;
+                }
+                
+
+                public bool B1(){
+                    return true;
+                }
+                public bool B11(){
+                    return false;
+                }
+                public bool B2(){
+                    bool bbb = true;
+                    return bbb;
+                }
+                public bool B3(){
+                    return b3;
+                }
+                private bool[] B444(){
+                    bool[] bbb = new bool[4];
+                    return bbb;
+                }
+                public bool[] B5(){
+                    return b5;
+                }
+
+                
+                public string S1(){
+                    return "a";
+                }
+                public string S2(){
+                    string sss = "aaaa";
+                    return sss;
+                }
+                public string S3(){
+                    return s3;
+                }
+                private string[] s444(){
+                    string[] sss = new string[4];
+                    return sss;
+                }
+                public string[] S5(){
+                    return s5;
+                }
+                
+
+                public MyClass M2(){
+                    MyClass mmm = new MyClass();
+                    return mmm;
+                }
+                public MyClass M3(){
+                    return m3;
+                }
+                private MyClass[] M444(){
+                    MyClass[] mmm = new MyClass[4];
+                    return mmm;
+                }
+                public MyClass[] M5(){
+                    return m5;
+                }
+                
+            }
+
+
+            void kxi2023 main (){
+                
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 26)
+
+    def test_cout_statement(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    cout << nnn;                    //error 1
+                    return nnn;
+                }
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+                public void Voooid(){          
+                    cout << 1;
+                    cout << (1+2);
+                    int a;
+                    int b;
+                    cout << (a+b);
+                    return;
+                }
+            }
+
+            void kxi2023 main (){
+                cout << true;       //error 2
+                cout << false;      //error 3
+
+                bool b;
+                cout << b;          //error 4
+
+                cout << 'a';
+                char cc;
+                cout << cc;
+
+                char[] carray = new char[3];
+                cout << carray;    //error 5
+                cout << carray[4];
+                
+                int[] iarray = new int[5];
+                cout << iarray;     //error 6
+                cout << iarray[3];
+
+                cout << "this is string";
+                string ss = "sssss";
+                cout << ss;
+
+                string[] sarray = new string[4];
+                cout << sarray;            //error 7
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 7)
+
+    def test_cin_statement(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                private int iii;
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    cin >> nnn;                    //error 1
+                    cin >> iii;
+                    return nnn;
+                }
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+                public void Voooid(){          
+                    cin >> 1;       
+                    cin >> (1+2);   
+                    int a;
+                    int b;
+                    cin >> (a+b);   
+                    cin >> a;
+                    cin >> b;
+                    return;
+                }
+            }
+
+            void kxi2023 main (){
+                cin >> 'a';
+                char cc;
+                cin >> cc;
+
+                char[] carray = new char[3];
+                cin >> carray;
+                cin >> carray[4];   //error 2
+
+                int[] iarray = new int[5];
+                cin >> iarray;      //error 3
+                cin >> iarray[3];
+
+                cin >> "this is string";        //error 4
+                string ss = "sssss";
+                cin >> ss;     //error 5
+
+                string[] sarray = new string[4];
+                cin >> sarray;      //error 6
+                cin >> sarray[2];       //error 7
+
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 7)
+
+    def test_switch(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+                public void Voooid(){          
+                    return;
+                }
+            }
+
+            void kxi2023 main (){ 
+                int a;
+                switch (a) {
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 0:
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                int[] b;
+                switch (b) {        //error 1
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (b[1]) {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                char c;
+                switch (c) {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                char[] cc;
+                switch (cc) {        //error 2
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (cc[1]) {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                bool bb;
+                switch (bb) {        //error 3
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                bool[] bbb;
+                switch (bbb) {        //error 4
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (true) {        //error 5
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (false) {        //error 6
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (null) {        //error 7
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                string sss;
+                switch (sss) {        //error 8
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                string[] ssss;
+                switch (ssss) {        //error 9
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (ssss[1]) {        //error 10
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch ('a') {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (1) {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                MyClass mm = new MyClass();
+                switch (mm.iii) {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+                switch (mm.returnMyClass().iii) {        
+                    case 1:
+                        cout << '-';
+                        break;
+                    case 'a':
+                        cout << '.';
+                    case 3:
+                        cout << ',';
+                        break;
+                    default:
+                        cout << '+';
+                }
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 10)
+
+    def test_ExEqualEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+                public void Voooid(){         
+                    return;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int[] iarray = null;
+                char[] carray = null;
+                bool[] barray = null;
+                string[] sarray = null;
+
+                null = m;       //error 1
+                m.returnMyClass() = null;
+                m.returnMyClass().iii = null;       //error 2 ,3
+                1 = 3;
+                int i1;
+                int i2;
+                i1 = 1;
+                1 = i1;
+                i1 = i2;
+
+                iarray = i1;        //error 4
+                iarray[2] = i2;
+                i2 = iarray[3];     
+                iarray[3] = m.returnMyClass().iii;
+                i1 = 'a';           //error 5
+                i1 = true;          //error 6
+                i1 = false;         //error 7
+                bool boo;
+                i1 = boo;           //error 8
+                i1 = "string";      //error 9
+                string str;     
+                char cc;
+                i1 = str;           //error 10
+                i1 = cc;            //error 11
+
+                'a' = 'b';
+                cc = 'a';
+                'a' = cc;
+                carray = cc;       //error 12
+                cc = carray;        //error 13
+                cc = carray[1];
+                carray[2] = cc;
+                cc = null;      //error 14 15
+                cc = 1;         //15
+                cc = i1;        //16
+                cc = iarray;        //17
+                cc = true;  //18    
+                cc = false; //19
+                cc = boo;   //20
+                cc = "string";  //21
+                cc = str;       //22
+                cc = m;     //23
+                i1 = m;     //25
+
+                "string" = "string";
+                "string" = str;
+                str = "string";
+                str = sarray;   //26
+                sarray = str;   //27
+                sarray[1] = str;
+                str = sarray[3];
+                str = null;     //28 29
+                str = 1;    //30
+                str = i1;   //31
+                str = iarray;   //32
+                str = 'a';      //33
+                str = cc;       //34
+                str = true;     //35
+                str = false;        //36
+                str = boo;      //37
+                str = m;        //38
+
+                true = false;   //39
+                false = false;  //40
+                true = true;    //41
+                false = false;  //42
+                true = boo;     //43
+                boo = true;
+                false = boo;    //44
+                boo = false;
+                boo = barray;       //39
+                barray = boo;       //40
+                barray[1] = boo;
+                boo = barray[1];
+                true = barray[1];   //45
+                barray[1] = true;
+                false = barray[1];  //46
+                barray[1] = false;
+                barray = false;     //41
+                false = barray;        //42
+                barray = true;      //43
+                true = barray;      //44
+
+
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 52)
+
+    def test_ExPlusEqualEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 += null; //1
+                i1 += 1;
+                1 += i1;
+                i1 += i1;
+                i1 += m.returnMyClass().iii;
+                i1 += m.iii;
+                m.returnMyClass().iii += i1;
+                m.iii += m.returnMyClass().iii;
+
+                i1 += iarray;   //2
+                iarray += i1;   //3
+                i1 += iarray[1];
+                iarray[1] += i1;
+                i1 += 'c';  //4
+                i1 += c1;   //5
+                'c' += i1;  //6
+                c1 += i1;   //7
+                true += i1; //8
+                i1 += true; //9
+                false += i1;    //10
+                i1 += false;    //11
+                i1 += b1;       //12
+                b1 += i1;       //13
+                i1 += s1;       //14
+                s1 += i1;       //15
+                m += i1;        //16
+                i1 += m;        //17
+
+                null += null;       //18
+                iarray += iarray;       //19
+                null += i1;         //20
+                iarray[1] += iarray[45];
+                'c' += 'c';     //21
+                c1 += c1;       //22
+                'c' += c1;      //23
+                c1 += 'c';      //24
+
+                true += true;   //25
+                false += false; //26
+                true += false;  //27
+                false += false; //28
+                b1 += b1;       //29
+                b1 += true;     //30
+                b1 += false;       // 31
+                true += b1;     //32
+                false += b1;        //33
+                b1 += barray;       //34
+                b1 += barray[1];      //35
+                barray[1] += b1;        //36
+                s1 += s1;       //37
+                "string" += s1;     //38
+                s1 += "sss";        //39
+                m += m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+    
+    def test_ExMinusEqualEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 -= null; //1
+                i1 -= 1;
+                1 -= i1;
+                i1 -= i1;
+                i1 -= m.returnMyClass().iii;
+                i1 -= m.iii;
+                m.returnMyClass().iii -= i1;
+                m.iii -= m.returnMyClass().iii;
+
+                i1 -= iarray;   //2
+                iarray -= i1;   //3
+                i1 -= iarray[1];
+                iarray[1] -= i1;
+                i1 -= 'c';  //4
+                i1 -= c1;   //5
+                'c' -= i1;  //6
+                c1 -= i1;   //7
+                true -= i1; //8
+                i1 -= true; //9
+                false -= i1;    //10
+                i1 -= false;    //11
+                i1 -= b1;       //12
+                b1 -= i1;       //13
+                i1 -= s1;       //14
+                s1 -= i1;       //15
+                m -= i1;        //16
+                i1 -= m;        //17
+
+                null -= null;       //18
+                iarray -= iarray;       //19
+                null -= i1;         //20
+                iarray[1] -= iarray[45];
+                'c' -= 'c';     //21
+                c1 -=c1;       //22
+                'c'-= c1;      //23
+                c1 -= 'c';      //24
+
+                true -= true;   //25
+                false -= false; //26
+                true -= false;  //27
+                false -= false; //28
+                b1 -= b1;       //29
+                b1 -= true;     //30
+                b1 -= false;       // 31
+                true -= b1;     //32
+                false -= b1;        //33
+                b1 -= barray;       //34
+                b1 -= barray[1];      //35
+                barray[1] -= b1;        //36
+                s1 -= s1;       //37
+                "string" -= s1;     //38
+                s1 -= "sss";        //39
+                m -= m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExDivideEqualEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 /= null; //1
+                i1 /= 1;
+                1 /= i1;
+                i1 /= i1;
+                i1 /= m.returnMyClass().iii;
+                i1 /= m.iii;
+                m.returnMyClass().iii /= i1;
+                m.iii /= m.returnMyClass().iii;
+
+                i1 /= iarray;   //2
+                iarray /= i1;   //3
+                i1 /= iarray[1];
+                iarray[1] /= i1;
+                i1 /= 'c';  //4
+                i1 /= c1;   //5
+                'c' /= i1;  //6
+                c1 /= i1;   //7
+                true /= i1; //8
+                i1 /= true; //9
+                false /= i1;    //10
+                i1 /= false;    //11
+                i1 /= b1;       //12
+                b1 /= i1;       //13
+                i1 /= s1;       //14
+                s1 /= i1;       //15
+                m /= i1;        //16
+                i1 /= m;        //17
+
+                null /= null;       //18
+                iarray /= iarray;       //19
+                null /= i1;         //20
+                iarray[1] /= iarray[45];
+                'c' /= 'c';     //21
+                c1 /=c1;       //22
+                'c' /= c1;      //23
+                c1 /= 'c';      //24
+
+                true /= true;   //25
+                false /= false; //26
+                true /= false;  //27
+                false /= false; //28
+                b1 /= b1;       //29
+                b1 /= true;     //30
+                b1 /= false;       // 31
+                true /= b1;     //32
+                false /= b1;        //33
+                b1 /= barray;       //34
+                b1 /= barray[1];      //35
+                barray[1] /= b1;        //36
+                s1 /= s1;       //37
+                "string" /= s1;     //38
+                s1 /= "sss";        //39
+                m /= m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExMultiplyEqualEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 *= null; //1
+                i1 *= 1;
+                1 *= i1;
+                i1 *= i1;
+                i1 *= m.returnMyClass().iii;
+                i1 *= m.iii;
+                m.returnMyClass().iii *= i1;
+                m.iii *= m.returnMyClass().iii;
+
+                i1 *= iarray;   //2
+                iarray *= i1;   //3
+                i1 *= iarray[1];
+                iarray[1] *= i1;
+                i1 *= 'c';  //4
+                i1 *= c1;   //5
+                'c' *= i1;  //6
+                c1 *= i1;   //7
+                true *=i1; //8
+                i1 *= true; //9
+                false *= i1;    //10
+                i1 *= false;    //11
+                i1 *= b1;       //12
+                b1 *= i1;       //13
+                i1 *= s1;       //14
+                s1 *= i1;       //15
+                m *= i1;        //16
+                i1 *= m;        //17
+
+                null *= null;       //18
+                iarray *= iarray;       //19
+                null *= i1;         //20
+                iarray[1] *= iarray[45];
+                'c' *= 'c';     //21
+                c1 *=c1;       //22
+                'c' *= c1;      //23
+                c1 *= 'c';      //24
+
+                true *= true;   //25
+                false *= false; //26
+                true *= false;  //27
+                false *= false; //28
+                b1 *= b1;       //29
+                b1 *= true;     //30
+                b1 *= false;       // 31
+                true *= b1;     //32
+                false *= b1;        //33
+                b1 *= barray;       //34
+                b1 *= barray[1];      //35
+                barray[1] *= b1;        //36
+                s1 *= s1;       //37
+                "string" *= s1;     //38
+                s1 *= "sss";        //39
+                m *= m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExPlusEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 + null; //1
+                i1 + 1;
+                1 + i1;
+                i1 + i1;
+                i1 + m.returnMyClass().iii;
+                i1 + m.iii;
+                m.returnMyClass().iii + i1;
+                m.iii + m.returnMyClass().iii;
+
+                i1 + iarray;   //2
+                iarray + i1;   //3
+                i1 + iarray[1];
+                iarray[1] + i1;
+                i1 + 'c';  //4
+                i1 + c1;   //5
+                'c' + i1;  //6
+                c1 + i1;   //7
+                true +i1; //8
+                i1 + true; //9
+                false + i1;    //10
+                i1 + false;    //11
+                i1 + b1;       //12
+                b1 + i1;       //13
+                i1 + s1;       //14
+                s1 + i1;       //15
+                m + i1;        //16
+                i1 + m;        //17
+
+                null + null;       //18
+                iarray + iarray;       //19
+                null + i1;         //20
+                iarray[1] + iarray[45];
+                'c' + 'c';     //21
+                c1 +c1;       //22
+                'c' + c1;      //23
+                c1 + 'c';      //24
+
+                true + true;   //25
+                false + false; //26
+                true + false;  //27
+                false + false; //28
+                b1 + b1;       //29
+                b1 + true;     //30
+                b1 + false;       // 31
+                true + b1;     //32
+                false + b1;        //33
+                b1 + barray;       //34
+                b1 + barray[1];      //35
+                barray[1] + b1;        //36
+                s1 + s1;       //37
+                "string" +s1;     //38
+                s1 + "sss";        //39
+                m + m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExMinusEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 - null; //1
+                i1 - 1;
+                1 - i1;
+                i1 - i1;
+                i1 - m.returnMyClass().iii;
+                i1 - m.iii;
+                m.returnMyClass().iii - i1;
+                m.iii - m.returnMyClass().iii;
+
+                i1 - iarray;   //2
+                iarray - i1;   //3
+                i1 - iarray[1];
+                iarray[1] - i1;
+                i1 - 'c';  //4
+                i1 - c1;   //5
+                'c' - i1;  //6
+                c1 - i1;   //7
+                true -i1; //8
+                i1 - true; //9
+                false - i1;    //10
+                i1 - false;    //11
+                i1 - b1;       //12
+                b1 - i1;       //13
+                i1 - s1;       //14
+                s1- i1;       //15
+                m - i1;        //16
+                i1 - m;        //17
+
+                null - null;       //18
+                iarray - iarray;       //19
+                null - i1;         //20
+                iarray[1] - iarray[45];
+                'c' - 'c';     //21
+                c1 -c1;       //22
+                'c' - c1;      //23
+                c1 - 'c';      //24
+
+                true - true;   //25
+                false - false; //26
+                true -false;  //27
+                false - false; //28
+                b1 - b1;       //29
+                b1 - true;     //30
+                b1 - false;       // 31
+                true - b1;     //32
+                false - b1;        //33
+                b1 - barray;       //34
+                b1 - barray[1];      //35
+                barray[1] - b1;        //36
+                s1 - s1;       //37
+                "string" - s1;     //38
+                s1 - "sss";        //39
+                m - m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExMultiplyEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 * null; //1
+                i1 * 1;
+                1 * i1;
+                i1 * i1;
+                i1 * m.returnMyClass().iii;
+                i1 * m.iii;
+                m.returnMyClass().iii * i1;
+                m.iii * m.returnMyClass().iii;
+
+                i1 * iarray;   //2
+                iarray * i1;   //3
+                i1 * iarray[1];
+                iarray[1] * i1;
+                i1 * 'c';  //4
+                i1 * c1;   //5
+                'c' * i1;  //6
+                c1 * i1;   //7
+                true *i1; //8
+                i1 * true; //9
+                false * i1;    //10
+                i1 * false;    //11
+                i1 * b1;       //12
+                b1 * i1;       //13
+                i1 * s1;       //14
+                s1 * i1;       //15
+                m * i1;        //16
+                i1 * m;        //17
+
+                null * null;       //18
+                iarray * iarray;       //19
+                null * i1;         //20
+                iarray[1] * iarray[45];
+                'c' * 'c';     //21
+                c1 *c1;       //22
+                'c' * c1;      //23
+                c1 * 'c';      //24
+
+                true * true;   //25
+                false * false; //26
+                true * false;  //27
+                false * false; //28
+                b1 * b1;       //29
+                b1 * true;     //30
+                b1 * false;       // 31
+                true * b1;     //32
+                false * b1;        //33
+                b1 * barray;       //34
+                b1 * barray[1];      //35
+                barray[1] * b1;        //36
+                s1 * s1;       //37
+                "string" * s1;     //38
+                s1 * "sss";        //39
+                m * m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExDivideEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+                public char ccc;
+                public int[] iarray;
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                int i1;
+                int[] iarray;
+                char c1;
+                bool b1;
+                string s1;
+                bool[] barray;
+
+                i1 / null; //1
+                i1 / 1;
+                1 / i1;
+                i1 / i1;
+                i1 / m.returnMyClass().iii;
+                i1 / m.iii;
+                m.returnMyClass().iii / i1;
+                m.iii / m.returnMyClass().iii;
+
+                i1 / iarray;   //2
+                iarray / i1;   //3
+                i1 / iarray[1];
+                iarray[1] / i1;
+                i1 / 'c';  //4
+                i1 / c1;   //5
+                'c' / i1;  //6
+                c1 / i1;   //7
+                true /i1; //8
+                i1 / true; //9
+                false / i1;    //10
+                i1 / false;    //11
+                i1 / b1;       //12
+                b1 / i1;       //13
+                i1 / s1;       //14
+                s1 / i1;       //15
+                m / i1;        //16
+                i1 / m;        //17
+
+                null / null;       //18
+                iarray / iarray;       //19
+                null / i1;         //20
+                iarray[1] / iarray[45];
+                'c' / 'c';     //21
+                c1/c1;       //22
+                'c' / c1;      //23
+                c1 / 'c';      //24
+
+                true / true;   //25
+                false / false; //26
+                true / false;  //27
+                false / false; //28
+                b1 / b1;       //29
+                b1 / true;     //30
+                b1 / false;       // 31
+                true / b1;     //32
+                false / b1;        //33
+                b1 / barray;       //34
+                b1 / barray[1];      //35
+                barray[1] / b1;        //36
+                s1 / s1;       //37
+                "string" / s1;     //38
+                s1 / "sss";        //39
+                m / m;     //40
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 40)
+
+    def test_ExCEqualEx2(self):
+            data = """
+            class MyClass {
+                MyClass(){}
+                public int iii;
+
+                public bool boolMethod(int ii){
+                    if (ii == 2) return true;
+                }
+
+                public MyClass returnMyClass(){
+                    MyClass nnn = new MyClass();
+                    return nnn;
+                }
+            }
+
+            class OtherClass{
+                OtherClass(MyClass mycl, int ii, bool[] b_array, string str, char cc, bool b){
+                    if (b) true;
+                }
+                public void Voooid(){         
+                    return;
+                }
+            }
+
+            void kxi2023 main (){
+                MyClass m = null;
+                OtherClass oc;
+                int[] iarray = null;
+                char[] carray = null;
+                bool[] barray = null;
+                string[] sarray = null;
+                char c1;
+                string s1;
+                bool b1;
+
+                null == m;       //error 1
+                m.returnMyClass() == null;  //2
+                m.returnMyClass().iii == null;       //3
+                1 == 3;
+                int i1;
+                int i2;
+                i1 == 1;
+                1 == i1;
+                i1 == i2;
+                m.returnMyClass().iii == i1;
+                m.returnMyClass().iii == 1;
+                m.returnMyClass().iii == 'a';   //4
+                1 == m.returnMyClass().iii;
+                iarray == 1;    //5
+                1 == iarray;    //6
+                i1 == iarray;   //7
+                iarray == i1;   //8
+                iarray[1] == 1;
+                1 == iarray[3];
+                i1 == iarray[2];
+                iarray[2] == i1;
+                i1 == c1;   //9
+                i1 == null; //10
+                null == 10;     //11
+                null == i1;
+                null == 'c';
+                null == c1;
+                null == true;
+                null == false;
+                null == b1; 
+                null == s1;
+                null == m;  //19
+                i1 == b1;
+                i1 == s1;
+                i1 == m;    //22
+
+                c1 == c1;
+                c1 == carray;
+                carray == c1;   //24
+                c1 == 'a';
+                'a' == c1;
+                carray[1] == c1;
+                carray[1] == 'a';
+                c1 == b1;
+                c1 == s1;
+                c1 == m;    //27
+
+                b1 == b1;
+                b1 == true;
+                b1 == false;
+                true == true;
+                false == false;
+                false == b1;
+                true == b1;
+                b1 == barray;
+                barray == b1; //28
+                barray[1] == true;
+                b1 == barray[2];
+                b1 == s1;
+                b1 == m;    //30
+
+                s1 == s1;
+                "string" == "string";
+                s1 == "string";
+                "string" == s1;
+                s1 == sarray[1];
+                sarray[1] == "a";
+                sarray == "hello";
+                "hh" == sarray; //32
+                s1 == m;
+
+                m == s1;
+                m == b1;
+                m == c1;
+                m == i1;        //37
+
+                m1 == null;
+                iarray == null;
+                barray == null;
+                sarray == null;
+                carray == null;
+
+                null == m1;
+                null == iarray;
+                null == barray;
+                null == sarray;
+                null == carray;
+
+
+            }
+            """
+            theLexer.theLexerReturnFucntion(data)
+            myAST = theParser.Parse(data)
+            symbolTable = SymbolTableVisitor()
+            myAST.accept(symbolTable)
+            self.assertEqual(len(symbolTable.errors), 0)
+            undeclaredVariableVistior = UndeclaredVisitor()
+            undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+            myAST.accept(undeclaredVariableVistior)
+            self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+            typeCheck = TypeChecking()
+            typeCheck.paramList = symbolTable.paramList
+            typeCheck.symbol_tables = symbolTable.symbol_tables
+            myAST.accept(typeCheck)
+            self.assertEqual(len(typeCheck.errors), 52)
+
 
 #new object calls constructor.  make sure class has constructor if calling new
 

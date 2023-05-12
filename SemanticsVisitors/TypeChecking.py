@@ -21,6 +21,8 @@ class TypeChecking(ASTVisitor):
         self.symbol_tables = []
         self.current_class = ""
         self.arguments = []
+        self.returnType = ""
+        self.returnFound = False
 
     def enter_scope(self):
         new_scope = self.UID.getID()
@@ -287,7 +289,7 @@ class TypeChecking(ASTVisitor):
             pass
                  
         elif isinstance(node, ASTStatementReturn):
-            pass
+            return self.get_type(node.MaybeExpression)
                  
         elif isinstance(node, ASTStatementSwitch):
             return self.get_type(node.Expression)
@@ -306,14 +308,12 @@ class TypeChecking(ASTVisitor):
             if tokType.type != 'ID' and tokType.type != 'char':
                 return(str(tokType.type).lower())
             else:
-                for x in (self.scope_stack):
+                for x in reversed(self.scope_stack):
                     for key, value in self.symbol_tables[x].items():
                         if key[0] == str(node.Terminal):
                             symbol = value['symbol']
                             return(str(symbol.Type))
 
-        else:
-            self.errors.append("didn't find expression")
 
 
 
@@ -386,14 +386,15 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
         expressionType = self.get_type(node.Expression)
         if isinstance(node.ArgOrIdx, ASTIndex):
-            idxType = self.get_type(node.ArgOrIdx)
-            if idxType != "int":
-                self.errors.append(f"Error: attempting to access an index and the index value is not an int.")
-            if len(expressionType) > 2:
-                if expressionType[-2:] != '[]':
+            if expressionType != None:
+                idxType = self.get_type(node.ArgOrIdx)
+                if idxType != "int":
+                    self.errors.append(f"Error: attempting to access an index and the index value is not an int.")
+                if len(expressionType) > 2:
+                    if expressionType[-2:] != '[]':
+                        self.errors.append(f"Error: attempting to get an index when variable is not an array.")
+                else:
                     self.errors.append(f"Error: attempting to get an index when variable is not an array.")
-            else:
-                self.errors.append(f"Error: attempting to get an index when variable is not an array.")
          
         else:
             if isinstance(node.Expression, ASTExpressionDotID):
@@ -518,7 +519,7 @@ class TypeChecking(ASTVisitor):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
         isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
+        if ((left_side == 'bool' or left_side == 'true' or left_side == 'bool') and (right_side == 'true' or right_side == 'false')) or ((right_side == 'bool' or right_side == 'true' or right_side == 'false') and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to '&&'' different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -530,7 +531,7 @@ class TypeChecking(ASTVisitor):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
         isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
+        if ((left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'true' or right_side == 'false')) or ((right_side == 'bool' or right_side == 'true' or right_side == 'false') and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -582,8 +583,10 @@ class TypeChecking(ASTVisitor):
             else:
                 if right_side == 'null':
                     isValid = True
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
+        if (left_side == 'bool' and (right_side == 'true' or right_side == 'false')) or (right_side == 'bool' and (left_side == 'true' or left_side == 'false')):
             isValid = True
+        if left_side == 'true' or left_side == 'false':
+            isValid = False
         if isValid == False:
             self.errors.append(f"Error: Attempting to assign different types. {left_side} and {right_side}. Around line {node.lineno}")
 
@@ -662,7 +665,7 @@ class TypeChecking(ASTVisitor):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2) 
         isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
+        if (left_side == 'bool' or left_side == 'true' or left_side=='false' and (right_side == 'true' or right_side == 'false')) or (right_side == 'bool' and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -674,7 +677,7 @@ class TypeChecking(ASTVisitor):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
         isValid = False
-        if (left_side == 'bool' and right_side == 'true' or right_side == 'false') or (right_side == 'bool' and left_side == 'true' or left_side == 'false'):
+        if (left_side == 'bool' and (right_side == 'true' or right_side == 'false')) or (right_side == 'bool' and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to '||' different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -773,9 +776,18 @@ class TypeChecking(ASTVisitor):
 
     def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
         self.enter_scope()
+        self.returnType = node.Type
+        if node.LRSquare != None:
+            self.returnType = str(node.Type) + '[]'
 
     def post_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
         self.exit_scope()
+        if self.returnType == 'void':
+            pass
+        else:
+            if self.returnFound == False:
+                self.errors.append(f"Error: Method doesn't have any return statements. Only 'void' can have no return statement")
+        self.returnType = ""
 
     def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
         pass
@@ -852,7 +864,7 @@ class TypeChecking(ASTVisitor):
 
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         messageType = self.get_type(node.Expression)
-        if messageType  != "int" and messageType !='char' and messageType != 'bool' and messageType != 'true'and messageType != 'false' and messageType != 'string':
+        if messageType  != "int" and messageType !='char' and messageType != 'string':
             self.errors.append(f"Error: Can not COUT {messageType}. Around line {node.lineno}")
 
     def pre_visit_StatementExpression(self, node: ASTStatementExpression):
@@ -893,7 +905,14 @@ class TypeChecking(ASTVisitor):
         pass
 
     def post_visit_StatementReturn(self, node: ASTStatementReturn):
-        pass
+        self.returnFound = True
+        type = self.get_type(node.MaybeExpression)
+        if type == None and self.returnType == 'void':
+            pass
+        elif type == self.returnType or (self.returnType == 'bool' and (type == 'true' or type == 'false')):
+            pass
+        else:
+            self.errors.append(f"Error: return type {type} doesn't match method return type {self.returnType}. Around line {node.lineno}")
 
     def pre_visit_StatementSwitch(self, node: ASTStatementSwitch):
         pass
@@ -909,7 +928,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
         ifType = self.get_type(node.Expression)
         if ifType != 'bool':
-            self.errors.append(f"Error: A bool is required after an if statement. {ifType} was given. Around line {node.lineno}")
+            self.errors.append(f"Error: A bool is required after a while statement. {ifType} was given. Around line {node.lineno}")
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         pass
