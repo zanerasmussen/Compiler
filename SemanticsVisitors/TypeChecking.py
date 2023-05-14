@@ -315,38 +315,9 @@ class TypeChecking(ASTVisitor):
                             return(str(symbol.Type))
 
 
-
-
-    def pre_visit_Argument(self, node: ASTArgument):
-        pass
-
-    def post_visit_Argument(self, node: ASTArgument):
-        pass
-
     def pre_visit_ArgumentList(self, node: ASTArgumentList):
         type = self.get_type(node.Expression)
         self.arguments.append(type)
-
-    def post_visit_ArgumentList(self, node: ASTArgumentList):
-        pass
-    
-    def pre_visit_ArgOrIdx(self, node: ASTArgOrIdx):
-        pass
-    
-    def post_visit_ArgOrIdx(self, node: ASTArgOrIdx):
-        pass
-
-    def pre_visit_Case(self, node: ASTCase):
-        pass
-
-    def post_visit_Case(self, node: ASTCase):
-        pass
-
-    def pre_visit_CaseBlock(self, node: ASTCaseBlock):
-        pass
-
-    def post_visit_CaseBlock(self, node: ASTCaseBlock):
-        pass
 
     def pre_visit_ClassDefinition(self, node: ASTClassDefinition):
         self.enter_scope()
@@ -356,32 +327,11 @@ class TypeChecking(ASTVisitor):
         self.exit_scope()
         self.current_class = ""
 
-    def pre_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
-        pass
-
-    def post_visit_ClassMemberDefinition(self, node: ASTClassMemberDefinition):
-        pass
-
     def pre_visit_CompilationUnit(self, node: ASTCompilationUnit):
         self.enter_scope()
 
     def post_visit_CompilationUnit(self, node: ASTCompilationUnit):
         self.exit_scope()
-
-    def pre_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        pass
-
-    def post_visit_ConstructorDeclaration(self, node: ASTConstructorDeclaration):
-        pass
-
-    def pre_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
-        pass
-
-    def post_visit_DataMemberDeclaration(self, node: ASTDataMemberDeclaration):
-        pass
-
-    def pre_visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
-        pass
 
     def post_visit_ExpressionArgIdx(self, node: ASTExpressionArgIdx):
         expressionType = self.get_type(node.Expression)
@@ -429,9 +379,6 @@ class TypeChecking(ASTVisitor):
             self.arguments = []
         #find what method is being called and check argument stack with parameters
 
-    def pre_visit_ExpressionDotID(self, node: ASTExpressionDotID):
-        pass
-
     def post_visit_ExpressionDotID(self, node: ASTExpressionDotID):
         isValid = False
         left_side = self.get_type(node.Expression)
@@ -450,16 +397,10 @@ class TypeChecking(ASTVisitor):
         if isValid == False:
             self.errors.append(f"Error: Invalid expression at line {node.lineno}. {left_side}.{node.ID} is not a valid method or dataMember")
 
-    def pre_visit_ExpressionMinus(self, node: ASTExpressionMinus):
-        pass
-
     def post_visit_ExpressionMinus(self, node: ASTExpressionMinus):
         right_side = self.get_type(node.Expression)
         if right_side != 'int':
             self.errors.append(f"Error: Attempting to '-' an invalid type. '{right_side}'. Need to be an 'int'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionNew(self, node: ASTExpressionNew):
-        pass
 
     def post_visit_ExpressionNew(self, node: ASTExpressionNew):
         type = self.get_type(node)
@@ -490,30 +431,15 @@ class TypeChecking(ASTVisitor):
                                         self.errors.append(f"Error: attempting to initialize an object of type '{type}'. Argument {x['paramTypes'][i]} was expected and {self.arguments[i]} was given. Around line {node.lineno}")
         self.arguments = []
 
-    def pre_visit_ExpressionNot(self, node: ASTExpressionNot):
-        pass
-
     def post_visit_ExpressionNot(self, node: ASTExpressionNot):
         left_side = self.get_type(node.Expression)
-        if left_side != 'bool':
+        if left_side != 'bool' and left_side != 'false' and left_side != 'true':
             self.errors.append(f"Error: Attempting to '!' an invalid type. '{left_side}' Needs to be an 'bool'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionPlus(self, node: ASTExpressionPlus):
-        pass
 
     def post_visit_ExpressionPlus(self, node: ASTExpressionPlus):
         right_side = self.get_type(node.Expression)
         if right_side != 'int':
             self.errors.append(f"Error: Attempting to '+' an invalid type. '{right_side}'. Need to be an 'int'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
-        pass
-    
-    def post_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
-        pass
-
-    def pre_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
-        pass
 
     def post_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
         left_side = self.get_type(node.Expression)
@@ -524,20 +450,26 @@ class TypeChecking(ASTVisitor):
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to '&&'' different types. {left_side} and {right_side}. Around line {node.lineno}")
 
-    def pre_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
-        pass
-
     def post_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
         isValid = False
+        if left_side == "null":
+            if len(right_side) >2:
+                if right_side[-2:] == '[]':
+                    isValid = True
+            if right_side!= 'int' and right_side != 'false' and right_side !='true' and right_side!= 'int[]' and right_side!= 'char' and right_side!= 'char[]' and right_side!= 'bool' and right_side!= 'bool[]' and right_side!= 'string' and right_side!= 'string[]':
+                isValid = True
+        if right_side == "null":
+            if len(left_side) > 2:
+                if left_side[-2:] == '[]':
+                    isValid = True
+            if left_side!= 'int' and left_side!= 'int[]' and left_side != 'true' and left_side != 'false' and left_side!= 'char' and left_side!= 'char[]' and left_side!= 'bool' and left_side!= 'bool[]' and left_side!= 'string' and left_side!= 'string[]':
+                isValid = True
         if ((left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'true' or right_side == 'false')) or ((right_side == 'bool' or right_side == 'true' or right_side == 'false') and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-
-    def pre_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
-        pass
 
     def post_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
         left_side = self.get_type(node.Expression)
@@ -548,9 +480,6 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '/' a variable of type {left_side} Only 'int' is able to be divided. Around line {node.lineno}")
 
-    def pre_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
-        pass
-
     def post_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
@@ -560,9 +489,6 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '/=' a variable of type {left_side} Only 'int' is able to be divided. Around line {node.lineno}")
 
-    def pre_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
-        pass
-
     def post_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
@@ -571,6 +497,9 @@ class TypeChecking(ASTVisitor):
             isValid = False
         else:
             isValid = True
+        if isinstance(node.Expression2, ASTExpressionNew):
+            if left_side == 'int' or left_side == 'char' or left_side == 'bool' or left_side == 'string':
+                isValid = False
         if len(left_side) > 2:
             if left_side[-2:] == '[]':
                 if right_side == 'null':
@@ -590,52 +519,45 @@ class TypeChecking(ASTVisitor):
         if isValid == False:
             self.errors.append(f"Error: Attempting to assign different types. {left_side} and {right_side}. Around line {node.lineno}")
 
-    def pre_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
-        pass
-
     def post_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
+            errorAdded = True
+        if left_side != 'int' and left_side != 'char' and errorAdded == False:
             self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
-        pass
 
     def post_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
+            errorAdded = True
+        if left_side != 'int' and left_side != 'char' and errorAdded == False:
             self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionELessE(self, node: ASTExpressionELessE):
-        pass
 
     def post_visit_ExpressionELessE(self, node: ASTExpressionELessE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
+            errorAdded = True
+        if left_side != 'int' and left_side != 'char' and errorAdded == False:
             self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
-        pass
 
     def post_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-        if left_side != 'int' and left_side != 'char':
+            errorAdded = True
+        if left_side != 'int' and left_side != 'char' and errorAdded == False:
             self.errors.append(f"Error: Attempting to compare an invalid type. '{left_side}' Needs to be an 'int' or 'char'. Around line {node.lineno}")
-
-    def pre_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
-        pass
 
     def post_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
         left_side = self.get_type(node.Expression)
@@ -646,9 +568,6 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '-' a variable of type {left_side} Only 'int' is able to be subtracted. Around line {node.lineno}")
 
-    def pre_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
-        pass
-
     def post_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
@@ -658,32 +577,35 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '-=' a variable of type {left_side} Only 'int' is able to be subtracted. Around line {node.lineno}")
 
-    def pre_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
-        pass
-
     def post_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
         left_side = self.get_type(node.Expression)
-        right_side = self.get_type(node.Expression2) 
+        right_side = self.get_type(node.Expression2)
         isValid = False
-        if (left_side == 'bool' or left_side == 'true' or left_side=='false' and (right_side == 'true' or right_side == 'false')) or (right_side == 'bool' and (left_side == 'true' or left_side == 'false')):
+        if left_side == "null":
+            if len(right_side) >2:
+                if right_side[-2:] == '[]':
+                    isValid = True
+            if right_side!= 'int' and right_side != 'false' and right_side !='true' and right_side!= 'int[]' and right_side!= 'char' and right_side!= 'char[]' and right_side!= 'bool' and right_side!= 'bool[]' and right_side!= 'string' and right_side!= 'string[]':
+                isValid = True
+        if right_side == "null":
+            if len(left_side) > 2:
+                if left_side[-2:] == '[]':
+                    isValid = True
+            if left_side!= 'int' and left_side!= 'int[]' and left_side != 'true' and left_side != 'false' and left_side!= 'char' and left_side!= 'char[]' and left_side!= 'bool' and left_side!= 'bool[]' and left_side!= 'string' and left_side!= 'string[]':
+                isValid = True
+        if ((left_side == 'bool' or left_side == 'true' or left_side == 'false') and (right_side == 'true' or right_side == 'false')) or ((right_side == 'bool' or right_side == 'true' or right_side == 'false') and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
-
-    def pre_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
-        pass
 
     def post_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
         isValid = False
-        if (left_side == 'bool' and (right_side == 'true' or right_side == 'false')) or (right_side == 'bool' and (left_side == 'true' or left_side == 'false')):
+        if ((left_side == 'bool' or left_side == 'true' or left_side == 'bool') and (right_side == 'true' or right_side == 'false')) or ((right_side == 'bool' or right_side == 'true' or right_side == 'false') and (left_side == 'true' or left_side == 'false')):
             isValid = True
         if left_side != right_side and isValid == False:
             self.errors.append(f"Error: Attempting to '||' different types. {left_side} and {right_side}. Around line {node.lineno}")
-
-    def pre_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
-        pass
     
     def post_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         left_side = self.get_type(node.Expression)
@@ -694,9 +616,6 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '+' a variable of type {left_side} Only 'int' is able to be added. Around line {node.lineno}")
 
-    def pre_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
-        pass
-
     def post_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
@@ -705,9 +624,6 @@ class TypeChecking(ASTVisitor):
         else:
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '+=' a variable of type {left_side} Only 'int' is able to be added. Around line {node.lineno}")
-
-    def pre_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
-        pass
 
     def post_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
         left_side = self.get_type(node.Expression)
@@ -718,9 +634,6 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '*' a variable of type {left_side} Only 'int' is able to be multiplied. Around line {node.lineno}")
 
-    def pre_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
-        pass
-
     def post_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
@@ -730,49 +643,13 @@ class TypeChecking(ASTVisitor):
             if left_side != "int":
                 self.errors.append(f"Error: Attempting to '*=' a variable of type {left_side} Only 'int' is able to be multiplied. Around line {node.lineno}")
 
-    def pre_visit_Index(self, node: ASTIndex):
-        pass
-
     def post_visit_Index(self, node: ASTIndex):
         idx = self.get_type(node.Expression)
         if idx != 'int':
             self.errors.append(f"Error: attempting to access index and 'int' was not given. {idx} was given. Around line {node.lineno}")
-    
-    def pre_visit_Initializer(self, node: ASTInitializer):
-        pass
-
-    def post_visit_Initializer(self, node: ASTInitializer):
-        pass
 
     def pre_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
         self.arguments.append(None)
-            
-    def post_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
-        pass
-
-    def pre_visit_MaybeExpression(self, node: ASTMaybeExpression):
-        pass
-
-    def post_visit_MaybeExpression(self, node: ASTMaybeExpression):
-        pass
-
-    def pre_visit_MaybeInitializer(self, node: ASTMaybeInitializer):
-        pass
-
-    def post_visit_MaybeInitializer(self, node: ASTMaybeInitializer):
-        pass
-
-    def pre_visit_MaybeParamList(self, node: ASTMaybeParamList):
-        pass
-
-    def post_visit_MaybeParamList(self, node: ASTMaybeParamList):
-        pass
-
-    def pre_visit_MethodBody(self, node: ASTMethodBody):
-        pass
-
-    def post_visit_MethodBody(self, node: ASTMethodBody):
-        pass
 
     def pre_visit_MethodDeclaration(self, node: ASTMethodDeclaration):
         self.enter_scope()
@@ -789,120 +666,30 @@ class TypeChecking(ASTVisitor):
                 self.errors.append(f"Error: Method doesn't have any return statements. Only 'void' can have no return statement")
         self.returnType = ""
 
-    def pre_visit_MethodSuffix(self, node: ASTMethodSuffix):
-        pass
-
-    def post_visit_MethodSuffix(self, node: ASTMethodSuffix):
-        pass
-
-    def pre_visit_MultipleCase(self, node: ASTMultipleCase):
-        pass
-
-    def post_visit_MultipleCase(self, node: ASTMultipleCase):
-        pass
-
-    def pre_visit_MultipleClassDefinition(self, node: ASTMultipleClassDefinition):
-        pass
-
-    def post_visit_MultipleClassDefinition(self, node: ASTMultipleClassDefinition):
-        pass
-                
-    def pre_visit_MultipleClassMemberDefinition(self, node: ASTMultipleClassMemberDefinition):
-        pass
-
-    def post_visit_MultipleClassMemberDefinition(self, node: ASTMultipleClassMemberDefinition):
-        pass
-
     def pre_visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
         if node.Expression != None:
             type = self.get_type(node.Expression)
             self.arguments.append(type)
-
-    def post_visit_MultipleCommaExpression(self, node: ASTMultipleCommaExpression):
-        pass
-
-    def pre_visit_MultipleCommaParameter(self, node: ASTMultipleCommaParameter):
-        pass
-
-    def post_visit_MultipleCommaParameter(self, node: ASTMultipleCommaParameter):
-        pass
-
-    def pre_visit_MultipleStatement(self, node: ASTMultipleStatement):
-        pass
-
-    def post_visit_MultipleStatement(self, node: ASTMultipleStatement):
-        pass
-
-    def pre_visit_Parameter(self, node: ASTParameter):
-        pass
-
-    def post_visit_Parameter(self, node: ASTParameter):
-        pass
-
-    def pre_visit_ParameterList(self, node: ASTParameterList):
-        pass
-
-    def post_visit_ParameterList(self, node: ASTParameterList):
-        pass
-
-    def pre_visit_StatementBreak(self, node: ASTStatementBreak):
-        pass
-
-    def post_visit_StatementBreak(self, node: ASTStatementBreak):
-        pass    
-
-    def pre_visit_StatementCIN(self, node: ASTStatementCIN):
-        pass
 
     def post_visit_StatementCIN(self, node: ASTStatementCIN):
         messageType = self.get_type(node.Expression)
         if messageType  != "int" and messageType !='char':
             self.errors.append(f"Error: Can not CIN {messageType}. Around line {node.lineno}")
 
-    def pre_visit_StatementCOUT(self, node: ASTStatementCOUT):
-        pass
-
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         messageType = self.get_type(node.Expression)
         if messageType  != "int" and messageType !='char' and messageType != 'string':
             self.errors.append(f"Error: Can not COUT {messageType}. Around line {node.lineno}")
-
-    def pre_visit_StatementExpression(self, node: ASTStatementExpression):
-        pass
-
-    def post_visit_StatementExpression(self, node: ASTStatementExpression):
-        pass
-
-    def pre_visit_StatementIF(self, node: ASTStatementIF):
-        pass
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
         ifType = self.get_type(node.Expression)
         if ifType != 'bool'  and ifType != 'true' and ifType != 'false':
             self.errors.append(f"Error: A bool is required after an if statement. {ifType} was given. Around line {node.lineno}")
 
-    def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-        pass
-
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
         ifType = self.get_type(node.Expression)
         if ifType != 'bool'  and ifType != 'true' and ifType != 'false':
             self.errors.append(f"Error: A bool is required after an if statement. {ifType} was given. Around line {node.lineno}")
-
-    def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        pass
-
-    def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
-        pass
-
-    def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
-        pass
-
-    def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
-        pass
-
-    def pre_visit_StatementReturn(self, node: ASTStatementReturn):
-        pass
 
     def post_visit_StatementReturn(self, node: ASTStatementReturn):
         self.returnFound = True
@@ -914,24 +701,15 @@ class TypeChecking(ASTVisitor):
         else:
             self.errors.append(f"Error: return type {type} doesn't match method return type {self.returnType}. Around line {node.lineno}")
 
-    def pre_visit_StatementSwitch(self, node: ASTStatementSwitch):
-        pass
-
     def post_visit_StatementSwitch(self, node: ASTStatementSwitch):
         type = self.get_type(node.Expression)
         if type != 'int' and type != 'char':
             self.errors.append(f"Error: Switch statement must be a 'char' or an 'int'. {type} was given. ")
 
-    def pre_visit_StatementWhile(self, node: ASTStatementWhile):
-        pass
-
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
         ifType = self.get_type(node.Expression)
         if ifType != 'bool':
             self.errors.append(f"Error: A bool is required after a while statement. {ifType} was given. Around line {node.lineno}")
-
-    def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
-        pass
 
     def post_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         type = node.Type
@@ -960,9 +738,3 @@ class TypeChecking(ASTVisitor):
                 done = True
             if done == False:
                 self.errors.append(f"Error: attempting to initalize a variable of type {type} and is getting set to {initalType}. Around line {node.lineno}")
-
-    def pre_visit_Terminal(self, node: ASTTerminal):
-        pass
-
-    def post_visit_Terminal(self, node: ASTTerminal):
-        pass
