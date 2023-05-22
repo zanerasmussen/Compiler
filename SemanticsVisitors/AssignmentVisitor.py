@@ -138,7 +138,7 @@ class AssignmentVisitor(ASTVisitor):
             left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
             right_side_init = right_side[1]
-            if left_side_init == "true" and right_side_init != "false":
+            if left_side_init != "false" and right_side_init != "false":
                 return ("int", "true")
             else:
                 self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
@@ -215,7 +215,7 @@ class AssignmentVisitor(ASTVisitor):
             left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
             right_side_init = right_side[1]
-            if left_side_init == "true" and right_side_init != "false":
+            if left_side_init != "false" and right_side_init != "false":
                 return ("int", "true")
             else:
                 self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}") 
@@ -237,7 +237,7 @@ class AssignmentVisitor(ASTVisitor):
             left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
             right_side_init = right_side[1]
-            if right_side_init != "false" and left_side_init != "terminal":
+            if right_side_init != "false" and left_side_init != "false":
                 return ("bool", "true")
             else:
                 self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
@@ -259,7 +259,7 @@ class AssignmentVisitor(ASTVisitor):
             left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
             right_side_init = right_side[1]
-            if left_side_init == "true" and right_side_init != "false":
+            if left_side_init != "false" and right_side_init != "false":
                 return ("int", "true")
             else:
                 self.errors.append(f"Error: Attemping to use {left_side[0]} and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
@@ -281,7 +281,7 @@ class AssignmentVisitor(ASTVisitor):
             left_side_init = left_side[1]
             right_side = self.get_type(node.Expression2)
             right_side_init = right_side[1]
-            if left_side_init == "true" and right_side_init != "false":
+            if left_side_init != "false" and right_side_init != "false":
                 return ("int", "true")
             else:
                 self.errors.append(f"Error: Attemping to use {left_side[0] } and {right_side[0]}. May not be initialized or 'terminal'. Around line {node.lineno}")
@@ -977,13 +977,13 @@ class AssignmentVisitor(ASTVisitor):
             if initalType[0] == 'null':
                 done= True
             else:
-                if initalType == 'null' and (type == 'int' or type == 'char' or type == 'bool' or type == 'string'):
+                if initalType[0] == 'null' and (type == 'int' or type == 'char' or type == 'bool' or type == 'string'):
                     self.errors.append(f"Error: null can only be assigned to a class or array type not {type}. Around line {node.lineno}")
                 else:
                     if initalType == 'null':
                         done = True
 
-            if type == 'bool' and (initalType == 'false' or initalType == 'true'):
+            if type == 'bool' and (initalType[0] == 'false' or initalType[0] == 'true'):
                 done = True
             elif type == initalType[0]:
                 done = True
