@@ -259,6 +259,9 @@ class SymbolTableVisitor(ASTVisitor):
             type = str(node.VariableDeclaration.Type) + "[]"
         if node.VariableDeclaration.Initializer.Initializer is not None:
             isInitialized = True
+            if isinstance(node.VariableDeclaration.Initializer.Initializer.Expression, ASTTerminal):
+                if node.VariableDeclaration.Initializer.Initializer.Expression.Terminal == 'null':
+                    isInitialized = False
         if node.VariableDeclaration.Type != 'void' and node.VariableDeclaration.Type != 'int' and node.VariableDeclaration.Type != 'char' and node.VariableDeclaration.Type != 'bool' and node.VariableDeclaration.Type != 'string':
             symbol = self.create_symbol("object", str(node.VariableDeclaration.ID), type, 12, False,  isInitialized)
         else:

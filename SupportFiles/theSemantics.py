@@ -40,7 +40,6 @@ def semantics(parsed_AST):
         sys.exit(4)
 
     breakReturn = BreakVisitor()
-    breakReturn.symbol_tables = symbolTable.symbol_tables
     parsed_AST.accept(breakReturn)
     if len(breakReturn.errors) != 0:
         for x in breakReturn.errors:

@@ -708,7 +708,7 @@ class TypeChecking(ASTVisitor):
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
         ifType = self.get_type(node.Expression)
-        if ifType != 'bool':
+        if ifType != 'bool'  and ifType != 'true' and ifType != 'false':
             self.errors.append(f"Error: A bool is required after a while statement. {ifType} was given. Around line {node.lineno}")
 
     def post_visit_VariableDeclaration(self, node: ASTVariableDeclaration):

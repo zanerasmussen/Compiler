@@ -1,4 +1,6 @@
 data = '''
+int a;
+a = 1;
 bool
 break
 case
