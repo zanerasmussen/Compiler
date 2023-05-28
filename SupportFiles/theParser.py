@@ -365,7 +365,7 @@ precedence = (
 
 
 def Parse(file):
-    parser = yacc.yacc(start="CompilationUnit", debug=True)
+    parser = yacc.yacc(start="CompilationUnit", debug=False)
     parsed_output = parser.parse(file)
     if parsed_output != None:
         return parsed_output

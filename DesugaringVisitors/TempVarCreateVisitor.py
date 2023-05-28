@@ -1,8 +1,36 @@
 from AbstractVisitor import ASTVisitor
 from AST import *
 
-class RENAME(ASTVisitor):
+class TempVarCreateVisitor(ASTVisitor):    
+    def __init__(self, dataSeg, TerminalIDS, counter, temporary_symbol_table, instructionLables):
+        self.dataSeg = dataSeg
+        self.TerminalIDS = TerminalIDS
+        self.temp_counter = counter
+        self.temporary_symbol_table = temporary_symbol_table
+        self.instructionLables = instructionLables
+
+    def get_temp_variable(self):
+        temp_var = f"@{self.temp_counter}"
+        self.temp_counter += 1
+        return temp_var
     
+    def add_temp_variable_to_data_segment(self, variable):
+            param1 = f"{variable}"
+            param2 = ".INT" 
+            self.dataSeg.append(f"{param1:<15} {param2:<15}")
+            self.dataSeg.extend([";"])
+
+    def add_to_temporary_symbol_table(self, node):
+        alreadyAdded = False
+        for x in self.temporary_symbol_table:
+            if x[0] == node:
+                alreadyAdded = True
+
+        if alreadyAdded == False:
+            variable = self.get_temp_variable()
+            self.temporary_symbol_table.append((node, variable))
+            self.add_temp_variable_to_data_segment(variable)
+
     def pre_visit_Argument(self, node: ASTArgument):
         pass
 
@@ -325,7 +353,7 @@ class RENAME(ASTVisitor):
         pass
 
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
 
     def pre_visit_StatementExpression(self, node: ASTStatementExpression):
         pass

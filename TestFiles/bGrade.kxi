@@ -16,7 +16,6 @@ class Fibonacci {
 
 class Test {
     Test() {}
-    private bool[] asdfasdf;
     public int test(int x) {
         cout << x;
         char l = '\n';

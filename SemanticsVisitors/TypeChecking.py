@@ -492,6 +492,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type = right_side
         isValid = False
         if left_side != right_side:
             isValid = False
@@ -673,11 +674,13 @@ class TypeChecking(ASTVisitor):
 
     def post_visit_StatementCIN(self, node: ASTStatementCIN):
         messageType = self.get_type(node.Expression)
+        node.type = str(messageType)
         if messageType  != "int" and messageType !='char':
             self.errors.append(f"Error: Can not CIN {messageType}. Around line {node.lineno}")
 
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         messageType = self.get_type(node.Expression)
+        node.type = str(messageType)
         if messageType  != "int" and messageType !='char' and messageType != 'string':
             self.errors.append(f"Error: Can not COUT {messageType}. Around line {node.lineno}")
 

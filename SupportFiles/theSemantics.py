@@ -46,6 +46,6 @@ def semantics(parsed_AST):
             print(x)
         sys.exit(5)
 
-    print("semantics")
+    return symbolTable.symbol_tables
     
  

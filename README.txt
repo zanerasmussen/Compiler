@@ -4,12 +4,6 @@ To run the lexer, go to the file directory in a terminal and run 'python3 main.p
 You can pass it a parameter of different files or you can not pass a file and it will run the default data.txt
 
 
-
-
-symantics needs to handle invalid assignement. such as 3 = 5 of function f = function g.
-
-
-
 Questions for passoff:
 1) function calls???
 2) .id has to be dataMEmber or mehtod?
@@ -50,21 +44,15 @@ limitations:
     variables are static. (public int pub can not be accessed in main without an object)
     C++ style of methods/dataMembers. Have to be declared before using them (forward declaring)
     didn't check for array size and if out of bounds
+    no index checking for arrays
     
 
 
 
 
 things to check for in semantics:
-    calling declared but not intialized variables
-    number of and types of parameters passed when calling functions
-        creating objects inside of a class
-        calling methods and datamembers inside a class
-    Checks to make sure all parameters are valid and all calls to that type are passing the correct type of parameters and the correct number. (constructor and methods)
-    does index checking
-    checks method and datamember calls. checks this statements and also <expression>.<identifier> expressions. j
-    if method is of type void. 
-        no return expression can be found
+        calling methods and datamembers inside a classhods)
+
 
 
     2nd class function calls
@@ -73,17 +61,6 @@ things to check for in semantics:
 
 
     <= and >= need to compare ints and char (separate)
-
-check when initialized
-check for new on left side
-
-
-
-
-
-
-
-remove 'abstract method' that will allow me to delete 'pass' definitions
 
 
 
@@ -96,10 +73,10 @@ desguaring
 
 calander for peter (20-40 hours) and with a check in points with professor. check in. 
 
-talk with academic advisor about summer class/graduation
 
-
-Need to add error messages to parser. 
+ 
 Check to make sure 'return' is found in method
- cin >> 1
- cin << (1+3)
+
+
+
+ add breaks if error is found between steps. 

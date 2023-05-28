@@ -1,0 +1,7 @@
+void kxi2023 main() {
+    cout << 1;
+    cout << '\n';
+    cout << 'a';
+    cout << '\n';
+    cout << "string";
+}

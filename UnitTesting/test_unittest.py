@@ -7,7 +7,7 @@ from SemanticsVisitors.TypeChecking import TypeChecking
 from SemanticsVisitors.AssignmentVisitor import AssignmentVisitor
 from SemanticsVisitors.BreakVisitor import BreakVisitor
 
-class Test_Lexer(unittest.TestCase):
+class Test_A_Lexer(unittest.TestCase):
 
 #base case examples. One for each token type
     def test_bool(self):
@@ -327,7 +327,7 @@ class Test_Lexer(unittest.TestCase):
         self.assertEqual(tok.type, "ID" )
         self.assertEqual(tok.value, 'ThisIsAID') 
 
-class Test_parser(unittest.TestCase):
+class Test_B_parser(unittest.TestCase):
 
     def test_Arguments_empty(self):
         data = """
@@ -2098,7 +2098,7 @@ class Test_parser(unittest.TestCase):
         parsed = theParser.ParseTester("VariableDeclaration", data)
         self.assertEqual(parsed, None)
 
-class Test_SymbolTableVisitor(unittest.TestCase):
+class Test_C_A_SymbolTableVisitor(unittest.TestCase):
 
     def test_basic(self):
         data = """
@@ -3987,7 +3987,7 @@ class Test_SymbolTableVisitor(unittest.TestCase):
         myAST.accept(symbolTable)
         self.assertEqual(len(symbolTable.errors), 0)
 
-class Test_UndeclaredVariables(unittest.TestCase):
+class Test_C_B_UndeclaredVariables(unittest.TestCase):
 
     def test_basic(self):
         data = """
@@ -5795,7 +5795,7 @@ class Test_UndeclaredVariables(unittest.TestCase):
     #     self.assertEqual(len(undeclaredVariableVistior.errors), 1)
     #     self.assertEqual(undeclaredVariableVistior.errors[0], 'Error: bb is used but never declared or used before it is declared. Around line 3')
 
-class Test_TypeChecking(unittest.TestCase):
+class Test_C_C_TypeChecking(unittest.TestCase):
 
     def test_big(self):
         data = """
@@ -9818,7 +9818,7 @@ class Test_TypeChecking(unittest.TestCase):
             myAST.accept(typeCheck)
             self.assertEqual(len(typeCheck.errors), 0)
 
-class Test_Assignments(unittest.TestCase):
+class Test_C_D_Assignments(unittest.TestCase):
 
     def test_basic(self):
             data = """
@@ -12039,7 +12039,7 @@ class Test_Assignments(unittest.TestCase):
             myAST.accept(assignmentCheck)
             self.assertEqual(len(assignmentCheck.errors), 0)
             
-class Test_Break(unittest.TestCase):
+class Test_C_E_Break(unittest.TestCase):
 
     def test_basic(self):
             data = """
@@ -12289,7 +12289,7 @@ class Test_Break(unittest.TestCase):
             myAST.accept(breakReturn)
             self.assertEqual(len(breakReturn.errors), 1)    
 
-class Test_Z_All_Semantics(unittest.TestCase):
+class Test_C_F__All_Semantics(unittest.TestCase):
 
     def test_Test1(self):
         data = """
@@ -12511,7 +12511,6 @@ class Test_Z_All_Semantics(unittest.TestCase):
     # def test_Test1(self):
     #     data = """
     #         void kxi2023 main() {
-            
     #         }
     #     """
     #     theLexer.theLexerReturnFucntion(data)
