@@ -50,11 +50,11 @@ class DataSegmentVisitor(ASTVisitor):
                             self.TerminalID.append((f"&{scope}_{key[0]}", key[0]))
 
                         elif symbol.Type == "string":
-                            param1 = f"&{scope}_{key[0]}"
+                            param1 = f"%{scope}_{key[0]}"
                             param2 = ".INT" 
                             self.dataSeg.append(f"{param1:<15} {param2:<15}")
                             self.dataSeg.extend([";"])
-                            self.TerminalID.append((f"&{scope}_{key[0]}", key[0]))
+                            self.TerminalID.append((f"%{scope}_{key[0]}", key[0]))
                         else:
                             #could be array or object.
                             pass
@@ -65,6 +65,10 @@ class DataSegmentVisitor(ASTVisitor):
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         myVar = f"&{self.theClass}_{node.ID}"
+        for x in self.TerminalID:
+            if myVar == x[0] and node.ID == x[1]:
+                node.ID = myVar
+        myVar = f"%{self.theClass}_{node.ID}"
         for x in self.TerminalID:
             if myVar == x[0] and node.ID == x[1]:
                 node.ID = myVar
@@ -99,6 +103,10 @@ class DataSegmentVisitor(ASTVisitor):
 
         elif varType == "ID":
             myVar = f"&{self.theClass}_{node.Terminal}"
+            for x in self.TerminalID:
+                if myVar == x[0] and node.Terminal == x[1]:
+                    node.Terminal = myVar
+            myVar = f"%{self.theClass}_{node.Terminal}"
             for x in self.TerminalID:
                 if myVar == x[0] and node.Terminal == x[1]:
                     node.Terminal = myVar

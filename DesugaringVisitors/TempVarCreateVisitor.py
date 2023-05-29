@@ -131,7 +131,7 @@ class TempVarCreateVisitor(ASTVisitor):
         pass
     
     def post_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
 
     def pre_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
         pass
@@ -161,7 +161,8 @@ class TempVarCreateVisitor(ASTVisitor):
         pass
 
     def post_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def pre_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         pass
@@ -215,13 +216,15 @@ class TempVarCreateVisitor(ASTVisitor):
         pass
     
     def post_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def pre_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         pass
 
     def post_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def pre_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
         pass
@@ -245,7 +248,7 @@ class TempVarCreateVisitor(ASTVisitor):
         pass
 
     def post_visit_Initializer(self, node: ASTInitializer):
-        pass
+        self.add_to_temporary_symbol_table(node)
 
     def pre_visit_MaybeArgumentList(self, node: ASTMaybeArgumentList):
         pass
@@ -413,4 +416,4 @@ class TempVarCreateVisitor(ASTVisitor):
         pass
 
     def post_visit_Terminal(self, node: ASTTerminal):
-        pass
+        self.add_to_temporary_symbol_table(node)

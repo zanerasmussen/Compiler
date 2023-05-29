@@ -7285,6 +7285,10 @@ class Test_C_C_TypeChecking(unittest.TestCase):
 
                 string[] sarray = new string[4];
                 cout << sarray;            //error 7
+                
+                int newT = 1;
+                cout << newT = 2;
+                cout << (newT = 4);
             }
             """
             theLexer.theLexerReturnFucntion(data)
@@ -7300,7 +7304,7 @@ class Test_C_C_TypeChecking(unittest.TestCase):
             typeCheck.paramList = symbolTable.paramList
             typeCheck.symbol_tables = symbolTable.symbol_tables
             myAST.accept(typeCheck)
-            self.assertEqual(len(typeCheck.errors), 7)
+            self.assertEqual(len(typeCheck.errors), 8)
 
     def test_cin_statement(self):
             data = """
@@ -12507,6 +12511,41 @@ class Test_C_F__All_Semantics(unittest.TestCase):
         breakReturn = BreakVisitor()
         myAST.accept(breakReturn)
         self.assertEqual(len(breakReturn.errors), 0)    
+    
+    def test_Test2(self):
+        data = """
+            void kxi2023 main() {
+                int i1;
+                bool b1 = false;
+                cout << (i1 = 1);
+                while (b1 == true){
+                    cout << 1;
+                }
+            }
+        """
+        theLexer.theLexerReturnFucntion(data)
+        myAST = theParser.Parse(data)
+        symbolTable = SymbolTableVisitor()
+        myAST.accept(symbolTable)
+        self.assertEqual(len(symbolTable.errors), 0)
+        undeclaredVariableVistior = UndeclaredVisitor()
+        undeclaredVariableVistior.oldSymbols = symbolTable.symbol_tables
+        myAST.accept(undeclaredVariableVistior)
+        self.assertEqual(len(undeclaredVariableVistior.errors), 0)
+        typeCheck = TypeChecking()
+        typeCheck.paramList = symbolTable.paramList
+        typeCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(typeCheck)
+        self.assertEqual(len(typeCheck.errors), 0)
+        assignmentCheck = AssignmentVisitor()
+        assignmentCheck.paramList = symbolTable.paramList
+        assignmentCheck.symbol_tables = symbolTable.symbol_tables
+        myAST.accept(assignmentCheck)
+        self.assertEqual(len(assignmentCheck.errors), 0)    
+        breakReturn = BreakVisitor()
+        myAST.accept(breakReturn)
+        self.assertEqual(len(breakReturn.errors), 0)    
+    
     
     # def test_Test1(self):
     #     data = """

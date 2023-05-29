@@ -932,6 +932,7 @@ class ASTVariableDeclaration(ASTBASENODE):
         self.Initializer = Initializer
         self.SEMICOLON = SEMICOLON
         self.asm = []
+        self.finalType = ""
 
     def accept(self, visitor):
         visitor.pre_visit_VariableDeclaration(self)

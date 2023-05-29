@@ -681,6 +681,8 @@ class TypeChecking(ASTVisitor):
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         messageType = self.get_type(node.Expression)
         node.type = str(messageType)
+        if isinstance(node.Expression, ASTExpressionEEqualE):
+            self.errors.append(f"Can not cout an assignment. maybe add '()'")
         if messageType  != "int" and messageType !='char' and messageType != 'string':
             self.errors.append(f"Error: Can not COUT {messageType}. Around line {node.lineno}")
 
@@ -718,7 +720,8 @@ class TypeChecking(ASTVisitor):
         type = node.Type
         if node.LRSquare != None:
             type = type + '[]'
-        
+        node.finalType = type
+
         if node.Initializer.Initializer != None:
             done = False
             initalType = self.get_type(node.Initializer.Initializer)
