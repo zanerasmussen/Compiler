@@ -31,6 +31,10 @@ class MainVisitor(ASTVisitor):
         self.add_line_asm(node, ";", " ", " ", " ")
         self.add_line_asm(node, "PRNTEND", "JMR", "R7", " ")   
         self.add_line_asm(node, ";", " ", " ", " ")
+        self.add_line_asm(node, "$CMPTRUE", "MOVI", "R10,", "#1")
+        self.add_line_asm(node, " ", "JMR", "R7", " ")
+        self.add_line_asm(node, "$CMPFALSE", "MOVI", "R10,", "#0")
+        self.add_line_asm(node, " ", "JMR", "R7", " ")
         self.add_line_asm(node, "MAIN", "ADI", "R8,", "#0")
 
         if node.MethodBody.MultipleStatement.Statement != None:

@@ -52,12 +52,17 @@ class ECompEqualEVisitor(ASTVisitor):
         flag = self.get_temporary_variable_from_table(node.Expression)
         flag2 = self.get_temporary_variable_from_table(node.Expression2)
 
-        if node.type == "int" or node.type == 'true' or node.type == 'false' or node.type == 'bool':
+        if node.type == "int" or node.type == 'true' or node.type == 'false' or node.type == 'bool' or node.type == "string":
             self.add_line_asm(node, f"{label} ", "LDR", "R10,", f"{flag}")
             self.add_line_asm(node, " ", "LDR", "R10,", "R10")
             self.add_line_asm(node, " ", "LDR", "R11,", f"{flag2}")
             self.add_line_asm(node, " ", "LDR", "R11,", "R11")
             self.add_line_asm(node, " ", "CMP", "R10,", "R11")
+            self.add_line_asm(node," ", "MOV", "R7,", "PC")
+            self.add_line_asm(node," ", "ADI", "R7,", "#48") #set Value
+            self.add_line_asm(node," ", "BRZ", "R10,", "$CMPTRUE") 
+            self.add_line_asm(node," ", "BLT", "R10,", "$CMPFALSE") 
+            self.add_line_asm(node," ", "BGT", "R10,", "$CMPFALSE") 
 
             variable = self.get_temp_variable()
             self.add_temp_variable_to_data_segment(variable)
@@ -76,6 +81,11 @@ class ECompEqualEVisitor(ASTVisitor):
             self.add_line_asm(node, " ", "LDR", "R11,", f"{flag2}")
             self.add_line_asm(node, " ", "LDB", "R11,", "R11")
             self.add_line_asm(node, " ", "CMP", "R10,", "R11")
+            self.add_line_asm(node," ", "MOV", "R7,", "PC")
+            self.add_line_asm(node," ", "ADI", "R7,", "#48") #set Value
+            self.add_line_asm(node," ", "BRZ", "R10,", "$CMPTRUE") 
+            self.add_line_asm(node," ", "BLT", "R10,", "$CMPFALSE") 
+            self.add_line_asm(node," ", "BGT", "R10,", "$CMPFALSE") 
 
             variable = self.get_temp_variable()
             self.add_temp_variable_to_data_segment(variable)
@@ -87,11 +97,3 @@ class ECompEqualEVisitor(ASTVisitor):
                     self.add_line_asm(node, " ", "STR", "R10,", f"{variable}")
                     self.add_line_asm(node, " ", "LDA", "R4,", f"{variable}")
                     self.add_line_asm(node, " ", "STR", "R4,", f"{x[1]}")
-
-        #string
-
-        #char
-
-
-            self.add_line_asm(node, ";", " ", " ", " ")
-            self.add_line_asm(node, " ", " ", " ", " ")
