@@ -315,11 +315,15 @@ def theLexerTester(stuff):
 
 def tokenChecker(stuff):
     import sys
+    errorAdded = False
     clone = stuff
     while True:
         tok = clone.token()
         if not tok:
             break
         elif tok.type == 'UNKNOWN':
+            errorAdded = True
             print("Unknown token " + str(tok.value) + " reached on line #" + str(tok.lineno))
             print("Caution when parsing with unknown tokens")
+    if errorAdded == True:
+        sys.exit(7)

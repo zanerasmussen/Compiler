@@ -14,7 +14,16 @@ from DesugaringVisitors.EMinusEqualEVisitor import *
 from DesugaringVisitors.ETimesEqualEVisitor import *
 from DesugaringVisitors.EDivideEqualEVisitor import *
 from DesugaringVisitors.ECompEqualEVisitor import *
-
+from DesugaringVisitors.ENotEqualEVisitor import *
+from DesugaringVisitors.ELessEVisitor import *
+from DesugaringVisitors.ELessEqualEVisitor import *
+from DesugaringVisitors.EGreaterEVisitor import *
+from DesugaringVisitors.EGreaterEqualEVisitor import *
+from DesugaringVisitors.EAANDEVisitor import *
+from DesugaringVisitors.EOOREVisitor import *
+from DesugaringVisitors.PlusEVisitor import *
+from DesugaringVisitors.MinusEVisitor import *
+from DesugaringVisitors.NotEVisitor import *
 from DesugaringVisitors.COUTVisitor import *
 
 
@@ -72,7 +81,37 @@ def desugar(parsed_AST, symbolTable):
     ECompEqualEVisit = ECompEqualEVisitor(EDivideEqualEVisit.dataSeg, EDivideEqualEVisit.TerminalIDS, EDivideEqualEVisit.temp_counter, EDivideEqualEVisit.temporary_symbol_table, EDivideEqualEVisit.instructionLables)
     parsed_AST.accept(ECompEqualEVisit)
 
-    coutVisit = COUTVisitor(ECompEqualEVisit.dataSeg, ECompEqualEVisit.TerminalIDS, ECompEqualEVisit.temp_counter, ECompEqualEVisit.temporary_symbol_table, ECompEqualEVisit.instructionLables)
+    ENotEqualEVisit = ENotEqualEVisitor(ECompEqualEVisit.dataSeg, ECompEqualEVisit.TerminalIDS, ECompEqualEVisit.temp_counter, ECompEqualEVisit.temporary_symbol_table, ECompEqualEVisit.instructionLables)
+    parsed_AST.accept(ENotEqualEVisit)
+
+    ELessEVisit = ELessEVisitor(ENotEqualEVisit.dataSeg, ENotEqualEVisit.TerminalIDS, ENotEqualEVisit.temp_counter, ENotEqualEVisit.temporary_symbol_table, ENotEqualEVisit.instructionLables)
+    parsed_AST.accept(ELessEVisit)
+
+    ELessEqualEVisit = ELessEqualEVisitor(ELessEVisit.dataSeg, ELessEVisit.TerminalIDS, ELessEVisit.temp_counter, ELessEVisit.temporary_symbol_table, ELessEVisit.instructionLables)
+    parsed_AST.accept(ELessEqualEVisit)
+
+    EGreaterEVisit = EGreaterEVisitor(ELessEqualEVisit.dataSeg, ELessEqualEVisit.TerminalIDS, ELessEqualEVisit.temp_counter, ELessEqualEVisit.temporary_symbol_table, ELessEqualEVisit.instructionLables)
+    parsed_AST.accept(EGreaterEVisit)
+
+    EGreaterEqualEVisit = EGreaterEqualEVisitor(EGreaterEVisit.dataSeg, EGreaterEVisit.TerminalIDS, EGreaterEVisit.temp_counter, EGreaterEVisit.temporary_symbol_table, EGreaterEVisit.instructionLables)
+    parsed_AST.accept(EGreaterEqualEVisit)
+
+    EAANDEVisit = EAANDEVisitor(EGreaterEqualEVisit.dataSeg, EGreaterEqualEVisit.TerminalIDS, EGreaterEqualEVisit.temp_counter, EGreaterEqualEVisit.temporary_symbol_table, EGreaterEqualEVisit.instructionLables)
+    parsed_AST.accept(EAANDEVisit)
+
+    EOOREVisit = EOOREVisitor(EAANDEVisit.dataSeg, EAANDEVisit.TerminalIDS, EAANDEVisit.temp_counter, EAANDEVisit.temporary_symbol_table, EAANDEVisit.instructionLables)
+    parsed_AST.accept(EOOREVisit)
+
+    PlusEVisit = PlusEVisitor(EOOREVisit.dataSeg, EOOREVisit.TerminalIDS, EOOREVisit.temp_counter, EOOREVisit.temporary_symbol_table, EOOREVisit.instructionLables)
+    parsed_AST.accept(PlusEVisit)
+
+    MinusEVisit = MinusEVisitor(PlusEVisit.dataSeg, PlusEVisit.TerminalIDS, PlusEVisit.temp_counter, PlusEVisit.temporary_symbol_table, PlusEVisit.instructionLables)
+    parsed_AST.accept(MinusEVisit)
+
+    NotEVisit = NotEVisitor (MinusEVisit.dataSeg, MinusEVisit.TerminalIDS, MinusEVisit.temp_counter, MinusEVisit.temporary_symbol_table, MinusEVisit.instructionLables)
+    parsed_AST.accept(NotEVisit)
+
+    coutVisit = COUTVisitor(NotEVisit.dataSeg, NotEVisit.TerminalIDS, NotEVisit.temp_counter, NotEVisit.temporary_symbol_table, NotEVisit.instructionLables)
     parsed_AST.accept(coutVisit)
 
     TCODEgenerate = TCODE()

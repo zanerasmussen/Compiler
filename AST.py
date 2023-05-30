@@ -329,6 +329,7 @@ class ASTExpressionEGreaterE(ASTBASENODE):
         self.GREATER = GREATER
         self.Expression2 = Expression2
         self.asm = []
+        self.type = ""
 
     def accept(self, visitor):
         visitor.pre_visit_ExpressionEGreaterE(self)
@@ -345,6 +346,7 @@ class ASTExpressionEGreaterEqualE(ASTBASENODE):
         self.GREATEQUAL = GREATEQUAL
         self.Expression2 = Expression2
         self.asm = []
+        self.type = ""
 
     def accept(self, visitor):
         visitor.pre_visit_ExpressionEGreaterEqualE(self)
@@ -361,6 +363,7 @@ class ASTExpressionELessE(ASTBASENODE):
         self.LESS = LESS
         self.Expression2 = Expression2
         self.asm = []
+        self.type = ""
 
     def accept(self, visitor):
         visitor.pre_visit_ExpressionELessE(self)
@@ -377,6 +380,7 @@ class ASTExpressionELessEqualE(ASTBASENODE):
         self.LESSEQUAL = LESSEQUAL
         self.Expression2 = Expression2
         self.asm = []
+        self.type = ""
 
     def accept(self, visitor):
         visitor.pre_visit_ExpressionELessEqualE(self)
@@ -425,6 +429,7 @@ class ASTExpressionENotEqualE(ASTBASENODE):
         self.NEQUAL = NEQUAL
         self.Expression2 = Expression2
         self.asm = []
+        self.type = ""
 
     def accept(self, visitor):
         visitor.pre_visit_ExpressionENotEqualE(self)

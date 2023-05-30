@@ -528,6 +528,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionEGreaterE(self, node: ASTExpressionEGreaterE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type = left_side
         errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -538,6 +539,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionEGreaterEqualE(self, node: ASTExpressionEGreaterEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type = left_side
         errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -548,6 +550,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionELessE(self, node: ASTExpressionELessE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type = left_side
         errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -558,6 +561,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type = left_side
         errorAdded = False
         if left_side != right_side:
             self.errors.append(f"Error: Attempting to compare different types. {left_side} and {right_side}. Around line {node.lineno}")
@@ -586,6 +590,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type= left_side
         isValid = False
         if left_side == "null":
             if len(right_side) >2:
@@ -694,6 +699,18 @@ class TypeChecking(ASTVisitor):
             self.errors.append(f"Can not cout an '=='. maybe add '()'. Around line {node.lineno}")       
         elif isinstance(node.Expression, ASTExpressionENotEqualE):
             self.errors.append(f"Can not cout an '!='. maybe add '()'. Around line {node.lineno}")
+        elif isinstance(node.Expression, ASTExpressionELessE):
+            self.errors.append(f"Can not cout an '<'. maybe add '()'. Around line {node.lineno}")
+        elif isinstance(node.Expression, ASTExpressionELessEqualE):
+            self.errors.append(f"Can not cout an '<='. maybe add '()'. Around line {node.lineno}")
+        elif isinstance(node.Expression, ASTExpressionEGreaterE):
+            self.errors.append(f"Can not cout an '>'. maybe add '()'. Around line {node.lineno}")
+        elif isinstance(node.Expression, ASTExpressionEGreaterEqualE):
+            self.errors.append(f"Can not cout an '>='. maybe add '()'. Around line {node.lineno}")
+        elif isinstance(node.Expression, ASTExpressionEAANDE):
+            self.errors.append(f"Can not cout an '&&'. maybe add '()'. Around line {node.lineno}")
+        elif isinstance(node.Expression, ASTExpressionEOORE):
+            self.errors.append(f"Can not cout an '||'. maybe add '()'. Around line {node.lineno}")
         if messageType  != "int" and messageType !='char' and messageType != 'string' and messageType != 'bool' and messageType != 'true' and messageType != 'false':
             self.errors.append(f"Error: Can not COUT {messageType}. Around line {node.lineno}")
 

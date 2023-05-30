@@ -24,7 +24,7 @@ limitations:
     C++ style of methods/dataMembers. Have to be declared before using them (forward declaring)
     didn't check for array size and if out of bounds
     cant do string1 == "test";
-    
+    --++-i1;
 
 
 desguaring
@@ -32,3 +32,5 @@ desguaring
     go from bottom to top (suggestion) inside to outside, smallest to largest
     fallthourgh for swithc statments (no case found)
     comment on new design submition
+
+    

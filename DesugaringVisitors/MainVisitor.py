@@ -35,16 +35,18 @@ class MainVisitor(ASTVisitor):
         self.add_line_asm(node, " ", "JMR", "R7", " ")
         self.add_line_asm(node, "$CMPFALSE", "MOVI", "R10,", "#0")
         self.add_line_asm(node, " ", "JMR", "R7", " ")
+        self.add_line_asm(node, "$POSITIVE", "MULI", "R9,", "#-1")
+        self.add_line_asm(node, " ", "JMR", "R7", " ")
+        self.add_line_asm(node, "$NEGATEZERO", "ADI", "R9,", "#1")
+        self.add_line_asm(node, " ", "JMR", "R7", " ")
+        self.add_line_asm(node, "$NEGATEONE", "MOVI", "R9,", "#0")
+        self.add_line_asm(node, " ", "JMR", "R7", " ")
         self.add_line_asm(node, "MAIN", "ADI", "R8,", "#0")
 
         if node.MethodBody.MultipleStatement.Statement != None:
             pass
             #self.instructionLables.append((node.MethodBody.MultipleStatement.Statement, "MAIN"))
         else:        
-            param1 = "MAIN"
-            param2 = "ADI"
-            param3 = "R0"
-            param4 = "#0"
-            node.asm.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
+            self.add_line_asm(node, "MAIN", "ADI", "R8,", "#0")
 
 

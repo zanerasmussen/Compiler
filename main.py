@@ -10,6 +10,7 @@ def main(argv):
         file = open(".\TestFiles\desugar.kxi", "r")
         file = file.read()
         tokens = theLexerReturnFucntion(file)
+        tokenChecker(tokens)
         parsed = Parse(file)
         symbols = semantics(parsed)
         desugar(parsed, symbols)
