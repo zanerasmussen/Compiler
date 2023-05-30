@@ -7261,11 +7261,11 @@ class Test_C_C_TypeChecking(unittest.TestCase):
             }
 
             void kxi2023 main (){
-                cout << true;       //error 2
-                cout << false;      //error 3
+                cout << true;       
+                cout << false;      
 
                 bool b;
-                cout << b;          //error 4
+                cout << b;          
 
                 cout << 'a';
                 char cc;
@@ -7287,8 +7287,12 @@ class Test_C_C_TypeChecking(unittest.TestCase):
                 cout << sarray;            //error 7
                 
                 int newT = 1;
-                cout << newT = 2;
+                cout << newT = 2;   //error 8
                 cout << (newT = 4);
+                cout << 1 == 1;
+                cout << 1 != 1;
+                cout << (1 == 1);
+                cout << (1 != 1);
             }
             """
             theLexer.theLexerReturnFucntion(data)
@@ -7304,7 +7308,7 @@ class Test_C_C_TypeChecking(unittest.TestCase):
             typeCheck.paramList = symbolTable.paramList
             typeCheck.symbol_tables = symbolTable.symbol_tables
             myAST.accept(typeCheck)
-            self.assertEqual(len(typeCheck.errors), 8)
+            self.assertEqual(len(typeCheck.errors), 7)
 
     def test_cin_statement(self):
             data = """

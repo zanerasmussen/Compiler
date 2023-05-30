@@ -14,7 +14,7 @@ class EPlusEVisitor(ASTVisitor):
     def add_line_asm(self, node, param1, param2, param3, param4):
         node.asm.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
 
-    def get_instructionLables_label(self, node: ASTStatementCOUT):
+    def get_instructionLables_label(self, node):
         for x in self.instructionLables:
             if x[0] == node:
                 return x[1]

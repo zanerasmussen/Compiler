@@ -6,7 +6,14 @@ from DesugaringVisitors.VariableDeclarationVisitor import *
 from DesugaringVisitors.ExEqualEx2Visitor import *
 from DesugaringVisitors.EPlusEVisitor import *
 from DesugaringVisitors.ExpressionParenVisitor import *
-
+from DesugaringVisitors.EMinusEVisitor import *
+from DesugaringVisitors.ETimesEVisitor import *
+from DesugaringVisitors.EDivideEVisitory import *
+from DesugaringVisitors.EPlusEqualEVisitor import *
+from DesugaringVisitors.EMinusEqualEVisitor import *
+from DesugaringVisitors.ETimesEqualEVisitor import *
+from DesugaringVisitors.EDivideEqualEVisitor import *
+from DesugaringVisitors.ECompEqualEVisitor import *
 
 from DesugaringVisitors.COUTVisitor import *
 
@@ -35,17 +42,37 @@ def desugar(parsed_AST, symbolTable):
     ExEqualEx2Visit = ExEqualEx2Visitor(variableDeclarationVisit.dataSeg, variableDeclarationVisit.TerminalIDS, variableDeclarationVisit.temp_counter, variableDeclarationVisit.temporary_symbol_table, variableDeclarationVisit.instructionLables)
     parsed_AST.accept(ExEqualEx2Visit)
 
-    EPlusEVisit = EPlusEVisitor(ExEqualEx2Visit.dataSeg, ExEqualEx2Visit.TerminalIDS, ExEqualEx2Visit.temp_counter, ExEqualEx2Visit.temporary_symbol_table, ExEqualEx2Visit.instructionLables)
-    parsed_AST.accept(EPlusEVisit)
-
-    EParenVisit = ExpressionParenVisitor(EPlusEVisit.dataSeg, EPlusEVisit.TerminalIDS, EPlusEVisit.temp_counter, EPlusEVisit.temporary_symbol_table, EPlusEVisit.instructionLables)
+    EParenVisit = ExpressionParenVisitor(ExEqualEx2Visit.dataSeg, ExEqualEx2Visit.TerminalIDS, ExEqualEx2Visit.temp_counter, ExEqualEx2Visit.temporary_symbol_table, ExEqualEx2Visit.instructionLables)
     parsed_AST.accept(EParenVisit)
 
+    EPlusEVisit = EPlusEVisitor(EParenVisit.dataSeg, EParenVisit.TerminalIDS, EParenVisit.temp_counter, EParenVisit.temporary_symbol_table, EParenVisit.instructionLables)
+    parsed_AST.accept(EPlusEVisit)
 
+    EMinusEVisit = EMinusEVisitor(EPlusEVisit.dataSeg, EPlusEVisit.TerminalIDS, EPlusEVisit.temp_counter, EPlusEVisit.temporary_symbol_table, EPlusEVisit.instructionLables)
+    parsed_AST.accept(EMinusEVisit)
 
+    ETimesEVisit = ETimesEVisitor(EMinusEVisit.dataSeg, EMinusEVisit.TerminalIDS, EMinusEVisit.temp_counter, EMinusEVisit.temporary_symbol_table, EMinusEVisit.instructionLables)
+    parsed_AST.accept(ETimesEVisit)
 
+    EDivideEVisit = EDivideEVisitor(ETimesEVisit.dataSeg, ETimesEVisit.TerminalIDS, ETimesEVisit.temp_counter, ETimesEVisit.temporary_symbol_table, ETimesEVisit.instructionLables)
+    parsed_AST.accept(EDivideEVisit)
 
-    coutVisit = COUTVisitor(EPlusEVisit.dataSeg, EPlusEVisit.TerminalIDS, EPlusEVisit.temp_counter, EPlusEVisit.temporary_symbol_table, EPlusEVisit.instructionLables)
+    EPlusEqualEVisit = EPlusEqualEVisitor(EDivideEVisit.dataSeg, EDivideEVisit.TerminalIDS, EDivideEVisit.temp_counter, EDivideEVisit.temporary_symbol_table, EDivideEVisit.instructionLables)
+    parsed_AST.accept(EPlusEqualEVisit)
+
+    EMinusEqualEVisit = EMinusEqualEVisitor(EPlusEqualEVisit.dataSeg, EPlusEqualEVisit.TerminalIDS, EPlusEqualEVisit.temp_counter, EPlusEqualEVisit.temporary_symbol_table, EPlusEqualEVisit.instructionLables)
+    parsed_AST.accept(EMinusEqualEVisit)
+
+    ETimesEqualEVisit = ETimesEqualEVisitor(EMinusEqualEVisit.dataSeg, EMinusEqualEVisit.TerminalIDS, EMinusEqualEVisit.temp_counter, EMinusEqualEVisit.temporary_symbol_table, EMinusEqualEVisit.instructionLables)
+    parsed_AST.accept(ETimesEqualEVisit)
+    
+    EDivideEqualEVisit = EDivideEqualEVisitor(ETimesEqualEVisit.dataSeg, ETimesEqualEVisit.TerminalIDS, ETimesEqualEVisit.temp_counter, ETimesEqualEVisit.temporary_symbol_table, ETimesEqualEVisit.instructionLables)
+    parsed_AST.accept(EDivideEqualEVisit)
+
+    ECompEqualEVisit = ECompEqualEVisitor(EDivideEqualEVisit.dataSeg, EDivideEqualEVisit.TerminalIDS, EDivideEqualEVisit.temp_counter, EDivideEqualEVisit.temporary_symbol_table, EDivideEqualEVisit.instructionLables)
+    parsed_AST.accept(ECompEqualEVisit)
+
+    coutVisit = COUTVisitor(ECompEqualEVisit.dataSeg, ECompEqualEVisit.TerminalIDS, ECompEqualEVisit.temp_counter, ECompEqualEVisit.temporary_symbol_table, ECompEqualEVisit.instructionLables)
     parsed_AST.accept(coutVisit)
 
     TCODEgenerate = TCODE()

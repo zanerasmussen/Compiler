@@ -29,7 +29,7 @@ class DataSegmentVisitor(ASTVisitor):
                 if inClass == False:
                     symbol = value['symbol']
                     if key[1] == "variable":
-                        if symbol.Type == 'int':
+                        if symbol.Type == 'int' or symbol.Type == 'true' or symbol.Type == 'false':
                             param1 = f"&{scope}_{key[0]}"
                             param2 = ".INT" 
                             self.dataSeg.append(f"{param1:<15} {param2:<15}")
@@ -45,7 +45,7 @@ class DataSegmentVisitor(ASTVisitor):
 
                         elif symbol.Type == 'bool':
                             param1 = f"&{scope}_{key[0]}"
-                            param2 = ".BYT" 
+                            param2 = ".INT" 
                             self.dataSeg.append(f"{param1:<15} {param2:<15}")
                             self.TerminalID.append((f"&{scope}_{key[0]}", key[0]))
 
@@ -58,10 +58,6 @@ class DataSegmentVisitor(ASTVisitor):
                         else:
                             #could be array or object.
                             pass
-
-    def pre_visit_Parameter(self, node: ASTParameter):
-        pass
-    #needed if doing functions
 
     def pre_visit_VariableDeclaration(self, node: ASTVariableDeclaration):
         myVar = f"&{self.theClass}_{node.ID}"
@@ -125,6 +121,38 @@ class DataSegmentVisitor(ASTVisitor):
                 self.dataSeg.append(f"{param1:<15} {param2:<15} {param3:<15}")
                 self.dataSeg.extend([";"])
                 node.Terminal = f"${self.counter}"
+                self.counter += 1
+
+        elif varType == "TRUE" :
+            exist = False
+            for x in self.TerminalID:
+                if x[1] == node.Terminal:
+                    exist = True
+                    node.Terminal = x[0]
+            if exist == False:
+                self.TerminalID.append(("#True", node.Terminal))
+                param1 = "#True"
+                param2 = ".INT"
+                param3 = "#1" 
+                self.dataSeg.append(f"{param1:<15} {param2:<15} {param3:<15}")
+                self.dataSeg.extend([";"])
+                node.Terminal = "#True"
+                self.counter += 1
+
+        elif varType == "FALSE":
+            exist = False
+            for x in self.TerminalID:
+                if x[1] == node.Terminal:
+                    exist = True
+                    node.Terminal = x[0]
+            if exist == False:
+                self.TerminalID.append(("#False", node.Terminal))
+                param1 = "#False"
+                param2 = ".INT"
+                param3 = "#0" 
+                self.dataSeg.append(f"{param1:<15} {param2:<15} {param3:<15}")
+                self.dataSeg.extend([";"])
+                node.Terminal = "#False"
                 self.counter += 1
 
         elif varType == "CHAR":

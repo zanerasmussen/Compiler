@@ -182,6 +182,7 @@ class RENAME(ASTVisitor):
 
     def post_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         pass
+        pass
 
     def pre_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         pass

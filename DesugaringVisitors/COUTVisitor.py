@@ -29,19 +29,27 @@ class COUTVisitor(ASTVisitor):
         label = self.get_instructionLables_label(node)
         flag = self.get_temporary_variable_from_table(node.Expression)
 
-        if node.type == "int":
+        if node.type == "int" or node.type == 'bool' or node.type == 'true' or node.type == 'false':
             type = 1
             self.add_line_asm(node, f"{label} ", "LDR", "R3,", f"{flag}")
             self.add_line_asm(node, " ", "LDR", "R3,", "R3")
             self.add_line_asm(node, " ", "TRP", f"#{type}", " ")
 
-        elif node.type == "bool" or node.type == "char":
+        elif node.type == "char":
             type = 3
             self.add_line_asm(node, f"{label} ",  "LDR", "R3,", f"{flag}")
             self.add_line_asm(node, " ", "LDB", "R3,", "R3")
             self.add_line_asm(node, " ", "TRP", f"#{type}", " ")
 
-        elif node.type == "string":
+        elif node.type == "string" and node.isID == True:
+            type = 3
+            self.add_line_asm(node, f"{label} ",  "LDR", "R0,", f"{flag}")
+            self.add_line_asm(node, " ", "LDR", "R0,", "R0")
+            self.add_line_asm(node, " ", "MOV", "R7,", "PC")
+            self.add_line_asm(node, " ", "ADI", "R7,", "#24")
+            self.add_line_asm(node, " ", "JMP", "PRINT", " ")
+
+        elif node.type == "string" and node.isID == False:
             type = 3
             self.add_line_asm(node, f"{label} ",  "LDR", "R0,", f"{flag}")
             self.add_line_asm(node, " ", "MOV", "R7,", "PC")

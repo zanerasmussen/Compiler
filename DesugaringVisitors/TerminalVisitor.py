@@ -26,7 +26,6 @@ class TerminalVisitor(ASTVisitor):
             if x[0] == node:
                 return x[1]
 
-
     def post_visit_Terminal(self, node: ASTTerminal):
         label = self.get_instructionLables_label(node)
         flag = self.get_temporary_variable_from_table(node)
@@ -35,10 +34,5 @@ class TerminalVisitor(ASTVisitor):
                 self.add_line_asm(node, f"{label} ", "LDA", "R7,", f"{node.Terminal}")
                 self.add_line_asm(node, " ", "STR", "R7,", f"{flag}")
             elif node == i[0] and node.Terminal[0] == '%':
-                self.add_line_asm(node, f"{label} ", "LDR", "R7,", f"{node.Terminal}")
-                self.add_line_asm(node, " ", "STR", "R7,", f"{flag}")
- 
-        # for i in self.TerminalIDS:
-        #     if i[0] == node.Terminal:
-        #         self.add_line_asm(node, f"{label} ", "LDA", "R8,", f"{i[0]}")
-        #         self.add_line_asm(node, " ", "STR", "R8,", f"{flag}")
+                self.add_line_asm(node, f"{label} ", "LDA", "R15,", f"{node.Terminal}")
+                self.add_line_asm(node, " ", "STR", "R15,", f"{flag}")

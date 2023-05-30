@@ -342,10 +342,11 @@ precedence = (
     ('right', 'NOT', 'AAND', 'OOR'),
     ('right', 'CEQUAL', 'NEQUAL'),
     ('right', 'GREATER', 'LESS', 'LESSEQUAL', 'GREATEQUAL'),
-    ('left', 'TIMES', 'DIVIDE'),
+    ('right', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
     ('left', 'PLUS', 'MINUS'),
+    ('left', 'TIMES', 'DIVIDE'),
     ('right', 'RIGHTSHIFT', 'LEFTSHIFT'),
-    ('right', 'EQUAL', 'PLUSEQUAL', 'MINUSEQUAL', 'TIMESEQUAL', 'DIVIDEEQUAL'),
+    ('right', 'EQUAL'),
     ('right', 'PERIOD'),
     ('right', 'RPAREN', 'LPAREN', 'RSQUARE', 'LSQUARE'),
 )

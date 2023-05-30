@@ -139,26 +139,17 @@ class TempVarCreateVisitor(ASTVisitor):
     def post_visit_ExpressionEAANDE(self, node: ASTExpressionEAANDE):
         pass
 
-    def pre_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
-        pass
-
     def post_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
-        pass
-
-    def pre_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def post_visit_ExpressionEDivideE(self, node: ASTExpressionEDivideE):
-        pass
-
-    def pre_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def post_visit_ExpressionEDivideEqualE(self, node: ASTExpressionEDivideEqualE):
-        pass
-    
-    def pre_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def post_visit_ExpressionEEqualE(self, node: ASTExpressionEEqualE):
         self.add_to_temporary_symbol_table(node.Expression)
@@ -188,55 +179,39 @@ class TempVarCreateVisitor(ASTVisitor):
     def post_visit_ExpressionELessEqualE(self, node: ASTExpressionELessEqualE):
         pass
 
-    def pre_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
-        pass
-
     def post_visit_ExpressionEMinusE(self, node: ASTExpressionEMinusE):
-        pass
-
-    def pre_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def post_visit_ExpressionEMinusEqualE(self, node: ASTExpressionEMinusEqualE):
-        pass
-
-    def pre_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def post_visit_ExpressionENotEqualE(self, node: ASTExpressionENotEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def pre_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         pass
 
     def post_visit_ExpressionEOORE(self, node: ASTExpressionEOORE):
         pass
-
-    def pre_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
-        pass
-    
+ 
     def post_visit_ExpressionEPlusE(self, node: ASTExpressionEPlusE):
         self.add_to_temporary_symbol_table(node.Expression)
         self.add_to_temporary_symbol_table(node.Expression2)
-
-    def pre_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
-        pass
 
     def post_visit_ExpressionEPlusEqualE(self, node: ASTExpressionEPlusEqualE):
         self.add_to_temporary_symbol_table(node.Expression)
         self.add_to_temporary_symbol_table(node.Expression2)
 
-    def pre_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
-        pass
-
     def post_visit_ExpressionETimesE(self, node: ASTExpressionETimesE):
-        pass
-
-    def pre_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def post_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        self.add_to_temporary_symbol_table(node.Expression2)
 
     def pre_visit_Index(self, node: ASTIndex):
         pass

@@ -23,6 +23,7 @@ class TypeChecking(ASTVisitor):
         self.arguments = []
         self.returnType = ""
         self.returnFound = False
+        self.isID = False
 
     def enter_scope(self):
         new_scope = self.UID.getID()
@@ -136,6 +137,8 @@ class TypeChecking(ASTVisitor):
             right_side = self.get_type(node.Expression2)
             if left_side == right_side:
                 return str(left_side)
+            elif left_side == 'bool' and (right_side == 'false' or right_side == 'true'):
+                return "bool"
             
         elif isinstance(node, ASTExpressionEGreaterE):
             left_side = self.get_type(node.Expression)
@@ -308,6 +311,7 @@ class TypeChecking(ASTVisitor):
             if tokType.type != 'ID' and tokType.type != 'char':
                 return(str(tokType.type).lower())
             else:
+                self.isID = True
                 for x in reversed(self.scope_stack):
                     for key, value in self.symbol_tables[x].items():
                         if key[0] == str(node.Terminal):
@@ -453,6 +457,7 @@ class TypeChecking(ASTVisitor):
     def post_visit_ExpresssionECEqualE(self, node: ASTExpressionECEqualE):
         left_side = self.get_type(node.Expression)
         right_side = self.get_type(node.Expression2)
+        node.type= left_side
         isValid = False
         if left_side == "null":
             if len(right_side) >2:
@@ -681,9 +686,15 @@ class TypeChecking(ASTVisitor):
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         messageType = self.get_type(node.Expression)
         node.type = str(messageType)
+        node.isID = self.isID
+        self.isID = False
         if isinstance(node.Expression, ASTExpressionEEqualE):
-            self.errors.append(f"Can not cout an assignment. maybe add '()'")
-        if messageType  != "int" and messageType !='char' and messageType != 'string':
+            self.errors.append(f"Can not cout an assignment. maybe add '()'. Around line {node.lineno}")        
+        elif isinstance(node.Expression, ASTExpressionECEqualE):
+            self.errors.append(f"Can not cout an '=='. maybe add '()'. Around line {node.lineno}")       
+        elif isinstance(node.Expression, ASTExpressionENotEqualE):
+            self.errors.append(f"Can not cout an '!='. maybe add '()'. Around line {node.lineno}")
+        if messageType  != "int" and messageType !='char' and messageType != 'string' and messageType != 'bool' and messageType != 'true' and messageType != 'false':
             self.errors.append(f"Error: Can not COUT {messageType}. Around line {node.lineno}")
 
     def post_visit_StatementIF(self, node: ASTStatementIF):

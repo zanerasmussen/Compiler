@@ -31,11 +31,11 @@ class VariableDeclarationVisitor(ASTVisitor):
             if node.ID == x[0]:
                 if node.Initializer.Initializer != None:
                     flag = self.get_temporary_variable_from_table(node.Initializer.Initializer.Expression)
-                    if node.finalType == 'int':
+                    if node.finalType == 'int' or node.finalType == 'bool':
                         self.add_line_asm(node, f"{label} ", "LDR", "R3,", f"{flag}")
                         self.add_line_asm(node, " ", "LDR", "R3,", "R3")
                         self.add_line_asm(node, " ", "STR", "R3,", f"{x[0]}")
-                    elif node.finalType == 'char' or node.finalType == 'bool':
+                    elif node.finalType == 'char' :
                         self.add_line_asm(node, f"{label} ", "LDR", "R3,", f"{flag}")
                         self.add_line_asm(node, " ", "LDB", "R3,", "R3")
                         self.add_line_asm(node, " ", "STR", "R3,", f"{x[0]}")

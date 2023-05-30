@@ -1,7 +1,7 @@
 from AbstractVisitor import ASTVisitor
 from AST import *
 
-class ExpressionParenVisitor(ASTVisitor):
+class ETimesEqualEVisitor(ASTVisitor):
     def __init__(self, dataSeg, TerminalIDS, counter, temporary_symbol_table, instructionLables):
         self.dataSeg = dataSeg
         self.TerminalIDS = TerminalIDS
@@ -24,10 +24,22 @@ class ExpressionParenVisitor(ASTVisitor):
         for x in self.temporary_symbol_table:
             if x[0] == node:
                 return x[1]
-    
-    def post_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
+
+    def post_visit_ExpressionETimesEqualE(self, node: ASTExpressionETimesEqualE):
+        label = self.get_instructionLables_label(node)
         flag = self.get_temporary_variable_from_table(node.Expression)
+        flag2 = self.get_temporary_variable_from_table(node.Expression2)
+
+        self.add_line_asm(node, f"{label} ", "LDR", "R1,", f"{flag}")
+        self.add_line_asm(node, " ", "LDR", "R1,", "R1")
+        self.add_line_asm(node, " ", "LDR", "R4,", f"{flag2}")
+        self.add_line_asm(node, " ", "LDR", "R4,", "R4")
+        self.add_line_asm(node, " ", "MUL", "R1,", "R4")
+
+        self.add_line_asm(node, " ", "LDR", "R7,", f"{flag}")
+        self.add_line_asm(node, " ", "STR", "R1,", "R7")
         for x in self.temporary_symbol_table:
             if node == x[0]:
-                self.add_line_asm(node, " ", "LDR", "R3,", f"{flag}")
-                self.add_line_asm(node, " ", "STR", "R3,", f"{x[1]}")
+                self.add_line_asm(node, " ", "STR", "R1,", f"{flag}")
+                self.add_line_asm(node, " ", "LDA", "R4,", f"{flag}")
+                self.add_line_asm(node, " ", "STR", "R4,", f"{x[1]}")

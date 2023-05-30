@@ -263,6 +263,7 @@ class ASTExpressionECEqualE(ASTBASENODE):
         self.CEQUAL = CEQUAL
         self.Expression2 = Expression2
         self.asm = []
+        self.type = ""
 
     def accept(self, visitor):
         visitor.pre_visit_ExpresssionECEqualE(self)
@@ -787,6 +788,7 @@ class ASTStatementCOUT(ASTBASENODE):
         self.Expression = Expression
         self.SEMICOLON = SEMICOLON
         self.type = ""
+        self.isID = False
         self.asm = []
 
     def accept(self, visitor):
