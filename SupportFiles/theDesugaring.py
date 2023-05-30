@@ -25,7 +25,9 @@ from DesugaringVisitors.PlusEVisitor import *
 from DesugaringVisitors.MinusEVisitor import *
 from DesugaringVisitors.NotEVisitor import *
 from DesugaringVisitors.COUTVisitor import *
-
+from DesugaringVisitors.CINVisitor import *
+from DesugaringVisitors.StatementExpressionVisitor import *
+from DesugaringVisitors.IFVisitor import *
 
 from DesugaringVisitors.TCODE import *
 
@@ -45,7 +47,7 @@ def desugar(parsed_AST, symbolTable):
     terminalVisitor = TerminalVisitor(tempVarCreate.dataSeg, tempVarCreate.TerminalIDS, tempVarCreate.temp_counter, tempVarCreate.temporary_symbol_table, tempVarCreate.instructionLables)
     parsed_AST.accept(terminalVisitor)
 
-    variableDeclarationVisit =VariableDeclarationVisitor(terminalVisitor.dataSeg, terminalVisitor.TerminalIDS, terminalVisitor.temp_counter, terminalVisitor.temporary_symbol_table, terminalVisitor.instructionLables)
+    variableDeclarationVisit =VariableDeclarationVisitor(terminalVisitor.dataSeg, terminalVisitor.TerminalIDS, terminalVisitor.temp_counter, terminalVisitor.temporary_symbol_table, terminalVisitor.instructionLables, tempVarCreate.statementLabelStack)
     parsed_AST.accept(variableDeclarationVisit)
 
     ExEqualEx2Visit = ExEqualEx2Visitor(variableDeclarationVisit.dataSeg, variableDeclarationVisit.TerminalIDS, variableDeclarationVisit.temp_counter, variableDeclarationVisit.temporary_symbol_table, variableDeclarationVisit.instructionLables)
@@ -111,8 +113,17 @@ def desugar(parsed_AST, symbolTable):
     NotEVisit = NotEVisitor (MinusEVisit.dataSeg, MinusEVisit.TerminalIDS, MinusEVisit.temp_counter, MinusEVisit.temporary_symbol_table, MinusEVisit.instructionLables)
     parsed_AST.accept(NotEVisit)
 
-    coutVisit = COUTVisitor(NotEVisit.dataSeg, NotEVisit.TerminalIDS, NotEVisit.temp_counter, NotEVisit.temporary_symbol_table, NotEVisit.instructionLables)
+    coutVisit = COUTVisitor(NotEVisit.dataSeg, NotEVisit.TerminalIDS, NotEVisit.temp_counter, NotEVisit.temporary_symbol_table, NotEVisit.instructionLables, variableDeclarationVisit.statementLabelStack)
     parsed_AST.accept(coutVisit)
+
+    cinVisit = CINVisitor(coutVisit.dataSeg, coutVisit.TerminalIDS, coutVisit.temp_counter, coutVisit.temporary_symbol_table, coutVisit.instructionLables, coutVisit.statementLabelStack)
+    parsed_AST.accept(cinVisit)
+
+    StatementExpressionVisit = StatementExpressionVisitor(cinVisit.dataSeg, cinVisit.TerminalIDS, cinVisit.temp_counter, cinVisit.temporary_symbol_table, cinVisit.instructionLables, cinVisit.statementLabelStack)
+    parsed_AST.accept(StatementExpressionVisit)
+
+    # IFVisit = IFVisitor(StatementExpressionVisit.dataSeg, StatementExpressionVisit.TerminalIDS, StatementExpressionVisit.temp_counter, StatementExpressionVisit.temporary_symbol_table, StatementExpressionVisit.instructionLables, StatementExpressionVisit.statementLabelStack)
+    # parsed_AST.accept(IFVisit)
 
     TCODEgenerate = TCODE()
     TCODEgenerate.dataSeg = dataSeg.dataSeg

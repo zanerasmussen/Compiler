@@ -777,7 +777,8 @@ class ASTStatementCIN(ASTBASENODE):
         self.Expression = Expression
         self.SEMICOLON = SEMICOLON
         self.type = ""
-        self.asm = []
+        self.asm_pre = []
+        self.asm_post = []
 
     def accept(self, visitor):
         visitor.pre_visit_StatementCIN(self)
@@ -794,7 +795,8 @@ class ASTStatementCOUT(ASTBASENODE):
         self.SEMICOLON = SEMICOLON
         self.type = ""
         self.isID = False
-        self.asm = []
+        self.asm_pre = []
+        self.asm_post = []
 
     def accept(self, visitor):
         visitor.pre_visit_StatementCOUT(self)
@@ -807,7 +809,8 @@ class ASTStatementExpression(ASTBASENODE):
         self.lineno = lineno
         self.Expression = Expression
         self.SEMICOLON = SEMICOLON
-        self.asm = []
+        self.asm_pre = []
+        self.asm_post = []
 
     def accept(self, visitor):
         visitor.pre_visit_StatementExpression(self)
@@ -823,7 +826,9 @@ class ASTStatementIF(ASTBASENODE):
         self.Expression = Expression
         self.RPAREN = RPAREN
         self.Statement = Statement
+        self.asm_pre = []
         self.asm = []
+        self.doneFlag = ""
 
     def accept(self, visitor):
         visitor.pre_visit_StatementIF(self)
@@ -844,6 +849,7 @@ class ASTStatementIFELSE(ASTBASENODE):
         self.ELSE = ELSE
         self.Statement2 = Statement2
         self.asm = []
+        self.doneFlag = ""
 
     def accept(self, visitor):
         visitor.pre_visit_StatementIFELSE(self)
@@ -873,6 +879,7 @@ class ASTStatementToVariableDeclaration(ASTBASENODE):
     def __init__(self, VariableDeclaration):
         self.VariableDeclaration = VariableDeclaration
         self.asm = []
+        self.asm_pre = []
 
     def accept(self, visitor):
         visitor.pre_visit_StatementToVariableDeclaration(self)

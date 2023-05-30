@@ -173,14 +173,26 @@ class TCODE(ASTVisitor):
     def post_visit_StatementBreak(self, node: ASTStatementBreak):
         self.TCODE.extend(node.asm)
 
+    def pre_visit_StatementCIN(self, node: ASTStatementCIN):
+        self.TCODE.extend(node.asm_pre)
+
     def post_visit_StatementCIN(self, node: ASTStatementCIN):
-        self.TCODE.extend(node.asm)
+        self.TCODE.extend(node.asm_post)
+
+    def pre_visit_StatementCOUT(self, node: ASTStatementCOUT):
+        self.TCODE.extend(node.asm_pre)
 
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
-        self.TCODE.extend(node.asm)
+        self.TCODE.extend(node.asm_post)
+
+    def pre_visit_StatementExpression(self, node: ASTStatementExpression):
+        self.TCODE.extend(node.asm_pre)
 
     def post_visit_StatementExpression(self, node: ASTStatementExpression):
-        self.TCODE.extend(node.asm)
+        self.TCODE.extend(node.asm_post)
+
+    def pre_visit_StatementIF(self, node: ASTStatementIF):
+        self.TCODE.extend(node.asm_pre)
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
         self.TCODE.extend(node.asm)
@@ -190,6 +202,9 @@ class TCODE(ASTVisitor):
 
     def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
         self.TCODE.extend(node.asm)
+
+    def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
+        self.TCODE.extend(node.asm_pre)
 
     def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
         self.TCODE.extend(node.asm)

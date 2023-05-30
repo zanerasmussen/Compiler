@@ -8,6 +8,7 @@ class TempVarCreateVisitor(ASTVisitor):
         self.temp_counter = counter
         self.temporary_symbol_table = temporary_symbol_table
         self.instructionLables = instructionLables
+        self.statementLabelStack = []
 
     def get_temp_variable(self):
         temp_var = f"@{self.temp_counter}"
@@ -138,25 +139,56 @@ class TempVarCreateVisitor(ASTVisitor):
         pass    
 
     def post_visit_StatementCIN(self, node: ASTStatementCIN):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        var = self.get_temp_variable()
+        var = "!"+var
+        self.instructionLables.append((node, f"{var}"))
+        self.statementLabelStack.append((node, var))
 
     def post_visit_StatementCOUT(self, node: ASTStatementCOUT):
         self.add_to_temporary_symbol_table(node.Expression)
+        var = self.get_temp_variable()
+        var = "!"+var
+        self.instructionLables.append((node, f"{var}"))
+        self.statementLabelStack.append((node, var))
 
     def post_visit_StatementExpression(self, node: ASTStatementExpression):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        var = self.get_temp_variable()
+        var = "!"+var
+        self.instructionLables.append((node, f"{var}"))
+        self.statementLabelStack.append((node, var))
 
     def post_visit_StatementIF(self, node: ASTStatementIF):
-        pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        var = self.get_temp_variable()
+        var = "!"+var
+        self.instructionLables.append((node, f"{var}"))
+        self.statementLabelStack.append((node, var))
+        flag = self.get_temp_variable()
+        flag = "#DONE" + var
+        node.doneFlag = flag
+        self.statementLabelStack.append((node, flag))
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
-       pass
+        self.add_to_temporary_symbol_table(node.Expression)
+        var = self.get_temp_variable()
+        var = "!"+var
+        self.instructionLables.append((node, f"{var}"))
+        self.statementLabelStack.append((node, var))
+        flag = self.get_temp_variable()
+        flag = "#DONE" + var
+        node.doneFlag = flag
+        self.statementLabelStack.append((node, var))
 
     def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
         pass
 
     def post_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
-        pass
+        var = self.get_temp_variable()
+        var = "!"+var
+        self.instructionLables.append((node, f"{var}"))
+        self.statementLabelStack.append((node, var))
 
     def post_visit_StatementReturn(self, node: ASTStatementReturn):
         pass
@@ -165,6 +197,9 @@ class TempVarCreateVisitor(ASTVisitor):
         pass
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
+        pass
+
+    def post_visit_VariableDeclaration(self, node: ASTVariableDeclaration): 
         pass
 
     def post_visit_Terminal(self, node: ASTTerminal):
