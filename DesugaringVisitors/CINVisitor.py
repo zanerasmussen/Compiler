@@ -62,7 +62,9 @@ class CINVisitor(ASTVisitor):
         for i in range(len(self.statementLabelStack) -1):
             if self.statementLabelStack[i][0] == node:
                 next = self.statementLabelStack.pop(i+1)
-                next = next[1]
+                next = next[1]                
+                if next == "":
+                    next = "###FINAL"
 
         if node.type == "int":
             trp = 2

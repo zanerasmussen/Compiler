@@ -26,8 +26,9 @@ class ExpressionParenVisitor(ASTVisitor):
                 return x[1]
     
     def post_visit_ExpressionPAREN(self, node: ASTExpressionPAREN):
+        label = self.get_instructionLables_label(node)
         flag = self.get_temporary_variable_from_table(node.Expression)
         for x in self.temporary_symbol_table:
             if node == x[0]:
-                self.add_line_asm(node, " ", "LDR", "R3,", f"{flag}")
+                self.add_line_asm(node, f"{label} ", "LDR", "R3,", f"{flag}")
                 self.add_line_asm(node, " ", "STR", "R3,", f"{x[1]}")

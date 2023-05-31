@@ -28,6 +28,8 @@ from DesugaringVisitors.COUTVisitor import *
 from DesugaringVisitors.CINVisitor import *
 from DesugaringVisitors.StatementExpressionVisitor import *
 from DesugaringVisitors.IFVisitor import *
+from DesugaringVisitors.IFELSEVisitor import *
+from DesugaringVisitors.whileStatementVisitor import *
 
 from DesugaringVisitors.TCODE import *
 
@@ -122,8 +124,14 @@ def desugar(parsed_AST, symbolTable):
     StatementExpressionVisit = StatementExpressionVisitor(cinVisit.dataSeg, cinVisit.TerminalIDS, cinVisit.temp_counter, cinVisit.temporary_symbol_table, cinVisit.instructionLables, cinVisit.statementLabelStack)
     parsed_AST.accept(StatementExpressionVisit)
 
-    # IFVisit = IFVisitor(StatementExpressionVisit.dataSeg, StatementExpressionVisit.TerminalIDS, StatementExpressionVisit.temp_counter, StatementExpressionVisit.temporary_symbol_table, StatementExpressionVisit.instructionLables, StatementExpressionVisit.statementLabelStack)
-    # parsed_AST.accept(IFVisit)
+    IFVisit = IFVisitor(StatementExpressionVisit.dataSeg, StatementExpressionVisit.TerminalIDS, StatementExpressionVisit.temp_counter, StatementExpressionVisit.temporary_symbol_table, StatementExpressionVisit.instructionLables, StatementExpressionVisit.statementLabelStack)
+    parsed_AST.accept(IFVisit)
+
+    IFELSEVisit = IFELSEVisitor(IFVisit.dataSeg, IFVisit.TerminalIDS, IFVisit.temp_counter, IFVisit.temporary_symbol_table, IFVisit.instructionLables, IFVisit.statementLabelStack)
+    parsed_AST.accept(IFELSEVisit)
+
+    WhileStatementVisit = WhileStatementVisitor(IFELSEVisit.dataSeg, IFELSEVisit.TerminalIDS, IFELSEVisit.temp_counter, IFELSEVisit.temporary_symbol_table, IFELSEVisit.instructionLables, IFELSEVisit.statementLabelStack)
+    parsed_AST.accept(WhileStatementVisit)
 
     TCODEgenerate = TCODE()
     TCODEgenerate.dataSeg = dataSeg.dataSeg

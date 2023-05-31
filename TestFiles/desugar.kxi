@@ -1,9 +1,11 @@
 void kxi2023 main() {
 
-if (true) cout << 1;
-
-
-
+  int i1 = 10;
+  while ((i1 >1)){
+    cout << i1;
+    cout <<'\n';
+    i1 -=1;
+  }
 }
 
 

@@ -1,7 +1,7 @@
 from AbstractVisitor import ASTVisitor
 from AST import *
 
-class IFVisitor(ASTVisitor):
+class IFELSEVisitor(ASTVisitor):
     def __init__(self, dataSeg, TerminalIDS, counter, temporary_symbol_table, instructionLables, statementLabelStack):
         self.dataSeg = dataSeg
         self.TerminalIDS = TerminalIDS
@@ -12,14 +12,14 @@ class IFVisitor(ASTVisitor):
 
         #visitor specific
 
-    def add_line_asm_pre(self, node, param1, param2, param3, param4):
-        node.asm_pre.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
+    def add_line_asm_after_exp(self, node, param1, param2, param3, param4):
+        node.asm_after_exp.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
 
     def add_line_asm(self, node, param1, param2, param3, param4):
         node.asm.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
 
-    def add_line_asm_mid(self, node, param1, param2, param3, param4):
-        node.asm_mid.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
+    def add_line_asm_after_statement_one(self, node, param1, param2, param3, param4):
+        node.asm_after_statement1.extend([f"{param1:<15} {param2:<15} {param3:<15} {param4:<15}"])
 
     def get_instructionLables_label(self, node):
         for x in self.instructionLables:
@@ -55,7 +55,7 @@ class IFVisitor(ASTVisitor):
             self.add_temp_variable_to_data_segment(variable)       
 
 
-    def pre_visit_StatementIF(self, node: ASTStatementIF):
+    def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
         label = self.get_instructionLables_label(node)
         flag = self.get_temporary_variable_from_table(node.Expression)
 
@@ -71,6 +71,12 @@ class IFVisitor(ASTVisitor):
             if self.statementLabelStack[i][0] == node.Statement:
                 sta = self.statementLabelStack.pop(i)
                 sta = sta[1]
+        else_sta = ""
+        for i in range(len(self.statementLabelStack)-1):
+            if self.statementLabelStack[i][0] == str(node)+"!!":
+                else_sta = self.statementLabelStack.pop(i)
+                else_sta = else_sta[1]
+                break
         done = ""
         for i in range(len(self.statementLabelStack)-1):
             if self.statementLabelStack[i][0] == str(node)+"!":
@@ -78,10 +84,11 @@ class IFVisitor(ASTVisitor):
                 done = done[1]
                 break
 
-        self.add_line_asm_mid(node, f"{label} ", "LDR", "R13,", f"{flag}")
-        self.add_line_asm_mid(node, " ", "LDR", "R13,", "R13")
-        self.add_line_asm_mid(node, " ", "CMPI", "R13,", "#0")
-        self.add_line_asm_mid(node, " ", "BRZ", "R13,", f"{done}")
+        self.add_line_asm_after_exp(node, f"{label} ", "LDR", "R13,", f"{flag}")
+        self.add_line_asm_after_exp(node, " ", "LDR", "R13,", "R13")
+        self.add_line_asm_after_exp(node, " ", "CMPI", "R13,", "#0")
+        self.add_line_asm_after_exp(node, " ", "BRZ", "R13,", f"{else_sta}")
+        self.add_line_asm_after_statement_one(node, f"{else_sta}", "ADI", "R0,", "#0")
         self.add_line_asm(node, f"{done}", "ADI", "R0,", "#0")
 
 

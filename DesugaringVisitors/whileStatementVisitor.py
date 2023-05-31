@@ -1,7 +1,7 @@
 from AbstractVisitor import ASTVisitor
 from AST import *
 
-class IFVisitor(ASTVisitor):
+class WhileStatementVisitor(ASTVisitor):
     def __init__(self, dataSeg, TerminalIDS, counter, temporary_symbol_table, instructionLables, statementLabelStack):
         self.dataSeg = dataSeg
         self.TerminalIDS = TerminalIDS
@@ -52,10 +52,9 @@ class IFVisitor(ASTVisitor):
         if alreadyAdded == False:
             variable = self.get_temp_variable()
             self.temporary_symbol_table.append((node, variable))
-            self.add_temp_variable_to_data_segment(variable)       
+            self.add_temp_variable_to_data_segment(variable)   
 
-
-    def pre_visit_StatementIF(self, node: ASTStatementIF):
+    def pre_visit_StatementWhile(self, node: ASTStatementWhile):
         label = self.get_instructionLables_label(node)
         flag = self.get_temporary_variable_from_table(node.Expression)
 
@@ -77,13 +76,16 @@ class IFVisitor(ASTVisitor):
                 done = self.statementLabelStack.pop(i)
                 done = done[1]
                 break
-
+        start = ""
+        for i in range(len(self.statementLabelStack)-1):
+            if self.statementLabelStack[i][0] == str(node)+"!!":
+                start = self.statementLabelStack.pop(i)
+                start = start[1]
+                break
+        self.add_line_asm_pre(node, f"{start} ", "ADI", "R0,", "#0")
         self.add_line_asm_mid(node, f"{label} ", "LDR", "R13,", f"{flag}")
         self.add_line_asm_mid(node, " ", "LDR", "R13,", "R13")
         self.add_line_asm_mid(node, " ", "CMPI", "R13,", "#0")
         self.add_line_asm_mid(node, " ", "BRZ", "R13,", f"{done}")
         self.add_line_asm(node, f"{done}", "ADI", "R0,", "#0")
-
-
-
 

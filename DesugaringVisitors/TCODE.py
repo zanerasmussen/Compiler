@@ -35,7 +35,7 @@ class TCODE(ASTVisitor):
         self.TCODE.extend(node.asm)
         
     def post_visit_CompilationUnit(self, node: ASTCompilationUnit):        
-        param1 = " "
+        param1 = "###FINAL"
         param2 = "TRP"
         param3 = "#0"
         param4 = " "
@@ -194,13 +194,22 @@ class TCODE(ASTVisitor):
     def pre_visit_StatementIF(self, node: ASTStatementIF):
         self.TCODE.extend(node.asm_pre)
 
+    def mid_visit_StatementIF(self, node: ASTStatementIF):
+        self.TCODE.extend(node.asm_mid)
+
     def post_visit_StatementIF(self, node: ASTStatementIF):
         self.TCODE.extend(node.asm)
+
+    def after_exp_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
+        self.TCODE.extend(node.asm_after_exp)
+
+    def after_statement_one_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
+        self.TCODE.extend(node.asm_after_statement1)
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
         self.TCODE.extend(node.asm)
 
-    def post_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
+    def pre_visit_StatementMultipleStatement(self, node: ASTStatementMultipleStatement):
         self.TCODE.extend(node.asm)
 
     def pre_visit_StatementToVariableDeclaration(self, node: ASTStatementToVariableDeclaration):
@@ -214,6 +223,12 @@ class TCODE(ASTVisitor):
 
     def post_visit_StatementSwitch(self, node: ASTStatementSwitch):
         self.TCODE.extend(node.asm)
+
+    def pre_visit_StatementWhile(self, node: ASTStatementWhile):
+        self.TCODE.extend(node.asm_pre)
+
+    def mid_visit_StatementWhile(self, node: ASTStatementWhile):
+        self.TCODE.extend(node.asm_mid)
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):
         self.TCODE.extend(node.asm)

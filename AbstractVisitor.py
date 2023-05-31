@@ -336,10 +336,19 @@ class ASTVisitor(metaclass=ABCMeta):
     def pre_visit_StatementIF(self, node: ASTStatementIF):
         pass
 
+    def mid_visit_StatementIF(self, node: ASTStatementIF):
+        pass
+
     def post_visit_StatementIF(self, node: ASTStatementIF):
         pass
 
     def pre_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
+        pass
+
+    def after_exp_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
+        pass
+
+    def after_statement_one_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
         pass
 
     def post_visit_StatementIFELSE(self, node: ASTStatementIFELSE):
@@ -370,6 +379,9 @@ class ASTVisitor(metaclass=ABCMeta):
         pass
 
     def pre_visit_StatementWhile(self, node: ASTStatementWhile):
+        pass
+
+    def mid_visit_StatementWhile(self, node: ASTStatementWhile):
         pass
 
     def post_visit_StatementWhile(self, node: ASTStatementWhile):

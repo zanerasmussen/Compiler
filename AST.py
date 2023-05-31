@@ -827,6 +827,7 @@ class ASTStatementIF(ASTBASENODE):
         self.RPAREN = RPAREN
         self.Statement = Statement
         self.asm_pre = []
+        self.asm_mid = []
         self.asm = []
         self.doneFlag = ""
 
@@ -834,6 +835,7 @@ class ASTStatementIF(ASTBASENODE):
         visitor.pre_visit_StatementIF(self)
         if self.Expression != None:
             self.Expression.accept(visitor)
+        visitor.mid_visit_StatementIF(self)
         if self.Statement != None:
             self.Statement.accept(visitor)
         visitor.post_visit_StatementIF(self)
@@ -849,14 +851,19 @@ class ASTStatementIFELSE(ASTBASENODE):
         self.ELSE = ELSE
         self.Statement2 = Statement2
         self.asm = []
+        self.asm_after_exp = []
+        self.asm_after_statement1 = []
         self.doneFlag = ""
+        self.exp2Flag = ""
 
     def accept(self, visitor):
         visitor.pre_visit_StatementIFELSE(self)
         if self.Expression != None:
             self.Expression.accept(visitor)
+        visitor.after_exp_visit_StatementIFELSE(self)
         if self.Statement != None:
             self.Statement.accept(visitor)
+        visitor.after_statement_one_visit_StatementIFELSE(self)
         if self.Statement2 != None:
             self.Statement2.accept(visitor)
         visitor.post_visit_StatementIFELSE(self)
@@ -927,12 +934,17 @@ class ASTStatementWhile(ASTBASENODE):
         self.Expression = Expression
         self.RPAREN = RPAREN
         self.Statement = Statement
+        self.asm_pre = []
         self.asm = []
+        self.asm_mid = []
+        self.doneFlag = ""
+        self.startFalg = ""
 
     def accept(self, visitor):
         visitor.pre_visit_StatementWhile(self)
         if self.Expression != None:
             self.Expression.accept(visitor)
+        visitor.mid_visit_StatementWhile(self)
         if self.Statement != None:
             self.Statement.accept(visitor)
         visitor.post_visit_StatementWhile(self)
